@@ -1,0 +1,563 @@
+------------------------------------------------------------
+-- Hammerspoon VDI Tools
+--
+-- Ctrl + Option + Cmd + V
+--     Mac clipboard -> keyboard typing -> VDI
+--
+-- Ctrl + Option + Cmd + 4
+--     Screenshot selection -> Apple Vision OCR -> clipboard
+--
+-- Ctrl + Option + Cmd + R
+--     Reload Hammerspoon config
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+-- SETTINGS
+------------------------------------------------------------
+
+local MODIFIERS = {"ctrl", "alt", "cmd"}
+
+-- Delay between typed characters.
+-- Increase to 0.015-0.030 if VDI loses characters.
+local TYPING_DELAY = 0.008
+
+local OCR_BINARY =
+    os.getenv("HOME") .. "/.hammerspoon/scripts/ocr"
+
+local OCR_IMAGE =
+    "/tmp/hammerspoon_ocr.png"
+
+
+------------------------------------------------------------
+-- PART 1
+-- MAC CLIPBOARD -> KEYBOARD -> VDI
+------------------------------------------------------------
+
+local typingTimer = nil
+
+
+local function utf8Chars(str)
+    local chars = {}
+
+    for char in str:gmatch("[\1-\127\194-\244][\128-\191]*") do
+        table.insert(chars, char)
+    end
+
+    return chars
+end
+
+
+local function stopTyping()
+
+    if typingTimer then
+        typingTimer:stop()
+        typingTimer = nil
+    end
+
+end
+
+
+local function typeSlowly(text)
+
+    -- Stop previous typing job if one is still running
+    stopTyping()
+
+    -- Normalize line endings
+    text = text:gsub("\r\n", "\n")
+    text = text:gsub("\r", "\n")
+
+    local chars = utf8Chars(text)
+    local index = 1
+
+
+    typingTimer = hs.timer.doEvery(TYPING_DELAY, function()
+
+        if index > #chars then
+
+            stopTyping()
+
+            hs.alert.show("Typing finished ✓", 0.7)
+
+            return
+        end
+
+
+        local char = chars[index]
+
+
+        ----------------------------------------------------
+        -- Special characters
+        ----------------------------------------------------
+
+        if char == "\n" then
+
+            hs.eventtap.keyStroke(
+                {},
+                "return",
+                0
+            )
+
+        elseif char == "\t" then
+
+            hs.eventtap.keyStroke(
+                {},
+                "tab",
+                0
+            )
+
+        else
+
+            hs.eventtap.keyStrokes(char)
+
+        end
+
+
+        index = index + 1
+
+    end)
+
+end
+
+
+------------------------------------------------------------
+-- HOTKEY:
+-- Ctrl + Option + Cmd + V
+------------------------------------------------------------
+
+hs.hotkey.bind(
+    MODIFIERS,
+    "V",
+
+    function()
+
+        local text = hs.pasteboard.getContents()
+
+
+        if not text or text == "" then
+
+            hs.alert.show(
+                "Clipboard is empty"
+            )
+
+            return
+        end
+
+
+        hs.alert.show(
+            "Typing clipboard…",
+            0.5
+        )
+
+
+        typeSlowly(text)
+
+    end
+)
+
+
+------------------------------------------------------------
+-- PART 2
+-- SCREENSHOT -> APPLE VISION OCR -> CLIPBOARD
+------------------------------------------------------------
+
+
+local function fileExists(path)
+
+    local file = io.open(path, "r")
+
+    if file then
+
+        file:close()
+
+        return true
+    end
+
+    return false
+
+end
+
+
+local function screenshotToOCR()
+
+
+    --------------------------------------------------------
+    -- Check OCR binary first
+    --------------------------------------------------------
+
+    if not fileExists(OCR_BINARY) then
+
+        hs.alert.show(
+            "OCR binary not found"
+        )
+
+        print(
+            "OCR binary not found:"
+        )
+
+        print(
+            OCR_BINARY
+        )
+
+        return
+    end
+
+
+    --------------------------------------------------------
+    -- Remove previous temporary screenshot
+    --------------------------------------------------------
+
+    os.remove(OCR_IMAGE)
+
+
+    hs.alert.show(
+        "Выдели область для OCR",
+        0.8
+    )
+
+
+    --------------------------------------------------------
+    -- STEP 1
+    -- macOS interactive screenshot
+    --------------------------------------------------------
+
+    local screenshotTask
+
+
+    screenshotTask = hs.task.new(
+
+        "/usr/sbin/screencapture",
+
+
+        ----------------------------------------------------
+        -- Screenshot callback
+        ----------------------------------------------------
+
+        function(exitCode, stdOut, stdErr)
+
+
+            ------------------------------------------------
+            -- Screenshot cancelled / failed
+            ------------------------------------------------
+
+            if exitCode ~= 0 then
+
+                print(
+                    "Screenshot cancelled or failed"
+                )
+
+                if stdErr and stdErr ~= "" then
+                    print(stdErr)
+                end
+
+                return
+            end
+
+
+            ------------------------------------------------
+            -- Make sure screenshot exists
+            ------------------------------------------------
+
+            if not fileExists(OCR_IMAGE) then
+
+                hs.alert.show(
+                    "Screenshot not created"
+                )
+
+                return
+            end
+
+
+            ------------------------------------------------
+            -- STEP 2
+            -- Run Apple Vision OCR binary
+            ------------------------------------------------
+
+            hs.alert.show(
+                "OCR…",
+                0.5
+            )
+
+
+            local ocrTask
+
+
+            ocrTask = hs.task.new(
+
+                OCR_BINARY,
+
+
+                ------------------------------------------------
+                -- OCR callback
+                ------------------------------------------------
+
+                function(
+                    ocrExitCode,
+                    text,
+                    errorText
+                )
+
+
+                    --------------------------------------------
+                    -- OCR failed
+                    --------------------------------------------
+
+                    if ocrExitCode ~= 0 then
+
+                        hs.alert.show(
+                            "OCR error"
+                        )
+
+                        print(
+                            "OCR ERROR"
+                        )
+
+                        print(
+                            "Exit code:",
+                            ocrExitCode
+                        )
+
+
+                        if errorText and errorText ~= "" then
+
+                            print(errorText)
+
+                        end
+
+
+                        os.remove(
+                            OCR_IMAGE
+                        )
+
+                        return
+                    end
+
+
+                    --------------------------------------------
+                    -- No text
+                    --------------------------------------------
+
+                    if not text or text == "" then
+
+                        hs.alert.show(
+                            "Текст не найден"
+                        )
+
+                        os.remove(
+                            OCR_IMAGE
+                        )
+
+                        return
+                    end
+
+
+                    --------------------------------------------
+                    -- Swift print() adds final newline.
+                    -- Remove only the final one.
+                    --------------------------------------------
+
+                    text = text:gsub(
+                        "\n$",
+                        ""
+                    )
+
+
+                    --------------------------------------------
+                    -- Put OCR result into LOCAL Mac clipboard
+                    --------------------------------------------
+
+                    hs.pasteboard.setContents(
+                        text
+                    )
+
+
+                    --------------------------------------------
+                    -- Debug output in Hammerspoon Console
+                    --------------------------------------------
+
+                    print(
+                        "========== OCR RESULT =========="
+                    )
+
+                    print(text)
+
+                    print(
+                        "================================"
+                    )
+
+
+                    --------------------------------------------
+                    -- Delete temporary screenshot
+                    --------------------------------------------
+
+                    os.remove(
+                        OCR_IMAGE
+                    )
+
+
+                    --------------------------------------------
+                    -- Done
+                    --------------------------------------------
+
+                    hs.alert.show(
+                        "OCR → Clipboard ✓",
+                        1.0
+                    )
+
+                end,
+
+
+                ------------------------------------------------
+                -- Arguments for OCR binary
+                ------------------------------------------------
+
+                {
+                    OCR_IMAGE
+                }
+
+            )
+
+
+            ------------------------------------------------
+            -- Start OCR
+            ------------------------------------------------
+
+            if not ocrTask then
+
+                hs.alert.show(
+                    "Failed to create OCR task"
+                )
+
+                return
+            end
+
+
+            local started = ocrTask:start()
+
+
+            if not started then
+
+                hs.alert.show(
+                    "Failed to start OCR"
+                )
+
+            end
+
+        end,
+
+
+        ----------------------------------------------------
+        -- Arguments for /usr/sbin/screencapture
+        ----------------------------------------------------
+
+        {
+            "-i",       -- interactive region selection
+            "-x",       -- no screenshot sound
+            OCR_IMAGE
+        }
+
+    )
+
+
+    --------------------------------------------------------
+    -- Start screenshot task
+    --------------------------------------------------------
+
+    if not screenshotTask then
+
+        hs.alert.show(
+            "Failed to create screenshot task"
+        )
+
+        return
+    end
+
+
+    local started = screenshotTask:start()
+
+
+    if not started then
+
+        hs.alert.show(
+            "Failed to start screenshot"
+        )
+
+    end
+
+end
+
+
+------------------------------------------------------------
+-- HOTKEY:
+-- Ctrl + Option + Cmd + 4
+------------------------------------------------------------
+
+hs.hotkey.bind(
+    MODIFIERS,
+    "4",
+    screenshotToOCR
+)
+
+
+------------------------------------------------------------
+-- PART 3
+-- RELOAD HAMMERSPOON
+--
+-- Ctrl + Option + Cmd + R
+------------------------------------------------------------
+
+hs.hotkey.bind(
+    MODIFIERS,
+    "R",
+
+    function()
+
+        hs.alert.show(
+            "Reloading Hammerspoon…",
+            0.5
+        )
+
+        hs.timer.doAfter(
+            0.2,
+
+            function()
+                hs.reload()
+            end
+        )
+
+    end
+)
+
+
+------------------------------------------------------------
+-- CONFIG LOADED
+------------------------------------------------------------
+
+hs.alert.show(
+    "VDI Tools loaded ✓",
+    1.0
+)
+
+print(
+    "================================"
+)
+
+print(
+    "VDI Tools loaded"
+)
+
+print(
+    "Ctrl+Option+Cmd+V -> Clipboard -> VDI"
+)
+
+print(
+    "Ctrl+Option+Cmd+4 -> Screenshot -> OCR"
+)
+
+print(
+    "Ctrl+Option+Cmd+R -> Reload config"
+)
+
+print(
+    "================================"
+)
