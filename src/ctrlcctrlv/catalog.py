@@ -59,3 +59,25 @@ ENGINE_VERSION = "b11552"
 ENGINE = Artifact("llama-b11552-bin-macos-arm64.tar.gz",
     "https://github.com/ggml-org/llama.cpp/releases/download/b11552/llama-b11552-bin-macos-arm64.tar.gz",
     "f4b33fe40d098033fb1a19a8a4a84383c4ca84c37b6a60d9f9a253f349b48c07", 12086252)
+
+WINDOWS_ENGINE = Artifact("llama-b11552-bin-win-cuda-12.4-x64.zip",
+    "https://github.com/ggml-org/llama.cpp/releases/download/b11552/llama-b11552-bin-win-cuda-12.4-x64.zip",
+    "e48331718aa82aa34571cfad8510e6d6b9a8e4dad11a73e065f94f212e280256", 265234947)
+WINDOWS_CUDART = Artifact("cudart-llama-bin-win-cuda-12.4-x64.zip",
+    "https://github.com/ggml-org/llama.cpp/releases/download/b11552/cudart-llama-bin-win-cuda-12.4-x64.zip",
+    "8c79a9b226de4b3cacfd1f83d24f962d0773be79f1e7b75c6af4ded7e32ae1d6", 391443627)
+WINDOWS_CPU_ENGINE = Artifact("llama-b11552-bin-win-cpu-x64.zip",
+    "https://github.com/ggml-org/llama.cpp/releases/download/b11552/llama-b11552-bin-win-cpu-x64.zip",
+    "c00741179811ff903b515eae28bdeef1f47af6e81c49920c4e68b62954e056d6", 19528406)
+
+
+def engine_artifacts(system, machine, acceleration="gpu"):
+    if acceleration not in {"gpu", "cpu"}:
+        raise ValueError("Неизвестный режим ускорения")
+    if system == "Darwin" and machine.lower() in {"arm64", "aarch64"}:
+        return (ENGINE,)
+    if system == "Windows" and machine.lower() in {"amd64", "x86_64"}:
+        if acceleration == "cpu":
+            return (WINDOWS_CPU_ENGINE,)
+        return WINDOWS_ENGINE, WINDOWS_CUDART
+    raise ValueError("Локальный движок поддерживает macOS ARM64 и Windows x64")

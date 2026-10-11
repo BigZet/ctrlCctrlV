@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ctrlcctrlv"
 version = "0.1.0"
-description = "Local and OpenRouter screen OCR and controlled keyboard transfer for macOS"
+description = "Local and OpenRouter screen OCR and controlled keyboard transfer for macOS and Windows"
 requires-python = ">=3.11"
 dependencies = [
   "PySide6-Essentials>=6.8,<7",
@@ -26,7 +26,7 @@ ctrlcctrlv = "ctrlcctrlv.app:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-ctrlcctrlv = ["assets/*.png", "assets/*.icns"]
+ctrlcctrlv = ["assets/*.png", "assets/*.icns", "assets/*.ico"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

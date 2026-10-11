@@ -14,15 +14,16 @@ def data_directory() -> Path:
 @dataclass
 class Settings:
     provider: str = "local"
+    acceleration: str = "gpu"
     local_model: str = "lightonocr-3-0.8b"
     remote_model: str = "qwen/qwen3-vl-8b-instruct"
     remote_mode: str = "json"
     show_preview: bool = True
     review_local_model: str = "qwen3-vl-4b"
     review_remote_model: str = "qwen/qwen3-vl-8b-instruct"
-    capture_hotkey: str = "ctrl+alt+cmd+4"
-    typing_hotkey: str = "ctrl+alt+cmd+v"
-    cancel_hotkey: str = "ctrl+alt+cmd+esc"
+    capture_hotkey: str = "ctrl+alt+4" if sys.platform == "win32" else "ctrl+alt+cmd+4"
+    typing_hotkey: str = "ctrl+alt+v" if sys.platform == "win32" else "ctrl+alt+cmd+v"
+    cancel_hotkey: str = "ctrl+alt+esc" if sys.platform == "win32" else "ctrl+alt+cmd+esc"
     character_delay: float = 0.008
     newline_delay: float = 0.060
     autoindent: bool = False
@@ -51,7 +52,7 @@ class Settings:
         for name in ("show_preview", "autoindent"):
             if type(getattr(self, name)) is not bool:
                 raise ValueError("Некорректная настройка: " + name)
-        for name in ("provider", "local_model", "remote_model", "remote_mode", "review_local_model",
+        for name in ("provider", "acceleration", "local_model", "remote_model", "remote_mode", "review_local_model",
                      "review_remote_model", "capture_hotkey", "typing_hotkey", "cancel_hotkey"):
             if not isinstance(getattr(self, name), str):
                 raise ValueError("Некорректная настройка: " + name)
@@ -76,6 +77,8 @@ class Settings:
             raise ValueError("Горячие клавиши должны различаться")
         if self.provider not in {"local", "openrouter"}:
             raise ValueError("Неизвестный OCR-провайдер")
+        if self.acceleration not in {"gpu", "cpu"}:
+            raise ValueError("Выберите GPU или CPU для локальной модели")
         if self.remote_mode not in {"json", "transcription"}:
             raise ValueError("Неизвестный протокол модели")
         if not 0.001 <= self.character_delay <= 0.2 or not 0 <= self.newline_delay <= 2:

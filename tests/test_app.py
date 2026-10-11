@@ -11,6 +11,35 @@ from ctrlcctrlv.core import Operation
 from ctrlcctrlv.settings import Settings
 
 
+@pytest.mark.parametrize("flag", ["--smoke", "--smoke-model"])
+def test_diagnostic_does_not_report_success_for_an_existing_instance(tmp_path, monkeypatch, flag):
+    from types import SimpleNamespace
+    import ctrlcctrlv.app as module
+    fake_app = SimpleNamespace(setApplicationName=lambda *a: None, setOrganizationName=lambda *a: None,
+                               setQuitOnLastWindowClosed=lambda *a: None)
+    monkeypatch.setattr(module, "QApplication", lambda *a: fake_app)
+    monkeypatch.setattr(module, "QLockFile", lambda *a: SimpleNamespace(tryLock=lambda *a: False))
+    monkeypatch.setattr(module, "Controller", lambda *a, **k: pytest.fail("Existing instance must not be tested"))
+    arguments = ["ctrlcctrlv", flag]
+    if flag == "--smoke-model":
+        arguments.append("lightonocr-3-0.8b")
+    monkeypatch.setattr(module.sys, "argv", arguments + ["--data-dir", str(tmp_path)])
+    assert module.main() == 1
+    assert not (tmp_path / "activate.request").exists()
+
+
+def test_russian_diagnostic_cannot_interrupt_cleanup_on_a_western_console(monkeypatch):
+    import io
+    import ctrlcctrlv.app as module
+    buffer = io.BytesIO()
+    output = io.TextIOWrapper(buffer, encoding="cp1252")
+    with monkeypatch.context() as patch:
+        patch.setattr(module.sys, "stdout", output)
+        module.diagnostic_print("Модель готова к OCR")
+        assert buffer.getvalue()
+    output.close()
+
+
 @pytest.fixture(scope="module")
 def app():
     return QApplication.instance() or QApplication([])
@@ -289,7 +318,8 @@ def test_engine_crash_immediately_offers_preparation_without_native_adapter(app,
     c = Controller(app, tmp_path, native=False)
     c.runtime.installed = lambda model: True
     c.runtime.engine_directory.mkdir(parents=True)
-    (c.runtime.engine_directory / "llama-server").touch()
+    import sys
+    (c.runtime.engine_directory / ("llama-server.exe" if sys.platform == "win32" else "llama-server")).touch()
     c.runtime.ready = True
     c.runtime.model_id = c.window.local_model.currentData()
     c.runtime.process = SimpleNamespace(poll=lambda: 1)
@@ -301,6 +331,44 @@ def test_engine_crash_immediately_offers_preparation_without_native_adapter(app,
         assert "подготовьте" in c.window.local_info.text()
     finally:
         c.runtime.process = None
+        dispose(c, app)
+
+
+def test_windowed_build_diagnostic_output_does_not_require_a_console(monkeypatch):
+    import sys
+    from ctrlcctrlv.app import diagnostic_print
+    monkeypatch.setattr(sys, "stdout", None)
+    diagnostic_print("synthetic smoke result")
+
+
+def test_deleting_model_releases_review_mapping_before_removing_files(app, tmp_path):
+    c = Controller(app, tmp_path, native=False)
+    identifier = c.window.local_model.currentData()
+    c.review_runtime.model_id = identifier
+    calls = []
+    c.review_runtime.stop = lambda: calls.append("review stopped")
+    c.runtime.delete = lambda model: calls.append(("delete", model))
+    try:
+        c.delete_model()
+        wait(app, lambda: c.model_cancel is None)
+        assert calls == ["review stopped", ("delete", identifier)]
+    finally:
+        dispose(c, app)
+
+
+def test_idle_unload_also_releases_model_only_held_by_reviewer(app, tmp_path):
+    import time
+    c = Controller(app, tmp_path, native=False)
+    c.review_runtime.ready = True
+    c.last_activity = time.monotonic() - 121 * 60
+    calls = []
+    c.runtime.stop = lambda: calls.append("ocr")
+    c.review_runtime.stop = lambda: calls.append("review")
+    try:
+        c.check_idle()
+        wait(app, lambda: c.model_cancel is None)
+        assert calls == ["ocr", "review"]
+    finally:
         dispose(c, app)
 
 

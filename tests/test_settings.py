@@ -11,7 +11,7 @@ def test_settings_roundtrip_without_key(tmp_path):
 
 
 def test_duplicate_hotkeys_rejected():
-    settings = Settings(typing_hotkey="cmd+alt+ctrl+4")
+    settings = Settings(typing_hotkey=Settings().capture_hotkey)
     with pytest.raises(ValueError, match="различаться"):
         settings.validate()
 
@@ -26,7 +26,8 @@ def test_older_settings_enable_preview_by_default(tmp_path):
     assert Settings.load(tmp_path).show_preview is True
 
 
-@pytest.mark.parametrize('content', ['[]', 'null', 'true', '123', '"text"', '[' * 3000 + '0' + ']' * 3000, ' ' * 65537])
+@pytest.mark.parametrize('content', ['[]', 'null', 'true', '123', '"text"', '[' * 3000 + '0' + ']' * 3000, ' ' * 65537],
+                         ids=['array', 'null', 'boolean', 'number', 'string', 'deep', 'oversized'])
 def test_non_object_deep_or_oversized_settings_recover_without_deleting_file(tmp_path, content):
     path = tmp_path / 'settings.json'
     path.write_text(content)

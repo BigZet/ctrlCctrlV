@@ -127,3 +127,86 @@ def test_preview_fits_and_restores_full_source_image_on_standard_and_retina_scre
         window.syntax_timer.stop()
         window.close()
         window.deleteLater()
+
+
+def test_pending_settings_reset_only_after_save_and_busy_fields_cannot_change(app):
+    window = SettingsWindow(Settings())
+    try:
+        assert window.save_hint.text() == 'Нет изменений'
+        initial = window.delay.value()
+        window.delay.setValue(initial + 1)
+        assert window.save_hint.text() == 'Есть изменения'
+        window.delay.setValue(initial)
+        assert window.save_hint.text() == 'Нет изменений'
+        window.key.setText('synthetic-key')
+        window.show_key.setChecked(True)
+        window.key.clear()
+        assert not window.show_key.isChecked()
+        assert window.key.echoMode() == window.key.EchoMode.Password
+        window.cancel_hotkey.setText('ctrl+shift+esc')
+        assert 'ctrl+shift+esc' in window.typing_hint.text()
+        window.mark_saved()
+        assert window.save_hint.text() == 'Нет изменений'
+        window.set_busy(True)
+        assert not window.delay.isEnabled()
+        assert not window.capture_hotkey.isEnabled()
+        assert not window.provider.isEnabled()
+        window.set_busy(False)
+        assert window.delay.isEnabled()
+    finally:
+        window.close()
+        window.deleteLater()
+
+
+def test_editor_view_controls_preserve_literal_text_and_track_explicit_copy(app):
+    from PySide6.QtGui import QTextOption
+    window = Preview()
+    image = QImage(200, 100, QImage.Format.Format_RGB32)
+    image.fill(0xffffffff)
+    original = 'def greet():\n\tprint("Ж")\n\n'
+    try:
+        window.display(image, original, 1, 'synthetic')
+        window.whitespace.setChecked(True)
+        window.wrap_text.setChecked(True)
+        window.font_size.setCurrentIndex(4)
+        app.processEvents()
+        assert window.text.toPlainText() == original
+        assert window.text.document().defaultTextOption().flags() & QTextOption.Flag.ShowTabsAndSpaces
+        assert window.text.lineWrapMode() == window.text.LineWrapMode.WidgetWidth
+        assert window.source_image == image
+        window.text.moveCursor(window.text.textCursor().MoveOperation.End)
+        window.text.insertPlainText('# manual')
+        assert window.copy_state.text() == 'Правки ещё не скопированы'
+        assert window.status.text() == 'Текст изменён · нажмите «Копировать текст»'
+        published = []
+        window.copy_requested.connect(published.append)
+        window.copy_shortcut.activated.emit()
+        assert published == [original + '# manual']
+        window.mark_copied(published[0])
+        assert window.copy_state.text().startswith('Совпадает с последней копией')
+        window.text.undo()
+        assert window.text.toPlainText() == original
+        assert window.copy_state.text() == 'Правки ещё не скопированы'
+    finally:
+        window.syntax_timer.stop()
+        window.close()
+        window.deleteLater()
+
+
+def test_existing_windows_follow_system_theme_changes(app):
+    from PySide6.QtGui import QColor, QPalette
+    original = QPalette(app.palette())
+    window = SettingsWindow(Settings())
+    try:
+        window.show()
+        for dark in (True, False):
+            palette = QPalette(original)
+            palette.setColor(QPalette.ColorRole.Window, QColor('#10151e' if dark else '#f3f5f9'))
+            app.setPalette(palette)
+            app.processEvents()
+            assert ('#10151e' if dark else '#f3f5f9') in window.styleSheet()
+            assert window.palette().color(QPalette.ColorRole.Text).lightness() > 128 if dark else window.palette().color(QPalette.ColorRole.Text).lightness() < 128
+    finally:
+        window.close()
+        window.deleteLater()
+        app.setPalette(original)

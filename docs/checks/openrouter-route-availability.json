@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "checked_date": "2026-10-11",
+  "source": "https://openrouter.ai/api/v1/models/qwen/qwen3-vl-8b-instruct/endpoints",
+  "model": "qwen/qwen3-vl-8b-instruct",
+  "listed_endpoint_count": 1,
+  "endpoints": [
+    {
+      "provider_name": "Parasail",
+      "tag": "parasail/bf16",
+      "input_usd_per_million": 0.25,
+      "output_usd_per_million": 0.75,
+      "latency_last_30m": null,
+      "throughput_last_30m": null,
+      "supports_json_response_format": true
+    }
+  ],
+  "generation_requests": 0,
+  "assessment": "No alternative provider is listed by this public endpoint query; missing latency is not a zero-latency measurement."
+}

@@ -140,3 +140,18 @@ def test_range_total_and_end_must_match_catalog(tmp_path, content_range):
 def test_invalid_slot_count_cannot_start_unbounded_runtime(tmp_path, slots):
     with pytest.raises(ValueError, match="slots"):
         LocalRuntime(tmp_path, slots=slots)
+
+
+def test_large_download_uses_bounded_ranges_and_validates_complete_digest(tmp_path):
+    contents = b"x" * (33 * 1024 * 1024)
+    calls = []
+    def response(request):
+        start, end = map(int, request.headers["Range"].removeprefix("bytes=").split("-"))
+        calls.append((start, end))
+        return httpx.Response(206, content=contents[start:end + 1],
+                              headers={"Content-Range": f"bytes {start}-{end}/{len(contents)}"})
+    destination = tmp_path / "engine.zip"
+    download(artifact(contents), destination, threading.Event(), lambda *args: None, httpx.MockTransport(response))
+    assert len(calls) == 3
+    assert calls[0] == (0, 16 * 1024 * 1024 - 1)
+    assert destination.read_bytes() == contents

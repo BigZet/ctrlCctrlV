@@ -1,11 +1,13 @@
 """A separate, opt-in visual check; proposals never publish themselves."""
 from dataclasses import dataclass
+from contextlib import contextmanager
 from difflib import SequenceMatcher, unified_diff
 from functools import cached_property
 import time
 
-from .core import Operation, OperationError
+from .core import Cancelled, Operation, OperationError
 from .ocr import OCRProvider
+from .hardware import InsufficientMemory
 
 REVIEW_PROMPT = (
     "Compare the screenshot with the provided OCR transcription. Return a literal transcription "
@@ -17,6 +19,49 @@ REVIEW_PROMPT = (
     'Return ONLY one JSON object {"text": "the complete checked transcription"}. '
     "Do not add Markdown wrappers unless they are actually visible in the screenshot."
 )
+
+
+@contextmanager
+def local_review_session(primary, reviewer, model_id, acceleration, cancel, progress,
+                         restore_errors, shutting_down=lambda: False):
+    """Release the owned OCR model only when concurrent models cannot fit."""
+    previous = None
+    try:
+        primary_mode = getattr(primary, "loaded_acceleration", None) or getattr(primary, "acceleration", "gpu")
+        if primary.ready and primary.model_id == model_id and primary_mode == acceleration:
+            yield primary
+            return
+        reviewer.acceleration = acceleration
+        primary_hardware = getattr(primary, "hardware", None) or {}
+        unknown_global = any(device.get("memory_source") == "CUDA budget; global memory unknown"
+                             for device in primary_hardware.get("devices", []))
+        if primary.ready and acceleration == "gpu" and unknown_global:
+            previous = primary.model_id, primary_mode
+            progress("Общая память GPU неизвестна · последовательная загрузка моделей…", 0, 1)
+            primary.stop()
+        try:
+            reviewer.start(model_id, cancel, progress)
+        except InsufficientMemory:
+            if not primary.ready:
+                raise
+            if cancel.is_set():
+                raise Cancelled("Проверка отменена")
+            previous = primary.model_id, primary_mode
+            progress("Недостаточно памяти для двух моделей · временная выгрузка OCR…", 0, 1)
+            primary.stop()
+            reviewer.start(model_id, cancel, progress)
+        yield reviewer
+    finally:
+        reviewer.stop()
+        if previous and not cancel.is_set() and not shutting_down():
+            identifier, mode = previous
+            primary.acceleration = mode
+            progress("Восстановление модели OCR…", 0, 1)
+            try:
+                primary.start(identifier, cancel, progress)
+            except Exception as error:
+                restore_errors.append(str(error) if isinstance(error, OperationError) else
+                                      "Не удалось восстановить OCR; подготовьте модель в настройках")
 
 
 @dataclass(frozen=True)

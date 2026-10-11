@@ -9,12 +9,15 @@ KEY_CODES = {
 
 
 def parse_hotkey(value):
+    # Command and Windows refer to the platform's meta key. Normalizing aliases
+    # also prevents registering duplicate shortcuts under different spellings.
+    value = value.lower().replace("win", "cmd")
     parts = value.lower().replace(" ", "").split("+")
     key, modifiers = parts[-1], parts[:-1]
     if key not in KEY_CODES or not modifiers or len(set(modifiers)) != len(modifiers):
         raise ValueError("Пример сочетания: ctrl+alt+cmd+4")
     if set(modifiers) - {"ctrl", "alt", "cmd", "shift"}:
-        raise ValueError("Модификаторы: ctrl, alt, cmd, shift")
+        raise ValueError("Модификаторы: ctrl, alt, cmd (или win), shift")
     if not set(modifiers) & {"ctrl", "alt", "cmd"}:
         raise ValueError("Добавьте ctrl, alt или cmd к сочетанию")
     return frozenset(modifiers), key

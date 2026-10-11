@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "checked_date": "2026-10-12",
+  "package": "artifacts/builds/windows-ui/ctrlCctrlV-windows-x64.zip",
+  "zip_sha256": "881e2e15d37ce944f718e51a6b0b3e08d3b247c727e1239bb01640e8acd68417",
+  "exe_sha256": "21a692c45d08cb2daed580340d4040a2a385de8055c7806cd7a35117c34f6f20",
+  "tests": {
+    "passed": 238,
+    "seconds": 9.46,
+    "exit_code": 0
+  },
+  "rendering": {
+    "states_per_configuration": 38,
+    "configurations": [
+      "standard",
+      "compact",
+      "150_percent"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "synthetic_only": true
+  },
+  "checks": {
+    "frozen_gui_loopback_smoke": true,
+    "frozen_credential_smoke": true,
+    "tested_exe_matches_published_zip": true,
+    "new_spinbox_asset_packaged": true,
+    "local_cpu_choice_saved": true,
+    "no_download_before_install_command": true,
+    "no_ocr_before_prepare_command": true,
+    "owned_application_stopped": true
+  },
+  "paid_requests": 0,
+  "mac_native_verified": false
+}

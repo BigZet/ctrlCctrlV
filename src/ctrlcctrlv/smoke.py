@@ -8,6 +8,19 @@ from .core import Cancelled, Operation
 from .ocr import OCRProvider
 
 
+def check_credentials():
+    """Opt-in check against a disposable service; never reads the app's key."""
+    import uuid
+    from .settings import Credentials
+    credentials = Credentials()
+    credentials.service = "ctrlCctrlV.Smoke." + uuid.uuid4().hex
+    try:
+        credentials.write("synthetic-smoke-value")
+        return credentials.read() == "synthetic-smoke-value"
+    finally:
+        credentials.write("")
+
+
 def check_ocr_transport():
     entered, disconnected = threading.Event(), threading.Event()
     failures = []

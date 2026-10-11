@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "checks": {
+    "expected_memory_rejection": true,
+    "reviewer_unloaded": true,
+    "primary_ready_after_review": true,
+    "restored_ocr_responds_literally": true,
+    "owned_engines_stopped": true
+  },
+  "acceleration": "gpu",
+  "fixture": "python-light-14",
+  "ocr_model": "lightonocr-3-0.8b",
+  "review_model": "qwen3-vl-4b",
+  "primary_preflight": {
+    "system": "Windows",
+    "architecture": "AMD64",
+    "physical_memory_bytes": 68592857088,
+    "available_memory_bytes": 33531936768,
+    "acceleration": "gpu",
+    "devices": [
+      {
+        "backend": "CUDA0",
+        "name": "NVIDIA GeForce RTX 3080",
+        "total_bytes": 10736369664,
+        "available_bytes": 4430217216,
+        "memory_source": "CUDA / NVML"
+      }
+    ]
+  },
+  "original_characters": 130,
+  "reviewer_preflight": {
+    "system": "Windows",
+    "architecture": "AMD64",
+    "physical_memory_bytes": 68592857088,
+    "available_memory_bytes": 33532534784,
+    "acceleration": "gpu",
+    "devices": [
+      {
+        "backend": "CUDA0",
+        "name": "NVIDIA GeForce RTX 3080",
+        "total_bytes": 10736369664,
+        "available_bytes": 4423516160,
+        "memory_source": "CUDA / NVML"
+      }
+    ]
+  },
+  "elapsed": 7.844000000040978,
+  "passed": true
+}

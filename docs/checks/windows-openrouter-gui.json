@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "model": "qwen/qwen3-vl-8b-instruct",
+  "fixture": "python-light-20",
+  "generation_limit": 1,
+  "max_output_tokens": 512,
+  "clipboard_backend": "windows",
+  "global_hotkeys_enabled": false,
+  "checks": {
+    "capture_button_available": true,
+    "selected_pixels_match_owned_fixture": true,
+    "publication_on_gui_thread": true,
+    "preview_visible": true,
+    "preview_matches_system_clipboard": true,
+    "preview_keeps_source_image": true,
+    "slow_result_notice_correct": true,
+    "editing_does_not_automatically_publish": true,
+    "manual_edit_explicit_copy": true,
+    "worker_released": true
+  },
+  "requests": [
+    {
+      "prompt_tokens": 338,
+      "completion_tokens": 56,
+      "cost_usd": 0.000125235,
+      "finish_reason": "stop"
+    }
+  ],
+  "ocr": {
+    "elapsed": 11.922000000020489,
+    "passed_4s": false,
+    "output_characters": 130,
+    "expected_characters": 131,
+    "exact": false,
+    "exact_ignoring_final_newline": true,
+    "character_errors": 1
+  },
+  "total_cost_usd": 0.000125235,
+  "clipboard_restored": true,
+  "passed": true
+}

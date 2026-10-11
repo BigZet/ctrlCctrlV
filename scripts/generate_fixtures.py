@@ -6,6 +6,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QFont, QFontMetricsF, QImage, QPainter
 from PySide6.QtWidgets import QApplication
+from ctrlcctrlv.fonts import monospace_font
 
 SAMPLES = {
     "python": 'def greet(name):\n    # Приветствие\n    if name == "Женя":\n        print(f"Hello, {name}!")\n\n    return {"ok": True, "value": None}\n',
@@ -44,7 +45,7 @@ def generate(directory, expanded=False):
             for size in ((16,) if name not in SAMPLES else (14, 20)):
                 identifier = f"{name}-{'dark' if dark else 'light'}-{size}"
                 lines = text.split("\n")
-                font = QFont("Menlo")
+                font = monospace_font()
                 font.setPixelSize(size)
                 metrics = QFontMetricsF(font)
                 width = max(1000, int(max(metrics.horizontalAdvance(line) for line in lines)) + 48)
@@ -61,6 +62,7 @@ def generate(directory, expanded=False):
                 manifest.append({"id": identifier, "image": identifier + ".png", "text": identifier + ".txt",
                                  "complexity": name.split("-")[-1] if name not in SAMPLES else "short",
                                  "width": image.width(), "height": image.height(), "font_pixels": size,
+                                 "font_family": font.family(),
                                  "characters": len(text), "lines": len(text.splitlines())})
     (directory / "manifest.json").write_text(json.dumps(manifest, indent=2))
     return manifest

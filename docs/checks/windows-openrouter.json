@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "model": "qwen/qwen3-vl-8b-instruct",
+  "generation_limit": 2,
+  "budget_usd": 0.05,
+  "clipboard_backend": "windows",
+  "checks": {
+    "ocr_published_to_system_clipboard": true,
+    "review_original_preserved": true,
+    "review_proposal_nonempty": true,
+    "review_did_not_publish": true,
+    "review_selection_works": true,
+    "cancel_before_request_preserves_clipboard": true,
+    "cancel_before_request_avoids_generation": true,
+    "invalid_auth_is_rejected": true,
+    "invalid_auth_preserves_clipboard": true,
+    "within_budget": true
+  },
+  "requests": [
+    {
+      "prompt_tokens": 338,
+      "completion_tokens": 56,
+      "cost_usd": 0.000125235,
+      "finish_reason": "stop"
+    },
+    {
+      "prompt_tokens": 436,
+      "completion_tokens": 56,
+      "cost_usd": 0.00014949,
+      "finish_reason": "stop"
+    }
+  ],
+  "pricing_usd_per_million": {
+    "input": 0.25,
+    "output": 0.75
+  },
+  "fixture": "python-light-20",
+  "image_size": [
+    1000,
+    252
+  ],
+  "ocr": {
+    "elapsed": 4.562000000034459,
+    "passed_4s": false,
+    "expected_characters": 131,
+    "output_characters": 130,
+    "exact": false,
+    "exact_ignoring_final_newline": true,
+    "character_errors": 1
+  },
+  "review": {
+    "elapsed": 4.76500000001397,
+    "changed": false,
+    "output_characters": 130,
+    "character_errors": 1,
+    "exact": false,
+    "exact_ignoring_final_newline": true
+  },
+  "total_cost_usd": 0.000274725,
+  "clipboard_restored": true,
+  "elapsed": 11.03200000000652,
+  "passed": true
+}

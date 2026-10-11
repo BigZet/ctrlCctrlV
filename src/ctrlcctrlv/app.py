@@ -1,4 +1,5 @@
 import argparse
+from contextlib import nullcontext
 import json
 from dataclasses import replace
 import os
@@ -15,9 +16,21 @@ from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 from .catalog import MODELS
 from .core import Operation, OperationError
 from .ocr import OCRProvider
+from .platforms import active_target, create_platform
 from .runtime import LocalRuntime
 from .settings import Credentials, Settings, data_directory
-from .ui import DiagnosticsDialog, Preview, SelectionOverlay, SettingsWindow
+from .ui import DiagnosticsDialog, Preview, SelectionOverlay, SettingsWindow, SetupWizard
+
+
+def diagnostic_print(message):
+    # PyInstaller's windowed Windows bootloader sets stdout/stderr to None.
+    if sys.stdout is not None:
+        try:
+            print(message, flush=True)
+        except UnicodeEncodeError:
+            # A redirected Windows console may use a Western code page. A log
+            # encoding failure must not interrupt diagnostic shutdown / cleanup.
+            print(message.encode("ascii", errors="backslashreplace").decode("ascii"), flush=True)
 
 
 class WorkerSignals(QObject):
@@ -60,16 +73,17 @@ class Controller(QObject):
         self.app = app
         self.directory = directory or data_directory()
         self.directory.mkdir(parents=True, exist_ok=True)
+        self.first_run = not (self.directory / "settings.json").exists()
+        self.setup_wizard = None
         self.settings = Settings.load(self.directory)
         self.credentials = Credentials()
-        self.runtime = LocalRuntime(self.directory)
-        self.review_runtime = LocalRuntime(self.directory, session="review")
+        self.runtime = LocalRuntime(self.directory, acceleration=self.settings.acceleration)
+        self.review_runtime = LocalRuntime(self.directory, session="review", acceleration=self.settings.acceleration)
         self.review_cancel = None
         self.diagnostics_cancel = None
         self.platform = platform_adapter
-        if native and self.platform is None and sys.platform == "darwin":
-            from .macos import MacPlatform
-            self.platform = MacPlatform()
+        if native and self.platform is None:
+            self.platform = create_platform()
         self.window = SettingsWindow(self.settings)
         self.preview = Preview()
         self.diagnostics_window = DiagnosticsDialog(self.window)
@@ -114,6 +128,8 @@ class Controller(QObject):
         self.window.preview_option_changed.connect(self.set_preview_option)
         self.window.diagnostics_requested.connect(self.show_diagnostics)
         self.window.local_model.currentIndexChanged.connect(self.refresh)
+        self.window.acceleration.currentIndexChanged.connect(self.refresh)
+        self.window.hardware_requested.connect(self.check_hardware)
         self.preview.copy_requested.connect(self.copy_edited)
         self.preview.repeat_requested.connect(self.repeat)
         self.preview.review_requested.connect(self.review_text)
@@ -189,11 +205,16 @@ class Controller(QObject):
         identifier = self.window.local_model.currentData()
         model = MODELS[identifier]
         installed = self.runtime.installed(identifier)
-        engine_available = self.runtime.binary is not None
-        ready = self.runtime.ready and self.runtime.model_id == identifier
-        self.window.local_info.setText("Готово к распознаванию" if ready else
+        acceleration = self.window.acceleration.currentData()
+        engine_available = LocalRuntime(self.directory, acceleration=acceleration).binary is not None
+        ready = (self.runtime.ready and self.runtime.model_id == identifier and
+                 (self.runtime.loaded_acceleration or self.runtime.acceleration) == acceleration)
+        state = ("Готово к распознаванию" if ready else
             "Движок отсутствует · восстановите установку" if installed and not engine_available else
             "Установлена · подготовьте модель" if installed else "Модель ещё не установлена")
+        if installed:
+            state += f" · файлы модели {sum(f.size for f in model.files) / 1_000_000_000:.1f} ГБ"
+        self.window.local_info.setText(state)
         self.window.local_info.setToolTip(f"Лицензия: {model.license}. Качество и скорость проверяйте на своих примерах.")
         self.window.install_button.setText("Восстановить движок" if installed and not engine_available else "Установить")
         self.window.install_button.setVisible(not installed or not engine_available)
@@ -218,9 +239,12 @@ class Controller(QObject):
         self.hotkeys_registered = bool(self.platform and self.platform.permissions()["input_monitoring"]
             and self.platform.start_hotkeys(self.hotkeys.action.emit, self.bindings))
         if not self.hotkeys_registered:
-            self.status("Глобальные клавиши недоступны. Операции доступны из меню; проверьте разрешения.")
+            self.status(getattr(self.platform, "last_hotkey_error", "") or
+                        "Глобальные клавиши недоступны. Операции доступны из меню; проверьте разрешения.")
 
     def handle_hotkey(self, action):
+        if self.setup_wizard and self.setup_wizard.isVisible():
+            return
         if action == "capture":
             self.capture()
         elif action == "type":
@@ -235,6 +259,10 @@ class Controller(QObject):
     def reopen_window(self):
         if self.shutting_down or self.overlays or self.capture_pending:
             return
+        if self.setup_wizard and self.setup_wizard.isVisible():
+            self.setup_wizard.raise_()
+            self.setup_wizard.activateWindow()
+            return
         if self.typing_pending or self.typing_cancel:
             self.cancel()
         if self.preview.isVisible() and not self.operation:
@@ -248,6 +276,28 @@ class Controller(QObject):
         self.window.showNormal()
         self.window.raise_()
         self.window.activateWindow()
+
+    def show_startup(self):
+        if not self.first_run:
+            self.show_settings()
+            return
+        self.setup_wizard = SetupWizard(self.window)
+        self.setup_wizard.accepted.connect(self.complete_setup)
+        self.setup_wizard.rejected.connect(self.show_settings)
+        self.setup_wizard.open()
+
+    def complete_setup(self):
+        self.window.provider.setCurrentIndex(self.window.provider.findData(self.setup_wizard.provider.currentData()))
+        self.window.acceleration.setCurrentIndex(self.window.acceleration.findData(self.setup_wizard.acceleration.currentData()))
+        if not self.save(announce=False):
+            self.show_settings()
+            return
+        self.first_run = False
+        self.show_settings()
+        if self.settings.provider == "openrouter":
+            self.window.key.setFocus()
+        self.status("Введите API-ключ и сохраните настройки" if self.settings.provider == "openrouter" else
+                    "Установите движок и модель, затем нажмите «Подготовить»")
 
     def save(self, announce=True):
         try:
@@ -279,6 +329,7 @@ class Controller(QObject):
                 return False
             self.window.key.clear()
             self.window.key.setPlaceholderText("API-ключ сохранён в системном хранилище; введите новый для замены")
+        self.window.mark_saved()
         if announce:
             self.status("Настройки и API-ключ сохранены" if value else "Настройки сохранены")
         return True
@@ -325,7 +376,8 @@ class Controller(QObject):
                 raise OperationError("Введите и сохраните API-ключ OpenRouter в настройках")
             return OCRProvider("https://openrouter.ai/api/v1/chat/completions",
                 self.settings.remote_model, key, self.settings.max_tokens, mode=self.settings.remote_mode)
-        if not self.runtime.ready or self.runtime.model_id != self.settings.local_model:
+        if (not self.runtime.ready or self.runtime.model_id != self.settings.local_model or
+                (self.runtime.loaded_acceleration or self.runtime.acceleration) != self.settings.acceleration):
             raise OperationError("Локальная модель не готова. Нажмите «Подготовить» в настройках.")
         model = MODELS[self.settings.local_model]
         return OCRProvider(self.runtime.endpoint + "/v1/chat/completions",
@@ -340,7 +392,7 @@ class Controller(QObject):
         try:
             self.provider()  # Do not capture if OCR is not configured/ready.
             if self.platform and not self.platform.permissions()["screen"]:
-                raise OperationError("Разрешите запись экрана в настройках macOS")
+                raise OperationError("Разрешите захват экрана в разделе «Система»")
         except Exception as error:
             self.status(str(error))
             self.show_settings()
@@ -359,7 +411,7 @@ class Controller(QObject):
             return
         screenshots = [(screen, screen.grabWindow(0)) for screen in self.app.screens()]
         if not screenshots or any(pixmap.isNull() for _, pixmap in screenshots):
-            self.status("Не удалось получить снимок экрана. Проверьте разрешения macOS.")
+            self.status("Не удалось получить снимок экрана. Проверьте доступ к экрану и активный сеанс.")
             self.show_settings()
             return
         for screen, snapshot in screenshots:
@@ -483,7 +535,7 @@ class Controller(QObject):
     def review_text(self):
         if self.busy() or self.preview.source_image is None or not self.save(announce=False):
             return
-        from .review import ReviewProvider
+        from .review import ReviewProvider, local_review_session
         settings = replace(self.settings)
         image = self.preview.source_image.copy()
         original = self.preview.text.toPlainText()
@@ -500,35 +552,38 @@ class Controller(QObject):
         self.preview.set_review_busy(True)
         self.status("Проверка текста…")
         self.preview.status.setText("Подготовка проверки · исходный текст уже в буфере")
+        restore_errors = []
         def task(progress):
             started = time.monotonic()
+            session = (local_review_session(self.runtime, self.review_runtime, settings.review_local_model,
+                       settings.acceleration, cancel, progress, restore_errors, lambda: self.shutting_down)
+                       if settings.provider == "local" else nullcontext(None))
             try:
-                if settings.provider == "local":
-                    runtime = self.runtime if self.runtime.ready and self.runtime.model_id == settings.review_local_model else self.review_runtime
-                    if runtime is self.review_runtime:
-                        runtime.start(settings.review_local_model, cancel, progress)
-                    provider = OCRProvider(runtime.endpoint + "/v1/chat/completions",
-                                           settings.review_local_model, runtime.key, settings.max_tokens, True)
-                else:
-                    key = self.credentials.read()
-                    if not key:
-                        raise OperationError("Сохраните API-ключ OpenRouter в настройках")
-                    provider = OCRProvider("https://openrouter.ai/api/v1/chat/completions",
-                                           settings.review_remote_model, key, settings.max_tokens)
-                operation = Operation(budget=30, cancelled=cancel)
-                progress("Сверка текста со снимком…", 0, 1)
-                buffer = QBuffer()
-                buffer.open(QIODevice.OpenModeFlag.WriteOnly)
-                if not image.save(buffer, "PNG"):
-                    raise OperationError("Не удалось подготовить изображение")
-                result = ReviewProvider(provider).inspect(bytes(buffer.data()), original, operation)
+                with session as runtime:
+                    if settings.provider == "local":
+                        provider = OCRProvider(runtime.endpoint + "/v1/chat/completions",
+                                               settings.review_local_model, runtime.key, settings.max_tokens, True)
+                    else:
+                        key = self.credentials.read()
+                        if not key:
+                            raise OperationError("Сохраните API-ключ OpenRouter в настройках")
+                        provider = OCRProvider("https://openrouter.ai/api/v1/chat/completions",
+                                               settings.review_remote_model, key, settings.max_tokens)
+                    operation = Operation(budget=30, cancelled=cancel)
+                    progress("Сверка текста со снимком…", 0, 1)
+                    buffer = QBuffer()
+                    buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+                    if not image.save(buffer, "PNG"):
+                        raise OperationError("Не удалось подготовить изображение")
+                    result = ReviewProvider(provider).inspect(bytes(buffer.data()), original, operation)
                 result = replace(result, elapsed=time.monotonic() - started)
                 result.prepare()
-                operation.check()
+                if cancel.is_set():
+                    raise OperationError("Проверка отменена")
                 return result
             finally:
-                # A separate runtime has its own key and never unloads the primary OCR model.
-                self.review_runtime.stop()
+                if settings.provider != "local":
+                    self.review_runtime.stop()
         def complete(result):
             if self.review_cancel is not cancel:
                 return
@@ -537,6 +592,9 @@ class Controller(QObject):
             self.status("Проверка завершена" if not cancel.is_set() else "Проверка отменена")
             if not cancel.is_set():
                 self.preview.propose(result)
+                if restore_errors:
+                    self.preview.status.setText("Проверка завершена; OCR не восстановлена: " + restore_errors[0])
+            self.refresh()
         def failed(message):
             if self.review_cancel is not cancel:
                 return
@@ -561,6 +619,7 @@ class Controller(QObject):
 
     def copy_edited(self, text):
         self.app.clipboard().setText(text)
+        self.preview.mark_copied(text)
         self.preview.status.setText("Исправленный текст скопирован")
 
     def check_syntax(self, text, language, revision):
@@ -621,6 +680,7 @@ class Controller(QObject):
         self.model_cancel = cancelled
         self.status("Подготовка модели…" if start else "Подготовка загрузки…")
         identifier = self.settings.local_model
+        self.runtime.acceleration = self.settings.acceleration
 
         def task(progress):
             if start:
@@ -636,12 +696,45 @@ class Controller(QObject):
             self.window.progress.hide()
             self.status(message)
             self.refresh()
+            if self.runtime.hardware:
+                from .hardware import describe_hardware
+                self.window.hardware_info.setText(describe_hardware(self.runtime.hardware, MODELS[identifier]))
             self.last_activity = time.monotonic()
 
         self.run_job(task, complete, complete, self.model_progress)
 
     def install(self):
         self.model_job()
+
+    def check_hardware(self):
+        if self.busy() or not self.save(announce=False):
+            return
+        from .hardware import describe_hardware, inspect_hardware, require_capacity
+        cancel = self.model_cancel = threading.Event()
+        acceleration = self.settings.acceleration
+        model = MODELS[self.settings.local_model]
+        runtime = LocalRuntime(self.directory, acceleration=acceleration)
+        self.status("Проверка оборудования…")
+        def task(progress):
+            report = inspect_hardware(runtime.binary, acceleration, cancel)
+            description = describe_hardware(report, model)
+            try:
+                require_capacity(report, model)
+            except OperationError as error:
+                description += "\n" + str(error)
+            return description
+        def complete(description):
+            if self.model_cancel is cancel:
+                self.model_cancel = None
+                if not cancel.is_set():
+                    self.window.hardware_info.setText(description)
+                self.status("Проверка оборудования отменена" if cancel.is_set() else "Оборудование проверено")
+        def failed(message):
+            if self.model_cancel is cancel:
+                self.model_cancel = None
+                self.window.hardware_info.setText(message)
+                self.status("Проверка оборудования отменена" if cancel.is_set() else message)
+        self.run_job(task, complete, failed)
 
     def start_model(self):
         self.model_job(start=True)
@@ -661,7 +754,13 @@ class Controller(QObject):
             self.status("Сначала завершите или отмените операцию")
             return
         identifier = self.window.local_model.currentData()
-        self.runtime_maintenance(lambda: self.runtime.delete(identifier), "Удаление модели…", "Модель удалена")
+        def delete():
+            # Windows keeps mapped GGUF files locked while either owned server
+            # is using them; release the reviewer before deleting shared files.
+            if self.review_runtime.model_id == identifier:
+                self.review_runtime.stop()
+            self.runtime.delete(identifier)
+        self.runtime_maintenance(delete, "Удаление модели…", "Модель удалена")
 
     def runtime_maintenance(self, action, pending_message, complete_message):
         token = self.model_cancel = threading.Event()
@@ -674,8 +773,12 @@ class Controller(QObject):
         self.run_job(lambda progress: (action(), complete_message)[1], complete, complete)
 
     def check_idle(self):
-        if self.runtime.ready and not self.busy() and time.monotonic() - self.last_activity > self.settings.idle_minutes * 60:
-            self.stop_model()
+        if not self.busy() and time.monotonic() - self.last_activity > self.settings.idle_minutes * 60:
+            if self.runtime.ready or self.review_runtime.ready:
+                def unload():
+                    self.runtime.stop()
+                    self.review_runtime.stop()
+                self.runtime_maintenance(unload, "Выгрузка моделей…", "Модели выгружены после простоя")
 
     def schedule_typing(self):
         if self.busy() or not self.save(announce=False):
@@ -710,7 +813,7 @@ class Controller(QObject):
             self.status("Сначала завершите или отмените текущую операцию")
             return
         if not self.platform:
-            self.status("Печать реализована только для macOS")
+            self.status("Печать доступна на macOS и Windows")
             return
         if self.platform.active_pid() == os.getpid():
             self.status("Поставьте курсор в целевой редактор и нажмите " + self.settings.typing_hotkey)
@@ -721,9 +824,9 @@ class Controller(QObject):
         cancelled = threading.Event()
         self.typing_cancel = cancelled
         settings = replace(self.settings)
-        target_pid = self.platform.active_pid()
+        target = active_target(self.platform)
         self.status("Печать…")
-        from .macos import type_text
+        from .typing import type_text
 
         def complete(message):
             if self.typing_cancel is cancelled:
@@ -732,7 +835,7 @@ class Controller(QObject):
                 self.status(message)
 
         self.run_job(lambda progress: (type_text(self.platform, text, settings, cancelled,
-            lambda done, total: progress("Печать…", done, total), expected_target_pid=target_pid), "Печать завершена")[1],
+            lambda done, total: progress("Печать…", done, total), expected_target=target), "Печать завершена")[1],
             complete, complete, self.model_progress)
 
     def cancel(self):
@@ -766,6 +869,8 @@ class Controller(QObject):
         self.window.hide()
         self.preview.hide()
         self.diagnostics_window.hide()
+        if self.setup_wizard:
+            self.setup_wizard.hide()
         self.tray.hide()
         self.shutdown_timer = QTimer(self)
         self.shutdown_timer.setInterval(100)
@@ -790,9 +895,15 @@ class Controller(QObject):
 def main():
     parser = argparse.ArgumentParser(description="ctrlCctrlV desktop app")
     parser.add_argument("--smoke", action="store_true", help="Open the UI briefly without capture, input or credentials")
+    parser.add_argument("--smoke-credentials", action="store_true", help="Also verify a disposable system credential with --smoke")
     parser.add_argument("--smoke-model", choices=tuple(MODELS), help="Diagnostic: warm an installed model through GUI workers and exit")
+    parser.add_argument("--acceleration", choices=("gpu", "cpu"), help="Select acceleration for --smoke-model")
     parser.add_argument("--data-dir", type=Path)
     args = parser.parse_args()
+    if args.smoke_credentials and not args.smoke:
+        parser.error("--smoke-credentials требует --smoke")
+    if args.acceleration and not args.smoke_model:
+        parser.error("--acceleration требует --smoke-model")
     app = QApplication([sys.argv[0]])
     app.setApplicationName("ctrlCctrlV")
     app.setOrganizationName("ctrlCctrlV")
@@ -801,11 +912,19 @@ def main():
     directory.mkdir(parents=True, exist_ok=True)
     lock = QLockFile(str(directory / "app.lock"))
     if not lock.tryLock(0):
+        if args.smoke or args.smoke_model:
+            diagnostic_print("Diagnostic run cannot use an already running instance")
+            return 1
         (directory / "activate.request").touch()
         return 0
     controller = Controller(app, directory, native=not (args.smoke or args.smoke_model))
-    controller.show_settings()
+    if args.smoke or args.smoke_model:
+        controller.show_settings()
+    else:
+        controller.show_startup()
     if args.smoke_model:
+        if args.acceleration:
+            controller.window.acceleration.setCurrentIndex(controller.window.acceleration.findData(args.acceleration))
         controller.window.local_model.setCurrentIndex(controller.window.local_model.findData(args.smoke_model))
         controller.start_model()
         monitor = QTimer(controller)
@@ -813,7 +932,7 @@ def main():
         def completed():
             if controller.model_cancel is None:
                 controller.exit_code = 0 if controller.runtime.ready else 1
-                print(controller.window.status.text(), flush=True)
+                diagnostic_print(controller.window.status.text())
                 monitor.stop()
                 controller.quit()
         monitor.timeout.connect(completed)
@@ -832,9 +951,14 @@ def main():
         deadline = time.monotonic() + 12
         diagnostics_started = False
         network_result = []
+        credential_result = []
         from .smoke import check_ocr_transport
         controller.run_job(lambda progress: check_ocr_transport(),
                            network_result.append, lambda message: network_result.append(False))
+        if args.smoke_credentials:
+            from .smoke import check_credentials
+            controller.run_job(lambda progress: check_credentials(), credential_result.append,
+                               lambda message: credential_result.append(False))
         monitor = QTimer(controller)
         monitor.setInterval(100)
         def parser_checked():
@@ -844,11 +968,12 @@ def main():
                 diagnostics_started = True
                 controller.show_diagnostics()
             report = controller.diagnostics_window.report.toPlainText()
-            if (report and network_result) or time.monotonic() >= deadline:
+            if (report and network_result and (not args.smoke_credentials or credential_result)) or time.monotonic() >= deadline:
                 try:
                     data = json.loads(report)
                     passed = diagnostics_started and data["schema"] == 1 and "signature" in data["build"]
                     passed = passed and network_result == [True]
+                    passed = passed and (not args.smoke_credentials or credential_result == [True])
                     size = controller.preview.image.pixmap().deviceIndependentSize()
                     viewport = controller.preview.image_view.viewport().size()
                     passed = passed and size.width() <= viewport.width() and size.height() <= viewport.height()
@@ -858,8 +983,10 @@ def main():
                 except (ValueError, KeyError, TypeError):
                     passed = False
                 controller.exit_code = 0 if passed else 1
-                print("GUI, background syntax and diagnostics checks passed" if passed else "GUI smoke check failed", flush=True)
-                print("OCR transport and cancellation checks passed" if network_result == [True] else "OCR transport check failed", flush=True)
+                diagnostic_print("GUI, background syntax and diagnostics checks passed" if passed else "GUI smoke check failed")
+                diagnostic_print("OCR transport and cancellation checks passed" if network_result == [True] else "OCR transport check failed")
+                if args.smoke_credentials:
+                    diagnostic_print("Disposable credential check passed" if credential_result == [True] else "Credential check failed")
                 monitor.stop()
                 controller.quit()
         monitor.timeout.connect(parser_checked)

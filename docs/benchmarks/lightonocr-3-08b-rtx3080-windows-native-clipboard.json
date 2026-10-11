@@ -1,0 +1,22 @@
+[
+  {
+    "id": "python-light-14",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "clipboard_backend": "windows",
+    "preparation_elapsed": 2.6719999999040738,
+    "complexity": "short",
+    "width": 1000,
+    "height": 198,
+    "expected_characters": 131,
+    "system": "Windows",
+    "architecture": "AMD64",
+    "encoding_elapsed": 0.015000000013969839,
+    "request_elapsed": 0.4380000000819564,
+    "elapsed": 0.4530000000959262,
+    "exact": false,
+    "exact_ignoring_final_newline": true,
+    "character_similarity": 0.9961685823754789,
+    "output_characters": 130
+  }
+]

@@ -4,7 +4,7 @@ import threading
 import pytest
 
 from ctrlcctrlv.core import Cancelled
-from ctrlcctrlv.macos import type_text
+from ctrlcctrlv.typing import type_text
 from ctrlcctrlv.settings import Settings
 
 
@@ -29,6 +29,15 @@ class FakePlatform:
 
     def key(self, key, modifiers=0):
         self.events.append(("key", key, modifiers))
+
+    def enter(self):
+        self.key(36)
+
+    def tab(self):
+        self.key(48)
+
+    def select_indentation(self):
+        self.key(115, 1)
 
 
 def test_unicode_crlf_tabs_and_autoindent():

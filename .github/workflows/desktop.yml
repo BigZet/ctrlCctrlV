@@ -1,0 +1,51 @@
+name: Desktop checks and builds
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      QT_QPA_PLATFORM: offscreen
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Check target architecture
+        run: python -c "import platform, struct; expected = 'arm64' if platform.system() == 'Darwin' else 'AMD64'; assert platform.machine() == expected and struct.calcsize('P') == 8, (platform.system(), platform.machine()); print(platform.system(), platform.machine())"
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m pytest -q
+      - run: python -m ctrlcctrlv --smoke --data-dir artifacts/ci-smoke
+      - name: Build Windows and check frozen GUI
+        if: runner.os == 'Windows'
+        run: python scripts/build_windows.py
+      - name: Build macOS ARM64 development app
+        if: runner.os == 'macOS'
+        run: python scripts/build_macos.py --development
+      - name: Check frozen macOS GUI
+        if: runner.os == 'macOS'
+        run: artifacts/builds/dist/ctrlCctrlV.app/Contents/MacOS/ctrlCctrlV --smoke --data-dir artifacts/ci-frozen-smoke
+      - name: Preserve macOS executable permissions
+        if: runner.os == 'macOS'
+        run: tar -czf artifacts/builds/ctrlCctrlV-macos-arm64.tar.gz -C artifacts/builds/dist ctrlCctrlV.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ctrlCctrlV-${{ runner.os }}
+          path: |
+            artifacts/builds/windows/ctrlCctrlV-windows-x64.zip
+            artifacts/builds/ctrlCctrlV-macos-arm64.tar.gz
+          if-no-files-found: error

@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "checks": {
+    "reviewer_ready": true,
+    "original_preserved": true,
+    "nonempty_proposal": true,
+    "reviewer_unloaded": true,
+    "primary_ready_after_review": true,
+    "restored_ocr_responds_literally": true,
+    "owned_engines_stopped": true
+  },
+  "acceleration": "cpu",
+  "fixture": "python-light-14",
+  "ocr_model": "lightonocr-3-0.8b",
+  "review_model": "qwen3-vl-4b",
+  "primary_preflight": {
+    "system": "Windows",
+    "architecture": "AMD64",
+    "physical_memory_bytes": 68592857088,
+    "available_memory_bytes": 33665212416,
+    "acceleration": "cpu",
+    "devices": []
+  },
+  "original_characters": 130,
+  "primary_unloaded_during_review": false,
+  "proposed_characters": 130,
+  "review_elapsed": 12.656000000075437,
+  "reviewer_preflight": {
+    "system": "Windows",
+    "architecture": "AMD64",
+    "physical_memory_bytes": 68592857088,
+    "available_memory_bytes": 32300335104,
+    "acceleration": "cpu",
+    "devices": []
+  },
+  "elapsed": 27.20299999997951,
+  "passed": true
+}

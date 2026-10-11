@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "application_build": "frozen_exe",
+  "model": "qwen/qwen3-vl-8b-instruct",
+  "fixture": "python-light-20",
+  "generation_limit": 1,
+  "max_output_tokens": 512,
+  "checks": {
+    "owned_fixture_native_pixels_match": true,
+    "selection_contains_only_owned_fixture": true,
+    "system_clipboard_matches_fixture_ignoring_final_newline": true,
+    "frozen_preview_visible": true,
+    "owned_frozen_process_stopped": true
+  },
+  "generation_cost_usd": null,
+  "exe_sha256": "f31a2770bdb23ba2a2c559bcdc26967dd209ec1257de7798ffe04697e7fb1d90",
+  "stage": "ocr",
+  "ocr": {
+    "elapsed_upper_bound": 9.436999999918044,
+    "passed_4s": false,
+    "output_characters": 130,
+    "expected_characters": 131,
+    "exact": false,
+    "exact_ignoring_final_newline": true
+  },
+  "observed_key_usage_delta_usd": 0.0,
+  "clipboard_restored": true,
+  "passed": true,
+  "package": "ctrlCctrlV-windows-x64-ae85f64a.zip",
+  "package_sha256": "c69c5f038635eebbd4bfb49f54c544cb63d0f171ef3f2151be1797a190e147e9",
+  "tested_exe_matches_published_zip": true,
+  "diagnostic_forced_shutdown": true
+}

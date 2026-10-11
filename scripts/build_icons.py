@@ -1,9 +1,11 @@
 """Reproducible vector drawing for application and macOS template icons."""
 from pathlib import Path
 import subprocess
+import struct
+import sys
 import tempfile
 
-from PySide6.QtCore import QPointF, QRectF, Qt
+from PySide6.QtCore import QBuffer, QIODevice, QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter, QPainterPath, QPen
 
 
@@ -57,6 +59,7 @@ def main():
     for name, points, color in (
         ("check", [(7, 17), (13, 23), (25, 9)], "white"),
         ("chevron", [(7, 12), (16, 21), (25, 12)], "#8494ac"),
+        ("chevron-up", [(7, 21), (16, 12), (25, 21)], "#8494ac"),
     ):
         glyph = QImage(32, 32, QImage.Format.Format_ARGB32_Premultiplied)
         glyph.fill(Qt.GlobalColor.transparent)
@@ -69,6 +72,20 @@ def main():
         painter.drawPath(path)
         painter.end()
         glyph.save(str(ASSETS / (name + ".png")))
+    pngs = []
+    for size in (16, 32, 48, 64, 128, 256):
+        buffer = QBuffer()
+        buffer.open(QIODevice.OpenModeFlag.WriteOnly)
+        draw(size).save(buffer, "PNG")
+        pngs.append((size, bytes(buffer.data())))
+    offset = 6 + 16 * len(pngs)
+    entries = []
+    for size, png in pngs:
+        entries.append(struct.pack("<BBBBHHII", size % 256, size % 256, 0, 0, 1, 32, len(png), offset))
+        offset += len(png)
+    (ASSETS / "app.ico").write_bytes(struct.pack("<HHH", 0, 1, len(pngs)) + b"".join(entries) + b"".join(png for _, png in pngs))
+    if sys.platform != "darwin":
+        return
     with tempfile.TemporaryDirectory() as temporary:
         iconset = Path(temporary) / "App.iconset"
         iconset.mkdir()

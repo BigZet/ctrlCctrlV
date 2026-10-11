@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "checked_date": "2026-10-12",
+  "package": "artifacts/builds/windows-ui/ctrlCctrlV-windows-x64.zip",
+  "package_sha256": "881e2e15d37ce944f718e51a6b0b3e08d3b247c727e1239bb01640e8acd68417",
+  "exe_sha256": "21a692c45d08cb2daed580340d4040a2a385de8055c7806cd7a35117c34f6f20",
+  "checks": {
+    "cpu": {
+      "exit_code": 0,
+      "elapsed": 2.953
+    },
+    "gpu": {
+      "exit_code": 0,
+      "elapsed": 3.75
+    }
+  },
+  "passed": true
+}

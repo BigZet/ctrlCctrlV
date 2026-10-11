@@ -1,8 +1,7 @@
 """macOS adapter. Importing the common core never imports system APIs."""
 import threading
-import time
-
-from .core import Cancelled, OperationError
+from .core import OperationError
+from .typing import type_text
 
 
 class MacPlatform:
@@ -85,6 +84,15 @@ class MacPlatform:
             q.CGEventKeyboardSetUnicodeString(event, len(units), units)
             q.CGEventPost(q.kCGHIDEventTap, event)
 
+    def enter(self):
+        self.key(36)
+
+    def tab(self):
+        self.key(48)
+
+    def select_indentation(self):
+        self.key(115, self.quartz.kCGEventFlagMaskShift)
+
     def start_hotkeys(self, emit, bindings):
         q = self.quartz
         from .hotkeys import KEY_CODES, parse_hotkey
@@ -136,49 +144,3 @@ class MacPlatform:
             self.quartz.CFRunLoopStop(self.loop)
         if self.thread:
             self.thread.join(timeout=1)
-
-
-def type_text(platform, text, settings, cancelled, progress, expected_target_pid=None):
-    if not platform.permissions()["accessibility"]:
-        raise OperationError("Разрешите управление вводом в настройках Accessibility")
-    deadline = time.monotonic() + 5
-    while platform.modifiers_pressed():
-        if cancelled.wait(0.02):
-            raise Cancelled("Печать остановлена")
-        if time.monotonic() >= deadline:
-            raise OperationError("Отпустите клавиши сочетания перед печатью")
-    target = platform.active_pid()
-    if expected_target_pid is not None and target != expected_target_pid:
-        raise Cancelled("Печать остановлена: активное приложение изменилось")
-    if target is None:
-        raise OperationError("Нет активного окна для печати")
-
-    def check():
-        if cancelled.is_set():
-            raise Cancelled("Печать остановлена")
-        if platform.active_pid() != target:
-            raise Cancelled("Печать остановлена: активное приложение изменилось")
-
-    text = text.replace("\r\n", "\n").replace("\r", "\n")
-    for index, char in enumerate(text):
-        check()
-        if char == "\n":
-            platform.key(36)
-            cancelled.wait(settings.newline_delay)
-            check()
-            # Do not leave selected indentation at the end of a trailing newline.
-            if settings.autoindent and index + 1 < len(text):
-                platform.key(115, platform.quartz.kCGEventFlagMaskShift)
-        elif char == "\t":
-            if settings.spaces_per_tab:
-                for _ in range(settings.spaces_per_tab):
-                    check()
-                    platform.character(" ")
-                    cancelled.wait(settings.character_delay)
-            else:
-                platform.key(48)
-        else:
-            platform.character(char)
-        progress(index + 1, len(text))
-        cancelled.wait(settings.character_delay)
-    check()

@@ -26,6 +26,12 @@ def command_number(command):
 def system_memory():
     if platform.system() == "Darwin":
         return command_number(["sysctl", "-n", "hw.memsize"])
+    if sys.platform == "win32":
+        from .windows import physical_memory
+        try:
+            return physical_memory()
+        except OSError:
+            return None
     try:
         return os.sysconf("SC_PHYS_PAGES") * os.sysconf("SC_PAGE_SIZE")
     except (AttributeError, OSError, ValueError):
@@ -60,6 +66,16 @@ def runtime_report(runtime):
     if running and platform.system() == "Darwin":
         value = command_number(["ps", "-o", "rss=", "-p", str(process.pid)])
         memory = value * 1024 if value is not None else None
+        code = process.poll()
+        running = code is None
+        if not running:
+            memory = None
+    elif running and sys.platform == "win32":
+        from .windows import resident_memory
+        try:
+            memory = resident_memory(process.pid)
+        except (OSError, AttributeError):
+            pass
         code = process.poll()
         running = code is None
         if not running:

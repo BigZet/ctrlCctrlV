@@ -3,8 +3,10 @@ import argparse
 import json
 from pathlib import Path
 import threading
+import time
 
 from ctrlcctrlv.catalog import MODELS
+from ctrlcctrlv.app import diagnostic_print
 from ctrlcctrlv.core import Operation
 from ctrlcctrlv.ocr import OCRProvider
 from ctrlcctrlv.review import ReviewProvider
@@ -33,18 +35,18 @@ def main():
     parser.add_argument("--limit", type=int, default=5)
     parser.add_argument("--step", type=int, default=4)
     args = parser.parse_args()
-    fixtures = json.loads((args.fixtures / "manifest.json").read_text())[::args.step][:args.limit]
+    fixtures = json.loads((args.fixtures / "manifest.json").read_text(encoding="utf-8"))[::args.step][:args.limit]
     runtime = LocalRuntime(args.data_dir, session="review")
     cancel = threading.Event()
     rows, inputs = [], []
-    progress = lambda label, *_: print(label, flush=True)
+    progress = lambda label, *_: diagnostic_print(label)
     try:
         runtime.start(args.ocr_model, cancel, progress)
         ocr = OCRProvider(runtime.endpoint + "/v1/chat/completions", args.ocr_model, runtime.key,
                           local=True, mode=MODELS[args.ocr_model].mode)
         for fixture in fixtures:
             png = (args.fixtures / fixture["image"]).read_bytes()
-            expected = (args.fixtures / fixture["text"]).read_text()
+            expected = (args.fixtures / fixture["text"]).read_text(encoding="utf-8")
             op = Operation()
             try:
                 original = ocr.recognize(png, op)
@@ -74,7 +76,7 @@ def main():
     finally:
         runtime.stop()
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(json.dumps(rows, indent=2))
+        args.output.write_text(json.dumps(rows, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":

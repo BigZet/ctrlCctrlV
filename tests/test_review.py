@@ -184,6 +184,7 @@ def test_background_review_keeps_clipboard_and_discards_stale_results(controller
         endpoint="http://127.0.0.1:1", key="test", stop=lambda: stopped.append(True))
     if action == "reuse":
         c.runtime = SimpleNamespace(ready=True, model_id=c.settings.review_local_model,
+            acceleration="gpu", loaded_acceleration="gpu",
             endpoint="http://127.0.0.1:1", key="primary", stop=lambda: pytest.fail("Primary model must remain loaded"))
         c.review_runtime.start = lambda *args: pytest.fail("Reuse the loaded model")
     if action == "source":

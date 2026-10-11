@@ -1,0 +1,14 @@
+{
+  "package": "ctrlCctrlV-windows-x64-ae85f64a.zip",
+  "package_sha256": "c69c5f038635eebbd4bfb49f54c544cb63d0f171ef3f2151be1797a190e147e9",
+  "checks": {
+    "cpu": {
+      "exit_code": 0,
+      "elapsed": 3.172
+    },
+    "gpu": {
+      "exit_code": 0,
+      "elapsed": 3.766
+    }
+  }
+}

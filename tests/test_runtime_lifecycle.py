@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import subprocess
 import sys
 import threading
@@ -14,6 +15,7 @@ def fake_installed(monkeypatch):
     # Python cannot import the fake GGUF path passed as -m, so this portable
     # owned child exits nonzero without loading a model or user source code.
     monkeypatch.setattr(LocalRuntime, "binary", property(lambda self: Path(sys.executable)))
+    monkeypatch.setattr(LocalRuntime, "preflight", lambda *args: None)
 
 
 def test_actual_crashing_child_is_reaped_and_key_removed(tmp_path, monkeypatch):
@@ -34,7 +36,9 @@ def test_spawn_failure_removes_key_and_restricts_its_permissions(tmp_path, monke
     key.write_text("old")
     key.chmod(0o644)
     def failed_spawn(*args, **kwargs):
-        assert key.stat().st_mode & 0o777 == 0o600
+        if os.name != "nt":
+            assert key.stat().st_mode & 0o777 == 0o600
+        assert key.read_text() != "old"
         raise OSError("Cannot spawn")
     monkeypatch.setattr(subprocess, "Popen", failed_spawn)
     runtime = LocalRuntime(tmp_path)
@@ -113,3 +117,15 @@ def test_force_kill_and_retry_keep_process_ownership(tmp_path):
     assert process.killed == 1
     assert runtime.process is None
     assert not key.exists()
+
+
+def test_locked_model_files_are_reported_instead_of_fake_success(tmp_path, monkeypatch):
+    runtime = LocalRuntime(tmp_path)
+    directory = tmp_path / "models/lightonocr-3-0.8b"
+    directory.mkdir(parents=True)
+    def locked(*args, **kwargs):
+        raise PermissionError("mapped file")
+    monkeypatch.setattr("ctrlcctrlv.runtime.shutil.rmtree", locked)
+    with pytest.raises(OperationError, match="Не удалось удалить"):
+        runtime.delete("lightonocr-3-0.8b")
+    assert directory.exists()

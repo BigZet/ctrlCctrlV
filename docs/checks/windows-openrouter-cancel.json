@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "model": "qwen/qwen3-vl-8b-instruct",
+  "generation_limit": 1,
+  "max_output_tokens": 512,
+  "clipboard_backend": "windows",
+  "fixture": "python-light-20",
+  "checks": {
+    "cancelled_exception": true,
+    "body_sent_before_cancellation": true,
+    "cancelled_within_one_second": true,
+    "transport_closed": true,
+    "complete_response_not_received": true,
+    "system_clipboard_unchanged": true
+  },
+  "generation_cost_usd": null,
+  "request_elapsed": 0.7650000000139698,
+  "cancellation_latency": 0.045999999972991645,
+  "headers_received_before_cancel": false,
+  "cancel_reason": "after_body_sent",
+  "observed_key_usage_delta_usd": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "billing_note": "aggregate_observations_are_not_final_generation_cost",
+  "passed": true
+}

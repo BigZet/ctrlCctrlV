@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "physical_memory_bytes": 68592857088,
+  "checks": {
+    "unicode_multiline_tab": true,
+    "cancel_after_first_character": true,
+    "stop_on_same_process_window_change": true,
+    "hotkey_registered": true,
+    "native_hotkey_dispatch": true,
+    "native_capture_monitor_1": true,
+    "native_capture_monitor_2": true
+  },
+  "screens": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "dpi_scale": 1.0
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "dpi_scale": 2.0
+    }
+  ],
+  "capture_dpi_scales": [
+    1.0,
+    2.0
+  ],
+  "passed": true
+}

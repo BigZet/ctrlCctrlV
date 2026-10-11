@@ -8,6 +8,7 @@ This is a local development/pilot application. It is not notarized for public di
 - HTTPX: BSD-3-Clause — https://github.com/encode/httpx
 - keyring: MIT — https://github.com/jaraco/keyring
 - llama.cpp: MIT — https://github.com/ggml-org/llama.cpp
+- NVIDIA CUDA runtime / cuBLAS on Windows: downloaded separately with the pinned llama.cpp CUDA release, not included in the application ZIP — https://docs.nvidia.com/cuda/eula/index.html
 - Qwen3-VL weights: Apache-2.0 — https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct
 - LightOnOCR-3 weights: Apache-2.0 — https://huggingface.co/lightonai/LightOnOCR-3-0.8B and https://huggingface.co/lightonai/LightOnOCR-3-4B
 

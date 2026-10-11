@@ -1,7 +1,9 @@
-"""Measure full OCR-to-clipboard latency. A timeout is recorded as a failure."""
+"""Measure complete OCR-to-clipboard latency, including successful runs over 4s."""
 import argparse
 from difflib import SequenceMatcher
 import json
+import os
+import platform
 from pathlib import Path
 import threading
 import time
@@ -11,6 +13,7 @@ from PySide6.QtCore import QBuffer, QIODevice, QMimeData
 from PySide6.QtGui import QImage
 
 from ctrlcctrlv.catalog import MODELS
+from ctrlcctrlv.app import diagnostic_print
 from ctrlcctrlv.core import Operation
 from ctrlcctrlv.ocr import OCRProvider
 from ctrlcctrlv.runtime import LocalRuntime
@@ -24,7 +27,12 @@ def main():
     parser.add_argument("--fixtures", type=Path, default=Path("artifacts/fixtures"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/benchmark.json"))
     parser.add_argument("--limit", type=int, default=20)
+    parser.add_argument("--isolated-clipboard", action="store_true",
+                        help="Use Qt offscreen clipboard without changing the system clipboard")
+    parser.add_argument("--acceleration", choices=("gpu", "cpu"), default="gpu")
     args = parser.parse_args()
+    if args.isolated_clipboard:
+        os.environ["QT_QPA_PLATFORM"] = "offscreen"
     app = QApplication([])
     clipboard = app.clipboard()
     # Preserve all original clipboard formats, including images and rich text.
@@ -33,22 +41,23 @@ def main():
     if current:
         for format_name in current.formats():
             previous.setData(format_name, current.data(format_name))
-    runtime = LocalRuntime(args.data_dir)
+    runtime = LocalRuntime(args.data_dir, acceleration=args.acceleration)
     results = []
     try:
         preparing = time.monotonic()
-        runtime.start(args.model, threading.Event(), lambda label, *rest: print(label, flush=True))
+        runtime.start(args.model, threading.Event(), lambda label, *rest: diagnostic_print(label))
         preparation_elapsed = time.monotonic() - preparing
         model = MODELS[args.model]
         provider = OCRProvider(runtime.endpoint + "/v1/chat/completions", args.model, runtime.key, 4096, True, model.mode)
-        fixtures = json.loads((args.fixtures / "manifest.json").read_text())[:args.limit]
+        fixtures = json.loads((args.fixtures / "manifest.json").read_text(encoding="utf-8"))[:args.limit]
         for fixture in fixtures:
             image = QImage(str(args.fixtures / fixture["image"]))
-            expected = (args.fixtures / fixture["text"]).read_text()
+            expected = (args.fixtures / fixture["text"]).read_text(encoding="utf-8")
             row = {"id": fixture["id"], "model": args.model, "passed_4s": False,
                    "clipboard_backend": app.platformName(), "preparation_elapsed": preparation_elapsed,
                    "complexity": fixture.get("complexity", "short"), "width": image.width(),
                    "height": image.height(), "expected_characters": len(expected)}
+            row.update(system=platform.system(), architecture=platform.machine(), acceleration=args.acceleration)
             operation = Operation()
             try:
                 buffer = QBuffer()
