@@ -1,0 +1,222 @@
+[
+  {
+    "id": "python-light-14",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.7091965420113411,
+    "exact": false,
+    "exact_ignoring_final_newline": true,
+    "character_similarity": 0.9961685823754789,
+    "output_characters": 130,
+    "expected_characters": 131
+  },
+  {
+    "id": "python-light-20",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.8354073330119718,
+    "exact": false,
+    "exact_ignoring_final_newline": true,
+    "character_similarity": 0.9961685823754789,
+    "output_characters": 130,
+    "expected_characters": 131
+  },
+  {
+    "id": "python-dark-14",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.7924088749859948,
+    "exact": false,
+    "exact_ignoring_final_newline": true,
+    "character_similarity": 0.9961685823754789,
+    "output_characters": 130,
+    "expected_characters": 131
+  },
+  {
+    "id": "python-dark-20",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.8179755410237703,
+    "exact": false,
+    "exact_ignoring_final_newline": true,
+    "character_similarity": 0.9961685823754789,
+    "output_characters": 130,
+    "expected_characters": 131
+  },
+  {
+    "id": "sql-light-14",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.644781500013778,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.9658536585365853,
+    "output_characters": 105,
+    "expected_characters": 100
+  },
+  {
+    "id": "sql-light-20",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.6275736659881659,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.9658536585365853,
+    "output_characters": 105,
+    "expected_characters": 100
+  },
+  {
+    "id": "sql-dark-14",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.6568895420059562,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.9658536585365853,
+    "output_characters": 105,
+    "expected_characters": 100
+  },
+  {
+    "id": "sql-dark-20",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.6387590829981491,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.9658536585365853,
+    "output_characters": 105,
+    "expected_characters": 100
+  },
+  {
+    "id": "json-light-14",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.7901343750127126,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.903954802259887,
+    "output_characters": 84,
+    "expected_characters": 93
+  },
+  {
+    "id": "json-light-20",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.8122115420119371,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.903954802259887,
+    "output_characters": 84,
+    "expected_characters": 93
+  },
+  {
+    "id": "json-dark-14",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.7706639999814797,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.903954802259887,
+    "output_characters": 84,
+    "expected_characters": 93
+  },
+  {
+    "id": "json-dark-20",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.8267519579967484,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.903954802259887,
+    "output_characters": 84,
+    "expected_characters": 93
+  },
+  {
+    "id": "shell-light-14",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.5870435000106227,
+    "exact": false,
+    "exact_ignoring_final_newline": true,
+    "character_similarity": 0.9925925925925926,
+    "output_characters": 67,
+    "expected_characters": 68
+  },
+  {
+    "id": "shell-light-20",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.6053063749859575,
+    "exact": false,
+    "exact_ignoring_final_newline": true,
+    "character_similarity": 0.9925925925925926,
+    "output_characters": 67,
+    "expected_characters": 68
+  },
+  {
+    "id": "shell-dark-14",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.5970851669844706,
+    "exact": false,
+    "exact_ignoring_final_newline": true,
+    "character_similarity": 0.9925925925925926,
+    "output_characters": 67,
+    "expected_characters": 68
+  },
+  {
+    "id": "shell-dark-20",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.6021200830000453,
+    "exact": false,
+    "exact_ignoring_final_newline": true,
+    "character_similarity": 0.9925925925925926,
+    "output_characters": 67,
+    "expected_characters": 68
+  },
+  {
+    "id": "text-light-14",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.6149429579963908,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.967741935483871,
+    "output_characters": 107,
+    "expected_characters": 110
+  },
+  {
+    "id": "text-light-20",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.618073708988959,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.967741935483871,
+    "output_characters": 107,
+    "expected_characters": 110
+  },
+  {
+    "id": "text-dark-14",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.6032845000154339,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.967741935483871,
+    "output_characters": 107,
+    "expected_characters": 110
+  },
+  {
+    "id": "text-dark-20",
+    "model": "lightonocr-3-0.8b",
+    "passed_4s": true,
+    "elapsed": 0.6021969160065055,
+    "exact": false,
+    "exact_ignoring_final_newline": false,
+    "character_similarity": 0.967741935483871,
+    "output_characters": 107,
+    "expected_characters": 110
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "model": "lightonocr-3-0.8b",
+    "preparation_elapsed": 1.1940492089779582,
+    "physical_memory_bytes": 51539607552,
+    "after_warmup": {
+      "state": "running",
+      "ready": true,
+      "model": "lightonocr-3-0.8b",
+      "exit_code": null,
+      "resident_memory_bytes": 1434206208
+    }
+  },
+  {
+    "model": "lightonocr-3-4b",
+    "preparation_elapsed": 4.020481582992943,
+    "physical_memory_bytes": 51539607552,
+    "after_warmup": {
+      "state": "running",
+      "ready": true,
+      "model": "lightonocr-3-4b",
+      "exit_code": null,
+      "resident_memory_bytes": 5743345664
+    }
+  },
+  {
+    "model": "qwen3-vl-4b",
+    "preparation_elapsed": 2.974295041000005,
+    "physical_memory_bytes": 51539607552,
+    "after_warmup": {
+      "state": "running",
+      "ready": true,
+      "model": "qwen3-vl-4b",
+      "exit_code": null,
+      "resident_memory_bytes": 4746870784
+    }
+  },
+  {
+    "model": "qwen3-vl-8b",
+    "preparation_elapsed": 4.622089165990474,
+    "physical_memory_bytes": 51539607552,
+    "after_warmup": {
+      "state": "running",
+      "ready": true,
+      "model": "qwen3-vl-8b",
+      "exit_code": null,
+      "resident_memory_bytes": 7582973952
+    }
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "fixture": "4000 identical lines followed by one correction",
+  "lines": 4001,
+  "baseline_changes_seconds": 1.1612615829999413,
+  "prepared_changes_and_diff_seconds": 0.0019048750000365544,
+  "cached_100_reads_seconds": 1.1916999937966466e-05,
+  "clipboard": "unused"
+}

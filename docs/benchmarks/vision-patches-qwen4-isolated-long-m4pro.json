@@ -1,0 +1,55 @@
+{
+  "engine": "Vision accurate + qwen3-vl-4b",
+  "isolated_samples": true,
+  "timing_scope": "prewarmed Vision + PNG file read + full patch request + validation; no clipboard",
+  "results": [
+    {
+      "id": "python-long-light-16",
+      "complexity": "long",
+      "passed_4s": false,
+      "ocr_elapsed": 0.23890174999996816,
+      "elapsed": 4.003311792000204,
+      "error": "ReadTimeout"
+    },
+    {
+      "id": "python-long-dark-16",
+      "complexity": "long",
+      "passed_4s": false,
+      "ocr_elapsed": 0.3448813750001136,
+      "elapsed": 4.00379491700005,
+      "error": "ReadTimeout"
+    },
+    {
+      "id": "sql-long-light-16",
+      "complexity": "long",
+      "passed_4s": false,
+      "ocr_elapsed": 0.37920554100037407,
+      "elapsed": 4.0031478749997405,
+      "error": "ReadTimeout"
+    },
+    {
+      "id": "sql-long-dark-16",
+      "complexity": "long",
+      "passed_4s": false,
+      "ocr_elapsed": 0.33953270799975144,
+      "elapsed": 4.003485375000309,
+      "error": "ReadTimeout"
+    },
+    {
+      "id": "json-long-light-16",
+      "complexity": "long",
+      "passed_4s": false,
+      "ocr_elapsed": 0.2169445839999753,
+      "elapsed": 4.00316495900006,
+      "error": "ReadTimeout"
+    },
+    {
+      "id": "json-long-dark-16",
+      "complexity": "long",
+      "passed_4s": false,
+      "ocr_elapsed": 0.28519683300055476,
+      "elapsed": 4.003630750000411,
+      "error": "ReadTimeout"
+    }
+  ]
+}

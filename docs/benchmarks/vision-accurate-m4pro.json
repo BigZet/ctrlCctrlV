@@ -1,0 +1,4172 @@
+{
+  "engine": "macOS Vision",
+  "system": "26.5.1",
+  "level": "accurate",
+  "revision": 3,
+  "supported_languages": [
+    "en-US",
+    "fr-FR",
+    "it-IT",
+    "de-DE",
+    "es-ES",
+    "pt-BR",
+    "zh-Hans",
+    "zh-Hant",
+    "yue-Hans",
+    "yue-Hant",
+    "ko-KR",
+    "ja-JP",
+    "ru-RU",
+    "uk-UA",
+    "th-TH",
+    "vi-VT",
+    "ar-SA",
+    "ars-SA",
+    "tr-TR",
+    "id-ID",
+    "cs-CZ",
+    "da-DK",
+    "nl-NL",
+    "no-NO",
+    "nn-NO",
+    "nb-NO",
+    "ms-MY",
+    "pl-PL",
+    "ro-RO",
+    "sv-SE"
+  ],
+  "language_correction": false,
+  "timing_scope": "image file decode + recognition + geometric reconstruction; no clipboard",
+  "layout": "estimated from recognized boxes only; no fixture geometry",
+  "results": [
+    {
+      "id": "python-light-14",
+      "complexity": "short",
+      "elapsed": 11.568071083999712,
+      "passed_4s": false,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9612403100775194,
+      "expected": "def greet(name):\n    # Приветствие\n    if name == \"Женя\":\n        print(f\"Hello, {name}!\")\n\n    return {\"ok\": True, \"value\": None}\n",
+      "actual": "def greet (name) :\n   # Приветствие\n   if name == \"Женя\":\n       print(f\"Hello, {name)!\")\n\n   return {\"ok\": True,\"value\": None}",
+      "blocks": [
+        {
+          "text": "def greet (name) :",
+          "x": 0.024000002266666598,
+          "y": 0.13131313063973066,
+          "width": 0.136,
+          "height": 0.08080808080808077
+        },
+        {
+          "text": "# Приветствие",
+          "x": 0.0579999982333334,
+          "y": 0.2424242422815754,
+          "width": 0.10999999999999999,
+          "height": 0.0808080783998123
+        },
+        {
+          "text": "if name == \"Женя\":",
+          "x": 0.05800000253333326,
+          "y": 0.34848484797979806,
+          "width": 0.152,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "print(f\"Hello, {name)!\")",
+          "x": 0.09200000053333332,
+          "y": 0.4696969712121211,
+          "width": 0.19999999999999998,
+          "height": 0.09090909090909094
+        },
+        {
+          "text": "return {\"ok\": True,",
+          "x": 0.05773495202881304,
+          "y": 0.6824345817438335,
+          "width": 0.16068359375,
+          "height": 0.11201731363932288
+        },
+        {
+          "text": "\"value\": None}",
+          "x": 0.22000000174803064,
+          "y": 0.6818181823232324,
+          "width": 0.12399999237060544,
+          "height": 0.07070707070707072
+        }
+      ]
+    },
+    {
+      "id": "python-light-20",
+      "complexity": "short",
+      "elapsed": 0.05089124999994965,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9923664122137404,
+      "expected": "def greet(name):\n    # Приветствие\n    if name == \"Женя\":\n        print(f\"Hello, {name}!\")\n\n    return {\"ok\": True, \"value\": None}\n",
+      "actual": "def greet (name):\n    # Приветствие\n    if name == \"Женя\":\n        print(f\"Hello, {name}!\")\n\n    return {\"ok\": True, \"value\": None}",
+      "blocks": [
+        {
+          "text": "def greet (name):",
+          "x": 0.022000001939999975,
+          "y": 0.09920634880952378,
+          "width": 0.19399999999999998,
+          "height": 0.08730158730158732
+        },
+        {
+          "text": "# Приветствие",
+          "x": 0.07200000197499998,
+          "y": 0.2103174600198413,
+          "width": 0.158,
+          "height": 0.0714285714285714
+        },
+        {
+          "text": "if name == \"Женя\":",
+          "x": 0.07400000356666653,
+          "y": 0.3134920633597884,
+          "width": 0.21399999999999997,
+          "height": 0.0714285714285714
+        },
+        {
+          "text": "print(f\"Hello, {name}!\")",
+          "x": 0.11999999880000002,
+          "y": 0.43253968150793654,
+          "width": 0.28800000000000003,
+          "height": 0.10317460317460325
+        },
+        {
+          "text": "return {\"ok\": True, \"value\": None}",
+          "x": 0.07400000044,
+          "y": 0.6507936517460318,
+          "width": 0.40800000000000003,
+          "height": 0.09523809523809523
+        }
+      ]
+    },
+    {
+      "id": "python-dark-14",
+      "complexity": "short",
+      "elapsed": 0.041476458000033745,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9647058823529412,
+      "expected": "def greet(name):\n    # Приветствие\n    if name == \"Женя\":\n        print(f\"Hello, {name}!\")\n\n    return {\"ok\": True, \"value\": None}\n",
+      "actual": "def greet (name):\n   # Приветствие\n   ifname == \"Женя\":\n       print(f\"Hello,{name}!\")\n\n   return {\"ok\": True,\"value\": None}",
+      "blocks": [
+        {
+          "text": "def greet (name):",
+          "x": 0.024000002266666598,
+          "y": 0.131313130976431,
+          "width": 0.136,
+          "height": 0.08080808080808077
+        },
+        {
+          "text": "# Приветствие",
+          "x": 0.05599999926666669,
+          "y": 0.24747474865319863,
+          "width": 0.11200000000000002,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "if",
+          "x": 0.058000000333333315,
+          "y": 0.34848484797979806,
+          "width": 0.020000000000000004,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "name == \"Женя\":",
+          "x": 0.07800000219999993,
+          "y": 0.3484848483164983,
+          "width": 0.132,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "print(f\"Hello,",
+          "x": 0.09200000571469719,
+          "y": 0.4696969712121211,
+          "width": 0.11799999237060546,
+          "height": 0.09090909090909094
+        },
+        {
+          "text": "{name}!\")",
+          "x": 0.21000000139999997,
+          "y": 0.4595959590909091,
+          "width": 0.08400000000000002,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "return {\"ok\": True,",
+          "x": 0.057999999600000025,
+          "y": 0.6818181803030303,
+          "width": 0.16,
+          "height": 0.09090909090909094
+        },
+        {
+          "text": "\"value\": None}",
+          "x": 0.22199999847500004,
+          "y": 0.6767676772727274,
+          "width": 0.12200000000000003,
+          "height": 0.08080808080808077
+        }
+      ]
+    },
+    {
+      "id": "python-dark-20",
+      "complexity": "short",
+      "elapsed": 0.05308337500082416,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9923664122137404,
+      "expected": "def greet(name):\n    # Приветствие\n    if name == \"Женя\":\n        print(f\"Hello, {name}!\")\n\n    return {\"ok\": True, \"value\": None}\n",
+      "actual": "def greet (name):\n    # Приветствие\n    if name == \"Женя\":\n        print(f\"Hello, {name}!\")\n\n    return {\"ok\": True, \"value\": None}",
+      "blocks": [
+        {
+          "text": "def greet (name):",
+          "x": 0.02200000242499995,
+          "y": 0.09920634890873015,
+          "width": 0.19399999999999998,
+          "height": 0.08730158730158721
+        },
+        {
+          "text": "# Приветствие",
+          "x": 0.06799999938000002,
+          "y": 0.21031746119047617,
+          "width": 0.16199999999999998,
+          "height": 0.08730158730158732
+        },
+        {
+          "text": "if name == \"Женя\":",
+          "x": 0.07400000213999997,
+          "y": 0.3134920632539683,
+          "width": 0.21400000000000002,
+          "height": 0.0714285714285714
+        },
+        {
+          "text": "print(f\"Hello, {name}!\")",
+          "x": 0.11800000362499992,
+          "y": 0.4365079359126984,
+          "width": 0.29000000000000004,
+          "height": 0.09523809523809523
+        },
+        {
+          "text": "return {\"ok\": True, \"value\": None}",
+          "x": 0.0708333264583336,
+          "y": 0.6403200633269672,
+          "width": 0.4125,
+          "height": 0.10031225189330084
+        }
+      ]
+    },
+    {
+      "id": "sql-light-14",
+      "complexity": "short",
+      "elapsed": 0.042004500000075495,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": true,
+      "similarity": 0.9949748743718593,
+      "expected": "SELECT id, name, COUNT(*) AS total\nFROM users\nWHERE name = 'Иван' AND active = 1\nGROUP BY id, name;\n",
+      "actual": "SELECT id, name, COUNT(*) AS total\nFROM users\nWHERE name = 'Иван' AND active = 1\nGROUP BY id, name;",
+      "blocks": [
+        {
+          "text": "SELECT id, name, COUNT(*) AS total",
+          "x": 0.024000002879999954,
+          "y": 0.14999999922222224,
+          "width": 0.28800000000000003,
+          "height": 0.09999999999999998
+        },
+        {
+          "text": "FROM users",
+          "x": 0.024000001433333296,
+          "y": 0.2611111109259259,
+          "width": 0.08600000000000001,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "WHERE name = 'Иван' AND active = 1",
+          "x": 0.024000003599999927,
+          "y": 0.38333333291666666,
+          "width": 0.288,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "GROUP BY id, name;",
+          "x": 0.02400000079999998,
+          "y": 0.5166666683333332,
+          "width": 0.152,
+          "height": 0.09999999999999998
+        }
+      ]
+    },
+    {
+      "id": "sql-light-20",
+      "complexity": "short",
+      "elapsed": 0.045222708000437706,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": true,
+      "similarity": 0.9949748743718593,
+      "expected": "SELECT id, name, COUNT(*) AS total\nFROM users\nWHERE name = 'Иван' AND active = 1\nGROUP BY id, name;\n",
+      "actual": "SELECT id, name, COUNT(*) AS total\nFROM users\nWHERE name = 'Иван' AND active = 1\nGROUP BY id, name;",
+      "blocks": [
+        {
+          "text": "SELECT id, name, COUNT(*) AS total",
+          "x": 0.021999995880000057,
+          "y": 0.13265306142857142,
+          "width": 0.412,
+          "height": 0.12244897959183676
+        },
+        {
+          "text": "FROM users",
+          "x": 0.023999998550000044,
+          "y": 0.26530612117346947,
+          "width": 0.12,
+          "height": 0.10204081632653061
+        },
+        {
+          "text": "WHERE name = 'Иван' AND active = 1",
+          "x": 0.02199999656666674,
+          "y": 0.4081632658163265,
+          "width": 0.412,
+          "height": 0.10204081632653061
+        },
+        {
+          "text": "GROUP BY id, name;",
+          "x": 0.022000000699999987,
+          "y": 0.5663265319387754,
+          "width": 0.218,
+          "height": 0.13265306122448972
+        }
+      ]
+    },
+    {
+      "id": "sql-dark-14",
+      "complexity": "short",
+      "elapsed": 0.040100416999848676,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9484536082474226,
+      "expected": "SELECT id, name, COUNT(*) AS total\nFROM users\nWHERE name = 'Иван' AND active = 1\nGROUP BY id, name;\n",
+      "actual": "SELECT id, name,COUNT (*) AStotal\nFROM users\nWHERE name= 'Иван'ANDactive = 1\nGROUP BY id,name,",
+      "blocks": [
+        {
+          "text": "SELECT id, name,",
+          "x": 0.02400000177499996,
+          "y": 0.14999999958333332,
+          "width": 0.14200000000000002,
+          "height": 0.09999999999999987
+        },
+        {
+          "text": "COUNT (*) AS",
+          "x": 0.16600000159999997,
+          "y": 0.13888888833333335,
+          "width": 0.096,
+          "height": 0.07777777777777772
+        },
+        {
+          "text": "total",
+          "x": 0.26399999920000006,
+          "y": 0.13888888944444444,
+          "width": 0.04799999999999999,
+          "height": 0.07777777777777772
+        },
+        {
+          "text": "FROM users",
+          "x": 0.024000000839999983,
+          "y": 0.26666666622222224,
+          "width": 0.084,
+          "height": 0.06666666666666665
+        },
+        {
+          "text": "WHERE name",
+          "x": 0.02400000146666662,
+          "y": 0.38333333314814816,
+          "width": 0.08800000000000001,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "= 'Иван'",
+          "x": 0.11199999910000003,
+          "y": 0.38333333402777775,
+          "width": 0.07200000000000001,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "AND",
+          "x": 0.18999999953333335,
+          "y": 0.38888888925925935,
+          "width": 0.027999999999999997,
+          "height": 0.06666666666666665
+        },
+        {
+          "text": "active = 1",
+          "x": 0.21999999850000007,
+          "y": 0.38333333425925925,
+          "width": 0.08999999999999997,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "GROUP BY id,",
+          "x": 0.024000001699999943,
+          "y": 0.5111111111111111,
+          "width": 0.10200000000000001,
+          "height": 0.0888888888888889
+        },
+        {
+          "text": "name,",
+          "x": 0.12592970161564812,
+          "y": 0.5222222233844396,
+          "width": 0.05014059829711914,
+          "height": 0.07000009748670788
+        }
+      ]
+    },
+    {
+      "id": "sql-dark-20",
+      "complexity": "short",
+      "elapsed": 0.04027124999993248,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9849246231155779,
+      "expected": "SELECT id, name, COUNT(*) AS total\nFROM users\nWHERE name = 'Иван' AND active = 1\nGROUP BY id, name;\n",
+      "actual": "SELECT id, name, COUNT(*) AS total\nFROM users\nWHERE name = \"Иван' AND active = 1\nGROUP BY id, name;",
+      "blocks": [
+        {
+          "text": "SELECT id, name, COUNT(*) AS total",
+          "x": 0.021999999600000025,
+          "y": 0.13775510369897953,
+          "width": 0.412,
+          "height": 0.13265306122448972
+        },
+        {
+          "text": "FROM users",
+          "x": 0.021999998983333355,
+          "y": 0.26530612295918365,
+          "width": 0.122,
+          "height": 0.10204081632653073
+        },
+        {
+          "text": "WHERE name = \"Иван' AND active = 1",
+          "x": 0.021999998850000025,
+          "y": 0.40306122308673475,
+          "width": 0.412,
+          "height": 0.11224489795918369
+        },
+        {
+          "text": "GROUP BY id, name;",
+          "x": 0.022000000699999987,
+          "y": 0.5663265319387754,
+          "width": 0.218,
+          "height": 0.13265306122448972
+        }
+      ]
+    },
+    {
+      "id": "json-light-14",
+      "complexity": "short",
+      "elapsed": 0.034341707999374194,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9666666666666667,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"values\": [0, 1, 2],\n    \"path\": \"C:\\\\data\"\n}\n",
+      "actual": "{\n   \"name\": \"Тест\",\n   \"enabled\": true,\n   \"values\": [0, 1, 2],\n   \"path\":\"C:\\\\data\"\n}",
+      "blocks": [
+        {
+          "text": "{",
+          "x": 0.024000000075,
+          "y": 0.12626262714646463,
+          "width": 0.010000000000000002,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "}",
+          "x": 0.024000000124999997,
+          "y": 0.6818181814393939,
+          "width": 0.010000000000000002,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "\"name\": \"Тест\",",
+          "x": 0.056000001681364014,
+          "y": 0.24242424242424243,
+          "width": 0.12799999237060547,
+          "height": 0.08080808080808088
+        },
+        {
+          "text": "\"enabled\": true,",
+          "x": 0.05600000223333326,
+          "y": 0.35858586010101,
+          "width": 0.13799999999999998,
+          "height": 0.09090909090909105
+        },
+        {
+          "text": "\"values\": [0, 1, 2],",
+          "x": 0.05799999790000004,
+          "y": 0.4646464646464647,
+          "width": 0.16799999999999998,
+          "height": 0.08080808080808077
+        },
+        {
+          "text": "\"path\":",
+          "x": 0.05600000150734864,
+          "y": 0.575757577104377,
+          "width": 0.05999999618530273,
+          "height": 0.08080807599154383
+        },
+        {
+          "text": "\"C:\\\\data\"",
+          "x": 0.11999999850000007,
+          "y": 0.5707070708754209,
+          "width": 0.09,
+          "height": 0.07070707070707061
+        }
+      ]
+    },
+    {
+      "id": "json-light-20",
+      "complexity": "short",
+      "elapsed": 0.037876458000027924,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9281767955801105,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"values\": [0, 1, 2],\n    \"path\": \"C:\\\\data\"\n}\n",
+      "actual": "    \"пате\": \"Тест\"\n    \"enabled\": true,\n    \"values\": [0, 1, 2],\n    \"path\":\"C:\\\\data\"\n}",
+      "blocks": [
+        {
+          "text": "}",
+          "x": 0.023999999900000003,
+          "y": 0.6468253959325396,
+          "width": 0.012,
+          "height": 0.0714285714285714
+        },
+        {
+          "text": "\"пате\": \"Тест\"",
+          "x": 0.07200000283333324,
+          "y": 0.19841269761904767,
+          "width": 0.16999999999999998,
+          "height": 0.0793650793650793
+        },
+        {
+          "text": "\"enabled\": true,",
+          "x": 0.06957697460877586,
+          "y": 0.3166480156413742,
+          "width": 0.19485592651367184,
+          "height": 0.09876479042900932
+        },
+        {
+          "text": "\"values\": [0, 1, 2],",
+          "x": 0.06999999798333337,
+          "y": 0.432539682473545,
+          "width": 0.24200000000000002,
+          "height": 0.10317460317460325
+        },
+        {
+          "text": "\"path\":",
+          "x": 0.07000000112499999,
+          "y": 0.5396825390873016,
+          "width": 0.09,
+          "height": 0.09523809523809512
+        },
+        {
+          "text": "\"C:\\\\data\"",
+          "x": 0.16199999840000004,
+          "y": 0.5357142856150794,
+          "width": 0.12799999999999997,
+          "height": 0.08730158730158732
+        }
+      ]
+    },
+    {
+      "id": "json-dark-14",
+      "complexity": "short",
+      "elapsed": 0.032976249999592255,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9444444444444444,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"values\": [0, 1, 2],\n    \"path\": \"C:\\\\data\"\n}\n",
+      "actual": "   \"пame\": \"Тест\",\n   \"enabled\": true,\n   \"values\": [0, 1, 2],\n   \"path\": \"C: \\\\data\"\n}",
+      "blocks": [
+        {
+          "text": "}",
+          "x": 0.021999999833333343,
+          "y": 0.6818181823232324,
+          "width": 0.009999999999999998,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "\"пame\": \"Тест\",",
+          "x": 0.05600000159999996,
+          "y": 0.24242424242424243,
+          "width": 0.128,
+          "height": 0.08080808080808088
+        },
+        {
+          "text": "\"enabled\": true,",
+          "x": 0.05599999773333342,
+          "y": 0.35353535319865315,
+          "width": 0.136,
+          "height": 0.08080808080808088
+        },
+        {
+          "text": "\"values\": [0, 1, 2],",
+          "x": 0.0560000008333333,
+          "y": 0.4696969712121211,
+          "width": 0.16999999999999998,
+          "height": 0.09090909090909094
+        },
+        {
+          "text": "\"path\": \"C: \\\\data\"",
+          "x": 0.056000001924999966,
+          "y": 0.5707070698232324,
+          "width": 0.154,
+          "height": 0.09090909090909094
+        }
+      ]
+    },
+    {
+      "id": "json-dark-20",
+      "complexity": "short",
+      "elapsed": 0.034631500000614324,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9617486338797814,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"values\": [0, 1, 2],\n    \"path\": \"C:\\\\data\"\n}\n",
+      "actual": "    \"name\": \"Тест\"\n    \"enabled\": true,\n    \"values\": [0, 1, 21,\n    \"path\": \"C: \\\\data\"\n}",
+      "blocks": [
+        {
+          "text": "}",
+          "x": 0.024000000066666666,
+          "y": 0.646825398015873,
+          "width": 0.011999999999999997,
+          "height": 0.0714285714285714
+        },
+        {
+          "text": "\"name\": \"Тест\"",
+          "x": 0.06999999787500005,
+          "y": 0.19841269841269843,
+          "width": 0.16999999999999998,
+          "height": 0.07936507936507942
+        },
+        {
+          "text": "\"enabled\": true,",
+          "x": 0.06799999755000005,
+          "y": 0.32142857113095236,
+          "width": 0.19599999999999998,
+          "height": 0.10317460317460325
+        },
+        {
+          "text": "\"values\": [0, 1, 21,",
+          "x": 0.07000000304999991,
+          "y": 0.44047619037698416,
+          "width": 0.244,
+          "height": 0.10317460317460303
+        },
+        {
+          "text": "\"path\": \"C: \\\\data\"",
+          "x": 0.07000000219999998,
+          "y": 0.539682538888889,
+          "width": 0.22000000000000003,
+          "height": 0.09523809523809512
+        }
+      ]
+    },
+    {
+      "id": "shell-light-14",
+      "complexity": "short",
+      "elapsed": 0.033100708999882045,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8527131782945736,
+      "expected": "#!/bin/sh\nvalue=\"a|b\"\nprintf '%s\\n' \"$value\"\n# [] {} () _ | : ; , .\n",
+      "actual": "#:/bin/sh\nvalue=\"a|b\"\nprintf '%s\\n' \"$value\"\n# |] ° () -1:;,•",
+      "blocks": [
+        {
+          "text": "#:/bin/sh",
+          "x": 0.023999999240000014,
+          "y": 0.14444444488888886,
+          "width": 0.07600000000000001,
+          "height": 0.06666666666666665
+        },
+        {
+          "text": "value=\"a|b\"",
+          "x": 0.023958520280510983,
+          "y": 0.2555555540360559,
+          "width": 0.09408296203613281,
+          "height": 0.0916381518046061
+        },
+        {
+          "text": "printf '%s\\n' \"$value\"",
+          "x": 0.02399999716666676,
+          "y": 0.3888888890458227,
+          "width": 0.186,
+          "height": 0.08888888623979352
+        },
+        {
+          "text": "# |] ° () -1:;,•",
+          "x": 0.024000003099999886,
+          "y": 0.5166666664814816,
+          "width": 0.186,
+          "height": 0.09999999999999998
+        }
+      ]
+    },
+    {
+      "id": "shell-light-20",
+      "complexity": "short",
+      "elapsed": 0.03558779200011486,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8217054263565892,
+      "expected": "#!/bin/sh\nvalue=\"a|b\"\nprintf '%s\\n' \"$value\"\n# [] {} () _ | : ; , .\n",
+      "actual": "#!/bin/sh\nvalue=\"a |b\"\nprintf 'gs\\n' \"$value\"\n# | I> ()-1:;,•",
+      "blocks": [
+        {
+          "text": "#!/bin/sh",
+          "x": 0.02197481605589651,
+          "y": 0.12244897907273844,
+          "width": 0.11005036926269529,
+          "height": 0.10346383464579678
+        },
+        {
+          "text": "value=\"a |b\"",
+          "x": 0.022000001359999986,
+          "y": 0.2602040807142857,
+          "width": 0.136,
+          "height": 0.11224489795918369
+        },
+        {
+          "text": "printf 'gs\\n' \"$value\"",
+          "x": 0.022000002679999936,
+          "y": 0.40816326428571437,
+          "width": 0.268,
+          "height": 0.12244897959183665
+        },
+        {
+          "text": "# | I> ()-1:;,•",
+          "x": 0.022000002216666644,
+          "y": 0.5663265303571429,
+          "width": 0.266,
+          "height": 0.13265306122448983
+        }
+      ]
+    },
+    {
+      "id": "shell-dark-14",
+      "complexity": "short",
+      "elapsed": 0.034243916000377794,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8503937007874016,
+      "expected": "#!/bin/sh\nvalue=\"a|b\"\nprintf '%s\\n' \"$value\"\n# [] {} () _ | : ; , .\n",
+      "actual": "#!/bin/sh\nvalue=\"a|b\"\nprintf '%s\\n' \"$value\"\n#[]  00)-1:;.•",
+      "blocks": [
+        {
+          "text": "#!/bin/sh",
+          "x": 0.02186611637134589,
+          "y": 0.144444444077851,
+          "width": 0.08026776885986328,
+          "height": 0.09665356742011177
+        },
+        {
+          "text": "value=\"a|b\"",
+          "x": 0.02396460472286981,
+          "y": 0.2611111094157566,
+          "width": 0.09407079315185547,
+          "height": 0.10207451714409721
+        },
+        {
+          "text": "printf '%s\\n' \"$value\"",
+          "x": 0.02400000232499994,
+          "y": 0.3777777769444445,
+          "width": 0.186,
+          "height": 0.0888888888888888
+        },
+        {
+          "text": "#[]",
+          "x": 0.020000000119999996,
+          "y": 0.5111111102222222,
+          "width": 0.036000000000000004,
+          "height": 0.0888888888888888
+        },
+        {
+          "text": "00)-1:;.•",
+          "x": 0.06800000236666659,
+          "y": 0.5166666664814816,
+          "width": 0.14200000000000002,
+          "height": 0.09999999999999998
+        }
+      ]
+    },
+    {
+      "id": "shell-dark-20",
+      "complexity": "short",
+      "elapsed": 0.03354162499999802,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8854961832061069,
+      "expected": "#!/bin/sh\nvalue=\"a|b\"\nprintf '%s\\n' \"$value\"\n# [] {} () _ | : ; , .\n",
+      "actual": "#!/bin/sh\nvalue=\"a |b\"\nprintf '%s\\n' \"$value\"\n# [] {} () -1::,•",
+      "blocks": [
+        {
+          "text": "#!/bin/sh",
+          "x": 0.021942874529610294,
+          "y": 0.12755102154079967,
+          "width": 0.11011425018310547,
+          "height": 0.11519683137231951
+        },
+        {
+          "text": "value=\"a |b\"",
+          "x": 0.021800522855679943,
+          "y": 0.2653061238901236,
+          "width": 0.13639895629882814,
+          "height": 0.1345660832463479
+        },
+        {
+          "text": "printf '%s\\n' \"$value\"",
+          "x": 0.022000002679999936,
+          "y": 0.40816326428571437,
+          "width": 0.268,
+          "height": 0.12244897959183665
+        },
+        {
+          "text": "# [] {} () -1::,•",
+          "x": 0.021999998275000054,
+          "y": 0.5612244880102042,
+          "width": 0.266,
+          "height": 0.1428571428571429
+        }
+      ]
+    },
+    {
+      "id": "text-light-14",
+      "complexity": "short",
+      "elapsed": 0.035894584000743635,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9861751152073732,
+      "expected": "Перенос текста из удалённого редактора.\nEnglish and русский в одной строке.\n\n    Строка с четырьмя пробелами.\n",
+      "actual": "Перенос текста из удалённого редактора.\nEnglish and русский в одной строке.\n   Строка с четырьмя пробелами.",
+      "blocks": [
+        {
+          "text": "Перенос текста из удалённого редактора.",
+          "x": 0.022000000575,
+          "y": 0.1444444430555556,
+          "width": 0.33,
+          "height": 0.11111111111111116
+        },
+        {
+          "text": "English and русский в одной строке.",
+          "x": 0.022000002979999947,
+          "y": 0.2666666664444444,
+          "width": 0.29800000000000004,
+          "height": 0.11111111111111105
+        },
+        {
+          "text": "Строка с четырьмя пробелами.",
+          "x": 0.056000011596061085,
+          "y": 0.5111111111111111,
+          "width": 0.23799998474121095,
+          "height": 0.0888888888888889
+        }
+      ]
+    },
+    {
+      "id": "text-light-20",
+      "complexity": "short",
+      "elapsed": 0.04410825000013574,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9908256880733946,
+      "expected": "Перенос текста из удалённого редактора.\nEnglish and русский в одной строке.\n\n    Строка с четырьмя пробелами.\n",
+      "actual": "Перенос текста из удалённого редактора.\nEnglish and русский в одной строке.\n    Строка с четырьмя пробелами.",
+      "blocks": [
+        {
+          "text": "Перенос текста из удалённого редактора.",
+          "x": 0.022000005224999883,
+          "y": 0.13265306275510202,
+          "width": 0.47,
+          "height": 0.12244897959183665
+        },
+        {
+          "text": "English and русский в одной строке.",
+          "x": 0.023999998600000027,
+          "y": 0.2755102056122449,
+          "width": 0.42,
+          "height": 0.12244897959183676
+        },
+        {
+          "text": "Строка с четырьмя пробелами.",
+          "x": 0.06999999662000005,
+          "y": 0.5561224492857142,
+          "width": 0.33799999999999997,
+          "height": 0.11224489795918369
+        }
+      ]
+    },
+    {
+      "id": "text-dark-14",
+      "complexity": "short",
+      "elapsed": 0.04284733399981633,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9483568075117371,
+      "expected": "Перенос текста из удалённого редактора.\nEnglish and русский в одной строке.\n\n    Строка с четырьмя пробелами.\n",
+      "actual": "Переностекста из удаленного редактора.\nEnglish and русскийчодной строке.\n   Строкас четырьмя пробелами.",
+      "blocks": [
+        {
+          "text": "Перенос",
+          "x": 0.02394860922434858,
+          "y": 0.14999999933982766,
+          "width": 0.06610278320312502,
+          "height": 0.0805158138275146
+        },
+        {
+          "text": "текста из удаленного редактора.",
+          "x": 0.08800000329999992,
+          "y": 0.14999999958333332,
+          "width": 0.26399999999999996,
+          "height": 0.07777777777777772
+        },
+        {
+          "text": "English and русский",
+          "x": 0.024000002366666592,
+          "y": 0.2611111094444445,
+          "width": 0.16199999999999998,
+          "height": 0.10000000000000009
+        },
+        {
+          "text": "чодной строке.",
+          "x": 0.20200000324803064,
+          "y": 0.2666666665097329,
+          "width": 0.11799999237060543,
+          "height": 0.08888888623979363
+        },
+        {
+          "text": "Строка",
+          "x": 0.057968172723759495,
+          "y": 0.5111111105700217,
+          "width": 0.05206365585327148,
+          "height": 0.09004510243733732
+        },
+        {
+          "text": "с четырьмя пробелами.",
+          "x": 0.11200000303333323,
+          "y": 0.5111111111111111,
+          "width": 0.18199999999999994,
+          "height": 0.0888888888888889
+        }
+      ]
+    },
+    {
+      "id": "text-dark-20",
+      "complexity": "short",
+      "elapsed": 0.044636124999669846,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9908256880733946,
+      "expected": "Перенос текста из удалённого редактора.\nEnglish and русский в одной строке.\n\n    Строка с четырьмя пробелами.\n",
+      "actual": "Перенос текста из удалённого редактора.\nEnglish and русский в одной строке.\n    Строка с четырьмя пробелами.",
+      "blocks": [
+        {
+          "text": "Перенос текста из удалённого редактора.",
+          "x": 0.02200000469999992,
+          "y": 0.12755102030612242,
+          "width": 0.47000000000000003,
+          "height": 0.11224489795918369
+        },
+        {
+          "text": "English and русский в одной строке.",
+          "x": 0.021999994725000135,
+          "y": 0.2755102043367347,
+          "width": 0.422,
+          "height": 0.12244897959183665
+        },
+        {
+          "text": "Строка с четырьмя пробелами.",
+          "x": 0.07000000281666661,
+          "y": 0.5561224488945579,
+          "width": 0.33799999999999997,
+          "height": 0.11224489795918369
+        }
+      ]
+    },
+    {
+      "id": "python-medium-light-16",
+      "complexity": "medium",
+      "elapsed": 0.11380608299987216,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.991304347826087,
+      "expected": "def collect(values):\n    result = []\n    # Проверка 1\n    if len(values) > 0:\n        result.append((\"item_0\", values[0]))\n    # Проверка 2\n    if len(values) > 1:\n        result.append((\"item_1\", values[1]))\n    # Проверка 3\n    if len(values) > 2:\n        result.append((\"item_2\", values[2]))\n    # Проверка 4\n    if len(values) > 3:\n        result.append((\"item_3\", values[3]))\n    # Проверка 5\n    if len(values) > 4:\n        result.append((\"item_4\", values[4]))\n    # Проверка 6\n    if len(values) > 5:\n        result.append((\"item_5\", values[5]))\n    return result\n",
+      "actual": "def collect (values):\n    result = []\n    # Проверка 1\n    if len(values) > 0:\n        result.append((\"item_0\", values[0]))\n    # Проверка 2\n    if len (values) > 1:\n        result.append((\"item_1\", values[1]))\n    # Проверка 3\n    if len(values) > 2:\n        result.append( (\"item_2\", values [2]))\n    # Проверка 4\n    if len (values) > 3:\n        result.append((\"item_3\", values [3]))\n    # Проверка 5\n    if len (values) > 4:\n        result.append((\"item_4\", values[4]))\n    # Проверка 6\n    if len (values) > 5:\n        result.append ((\"item_5\", values[5]))\n    return result",
+      "blocks": [
+        {
+          "text": "def collect (values):",
+          "x": 0.024000000399999975,
+          "y": 0.04166666661762486,
+          "width": 0.192,
+          "height": 0.02777777694993544
+        },
+        {
+          "text": "result = []",
+          "x": 0.06399999995757577,
+          "y": 0.08506944440761788,
+          "width": 0.10400000000000001,
+          "height": 0.02430555555555558
+        },
+        {
+          "text": "# Проверка 1",
+          "x": 0.062000001474999976,
+          "y": 0.12847222204861114,
+          "width": 0.118,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if len(values) > 0:",
+          "x": 0.05981636186293644,
+          "y": 0.17013888735787575,
+          "width": 0.1863672637939453,
+          "height": 0.03512035972542238
+        },
+        {
+          "text": "result.append((\"item_0\", values[0]))",
+          "x": 0.10199999570000011,
+          "y": 0.21180555572916665,
+          "width": 0.344,
+          "height": 0.03472222222222221
+        },
+        {
+          "text": "# Проверка 2",
+          "x": 0.06200000578136385,
+          "y": 0.2517361108217593,
+          "width": 0.11799999237060546,
+          "height": 0.03125
+        },
+        {
+          "text": "if len (values) > 1:",
+          "x": 0.06200000183999998,
+          "y": 0.2916666665277778,
+          "width": 0.184,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "result.append((\"item_1\", values[1]))",
+          "x": 0.10199999570000011,
+          "y": 0.33680555572916665,
+          "width": 0.344,
+          "height": 0.03472222222222221
+        },
+        {
+          "text": "# Проверка 3",
+          "x": 0.06200000578136385,
+          "y": 0.378472221875,
+          "width": 0.11799999237060546,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if len(values) > 2:",
+          "x": 0.06200000229999995,
+          "y": 0.4184027776475695,
+          "width": 0.184,
+          "height": 0.02430555555555558
+        },
+        {
+          "text": "result.append( (\"item_2\", values [2]))",
+          "x": 0.10199999570000011,
+          "y": 0.4618055557291666,
+          "width": 0.344,
+          "height": 0.0347222222222221
+        },
+        {
+          "text": "# Проверка 4",
+          "x": 0.062000001474999976,
+          "y": 0.5034722219618055,
+          "width": 0.118,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if len (values) > 3:",
+          "x": 0.06199999993333333,
+          "y": 0.5416666666176249,
+          "width": 0.184,
+          "height": 0.02777777694993555
+        },
+        {
+          "text": "result.append((\"item_3\", values [3]))",
+          "x": 0.10200000144999996,
+          "y": 0.5868055559895833,
+          "width": 0.344,
+          "height": 0.03472222222222221
+        },
+        {
+          "text": "# Проверка 5",
+          "x": 0.0600000058146972,
+          "y": 0.6267361109375,
+          "width": 0.11999999237060549,
+          "height": 0.03125
+        },
+        {
+          "text": "if len (values) > 4:",
+          "x": 0.06200000229999995,
+          "y": 0.6666666665798611,
+          "width": 0.184,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "result.append((\"item_4\", values[4]))",
+          "x": 0.10200000576666644,
+          "y": 0.7118055553240741,
+          "width": 0.346,
+          "height": 0.03472222222222221
+        },
+        {
+          "text": "# Проверка 6",
+          "x": 0.062000001914697324,
+          "y": 0.7517361105902778,
+          "width": 0.11799999237060546,
+          "height": 0.03125
+        },
+        {
+          "text": "if len (values) > 5:",
+          "x": 0.06200000183999998,
+          "y": 0.7916666665277778,
+          "width": 0.184,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "result.append ((\"item_5\", values[5]))",
+          "x": 0.10000000347999992,
+          "y": 0.8385416663541666,
+          "width": 0.348,
+          "height": 0.03819444444444442
+        },
+        {
+          "text": "return result",
+          "x": 0.06400000157499997,
+          "y": 0.8767361109809028,
+          "width": 0.126,
+          "height": 0.02430555555555558
+        }
+      ]
+    },
+    {
+      "id": "python-medium-dark-16",
+      "complexity": "medium",
+      "elapsed": 0.12359475000084785,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9801894918173988,
+      "expected": "def collect(values):\n    result = []\n    # Проверка 1\n    if len(values) > 0:\n        result.append((\"item_0\", values[0]))\n    # Проверка 2\n    if len(values) > 1:\n        result.append((\"item_1\", values[1]))\n    # Проверка 3\n    if len(values) > 2:\n        result.append((\"item_2\", values[2]))\n    # Проверка 4\n    if len(values) > 3:\n        result.append((\"item_3\", values[3]))\n    # Проверка 5\n    if len(values) > 4:\n        result.append((\"item_4\", values[4]))\n    # Проверка 6\n    if len(values) > 5:\n        result.append((\"item_5\", values[5]))\n    return result\n",
+      "actual": "def collect (values):\n    result = []\n    # Проверка 1\n    if len (values) > 0:\n        result.append( (\"item_0\", values [0]))\n    # Проверка 2\n    if len (values) > 1:\n        result.append( (\"item_1\", values [1]))\n    # Проверка 3\n    if len (values) > 2:\n        result.append( (\"item_2\", values [21))\n    # Проверка 4\n    if len (values) > 3:\n        result.append( (\"item_3\", values [3]))\n    # Проверка 5\n    if len (values) > 4:\n        result. append( (\"item_4\", values [4]))\n    # Проверка 6\n    if len (values) > 5:\n        result.append ((\"item_5\", values [5]))\n    return result",
+      "blocks": [
+        {
+          "text": "def collect (values):",
+          "x": 0.023999998800000043,
+          "y": 0.04166666661762486,
+          "width": 0.192,
+          "height": 0.02777777694993544
+        },
+        {
+          "text": "result = []",
+          "x": 0.06400000119999996,
+          "y": 0.08333333328429154,
+          "width": 0.10400000000000001,
+          "height": 0.02777777694993555
+        },
+        {
+          "text": "# Проверка 1",
+          "x": 0.06199999917142859,
+          "y": 0.12847222237103173,
+          "width": 0.11599999999999999,
+          "height": 0.02777777777777768
+        },
+        {
+          "text": "if len (values) > 0:",
+          "x": 0.05999999772500007,
+          "y": 0.1684027773871528,
+          "width": 0.186,
+          "height": 0.03125
+        },
+        {
+          "text": "result.append( (\"item_0\", values [0]))",
+          "x": 0.1019999956750001,
+          "y": 0.21180555572916665,
+          "width": 0.346,
+          "height": 0.03472222222222221
+        },
+        {
+          "text": "# Проверка 2",
+          "x": 0.06000000041999999,
+          "y": 0.25347222250000007,
+          "width": 0.11800000000000001,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if len (values) > 1:",
+          "x": 0.06199999700000009,
+          "y": 0.29166666661762486,
+          "width": 0.184,
+          "height": 0.02777777694993544
+        },
+        {
+          "text": "result.append( (\"item_1\", values [1]))",
+          "x": 0.10200000576666644,
+          "y": 0.3368055553240741,
+          "width": 0.346,
+          "height": 0.03472222222222232
+        },
+        {
+          "text": "# Проверка 3",
+          "x": 0.06000000041999999,
+          "y": 0.37847222249999996,
+          "width": 0.11800000000000001,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if len (values) > 2:",
+          "x": 0.061999997333333424,
+          "y": 0.41666666661762486,
+          "width": 0.184,
+          "height": 0.02777777694993544
+        },
+        {
+          "text": "result.append( (\"item_2\", values [21))",
+          "x": 0.10199999570000011,
+          "y": 0.4618055557291666,
+          "width": 0.344,
+          "height": 0.0347222222222221
+        },
+        {
+          "text": "# Проверка 4",
+          "x": 0.060000001848030664,
+          "y": 0.5034722223379628,
+          "width": 0.11799999237060546,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if len (values) > 3:",
+          "x": 0.06200000229999995,
+          "y": 0.5416666665798611,
+          "width": 0.184,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "result.append( (\"item_3\", values [3]))",
+          "x": 0.10200000432499991,
+          "y": 0.5868055553819445,
+          "width": 0.34600000000000003,
+          "height": 0.03472222222222221
+        },
+        {
+          "text": "# Проверка 5",
+          "x": 0.059999998525000035,
+          "y": 0.6284722223090278,
+          "width": 0.118,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if len (values) > 4:",
+          "x": 0.061999997333333424,
+          "y": 0.6666666666176249,
+          "width": 0.184,
+          "height": 0.02777777694993555
+        },
+        {
+          "text": "result. append( (\"item_4\", values [4]))",
+          "x": 0.09999999420000018,
+          "y": 0.7118055556712963,
+          "width": 0.34800000000000003,
+          "height": 0.03472222222222221
+        },
+        {
+          "text": "# Проверка 6",
+          "x": 0.06000000041999999,
+          "y": 0.7534722225000001,
+          "width": 0.11800000000000001,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if len (values) > 5:",
+          "x": 0.06199999700000009,
+          "y": 0.7916666666176249,
+          "width": 0.184,
+          "height": 0.02777777694993555
+        },
+        {
+          "text": "result.append ((\"item_5\", values [5]))",
+          "x": 0.10000000139999997,
+          "y": 0.8385416671440972,
+          "width": 0.348,
+          "height": 0.03819444444444442
+        },
+        {
+          "text": "return result",
+          "x": 0.06400000528136389,
+          "y": 0.8749999999509581,
+          "width": 0.12399999237060545,
+          "height": 0.02777777694993544
+        }
+      ]
+    },
+    {
+      "id": "sql-medium-light-16",
+      "complexity": "medium",
+      "elapsed": 0.10953591599991341,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9841269841269841,
+      "expected": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_0,\n    SUM(CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,\n    SUM(CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,\n    SUM(CASE WHEN category = 'group_3' THEN amount ELSE 0 END) AS total_3,\n    SUM(CASE WHEN category = 'group_4' THEN amount ELSE 0 END) AS total_4,\n    SUM(CASE WHEN category = 'group_5' THEN amount ELSE 0 END) AS total_5\nFROM transactions\nWHERE active = 1\n    AND owner = 'Иван'\nGROUP BY account_id;\n",
+      "actual": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE O END) AS total_0,\n    SUM(CASE WHEN category = 'group_1' THEN amount ELSE Ø END) AS total_1,\n    SUM (CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,\n    SUM (CASE WHEN category = 'group_3' THEN amount ELSE 0 END) AS total_3,\n      M(CASE WHEN category = 'group_4' THEN amount ELSE 0 END) AS total_4,\n      M(CASE WHEN category = 'group_5' THEN amount ELSE O END) AS total_5\nFROM transactions\nWHERE active = 1\n    AND owner = 'Иван'\nGROUP BY account_id;",
+      "blocks": [
+        {
+          "text": "SELECT",
+          "x": 0.021889432477359208,
+          "y": 0.07738095261791766,
+          "width": 0.06022113418579102,
+          "height": 0.05014978703998385
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_0' THEN amount ELSE O END) AS total_0,",
+          "x": 0.0619999969000001,
+          "y": 0.14583333224206352,
+          "width": 0.6739999999999999,
+          "height": 0.06547619047619047
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_1' THEN amount ELSE Ø END) AS total_1,",
+          "x": 0.061999999433333355,
+          "y": 0.21428571329365076,
+          "width": 0.674,
+          "height": 0.059523809523809534
+        },
+        {
+          "text": "SUM (CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,",
+          "x": 0.06200000842499981,
+          "y": 0.28869047626488104,
+          "width": 0.6739999999999999,
+          "height": 0.05357142857142849
+        },
+        {
+          "text": "SUM (CASE WHEN category = 'group_3' THEN amount ELSE 0 END) AS total_3,",
+          "x": 0.06200000842499981,
+          "y": 0.3601190476934525,
+          "width": 0.6739999999999999,
+          "height": 0.0535714285714286
+        },
+        {
+          "text": "M(CASE WHEN category = 'group_4' THEN amount ELSE 0 END) AS total_4,",
+          "x": 0.08333334145833311,
+          "y": 0.425925925462963,
+          "width": 0.6499999999999999,
+          "height": 0.06172839232853489
+        },
+        {
+          "text": "M(CASE WHEN category = 'group_5' THEN amount ELSE O END) AS total_5",
+          "x": 0.08333334416666623,
+          "y": 0.4931106682581999,
+          "width": 0.6499999999999999,
+          "height": 0.0755070533071246
+        },
+        {
+          "text": "FROM transactions",
+          "x": 0.023999998360000035,
+          "y": 0.5744047622023809,
+          "width": 0.164,
+          "height": 0.04166666666666663
+        },
+        {
+          "text": "WHERE active = 1",
+          "x": 0.023999998716666696,
+          "y": 0.6458333335813492,
+          "width": 0.15400000000000003,
+          "height": 0.04166666666666674
+        },
+        {
+          "text": "AND owner = 'Иван'",
+          "x": 0.06199999826000004,
+          "y": 0.7142857146428571,
+          "width": 0.174,
+          "height": 0.04761904761904767
+        },
+        {
+          "text": "GROUP BY account_id;",
+          "x": 0.024000002424999948,
+          "y": 0.7946428567708334,
+          "width": 0.19399999999999998,
+          "height": 0.0535714285714286
+        }
+      ]
+    },
+    {
+      "id": "sql-medium-dark-16",
+      "complexity": "medium",
+      "elapsed": 0.10487499999999272,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9878391019644528,
+      "expected": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_0,\n    SUM(CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,\n    SUM(CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,\n    SUM(CASE WHEN category = 'group_3' THEN amount ELSE 0 END) AS total_3,\n    SUM(CASE WHEN category = 'group_4' THEN amount ELSE 0 END) AS total_4,\n    SUM(CASE WHEN category = 'group_5' THEN amount ELSE 0 END) AS total_5\nFROM transactions\nWHERE active = 1\n    AND owner = 'Иван'\nGROUP BY account_id;\n",
+      "actual": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_o,\n    SUM( CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,\n    SUM(CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,\n    SUM(CASE WHEN category = 'group_3']THEN amount ELSE 0 END) AStotal_3,\n    SUM(CASE WHEN category = \"group_4' THEN amount ELSE 0 END) AS total_4,\n    SUM(CASE WHEN category = 'group_5' THEN amount ELSE 0 END) AS total_5\nFROM transactions\nWHERE active = 1\n    AND owner = \"Иван\"\nGROUP BY account_id;",
+      "blocks": [
+        {
+          "text": "SELECT",
+          "x": 0.0218757911197941,
+          "y": 0.07738095261560529,
+          "width": 0.060248416900634774,
+          "height": 0.050471249080839664
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_o,",
+          "x": 0.060000005616666616,
+          "y": 0.14880952371031742,
+          "width": 0.6739999999999999,
+          "height": 0.0714285714285714
+        },
+        {
+          "text": "SUM( CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,",
+          "x": 0.06000000673999989,
+          "y": 0.22023809511904757,
+          "width": 0.6739999999999999,
+          "height": 0.0714285714285714
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,",
+          "x": 0.05999999810000003,
+          "y": 0.29166666595238094,
+          "width": 0.674,
+          "height": 0.07142857142857151
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_3']",
+          "x": 0.06181248312365341,
+          "y": 0.35584368372271363,
+          "width": 0.33633306884765624,
+          "height": 0.07689199561164506
+        },
+        {
+          "text": "THEN amount ELSE 0 END) AS",
+          "x": 0.396000002175,
+          "y": 0.36309523735119054,
+          "width": 0.254,
+          "height": 0.059523809523809534
+        },
+        {
+          "text": "total_3,",
+          "x": 0.6559003067196248,
+          "y": 0.3630952374994254,
+          "width": 0.07819938659667969,
+          "height": 0.0618818998336792
+        },
+        {
+          "text": "SUM(CASE WHEN category = \"group_4' THEN amount ELSE 0 END) AS total_4,",
+          "x": 0.06189516530956729,
+          "y": 0.4327342821712832,
+          "width": 0.6722175292968751,
+          "height": 0.07757419915426356
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_5' THEN amount ELSE 0 END) AS total_5",
+          "x": 0.05999999817999998,
+          "y": 0.5059523802380953,
+          "width": 0.6659999999999999,
+          "height": 0.0714285714285714
+        },
+        {
+          "text": "FROM transactions",
+          "x": 0.024000001099999977,
+          "y": 0.5714285708333333,
+          "width": 0.16399999999999998,
+          "height": 0.04761904761904756
+        },
+        {
+          "text": "WHERE active = 1",
+          "x": 0.023999998716666696,
+          "y": 0.6458333335813492,
+          "width": 0.15400000000000003,
+          "height": 0.04166666666666674
+        },
+        {
+          "text": "AND owner = \"Иван\"",
+          "x": 0.062000001739999956,
+          "y": 0.7113095233928571,
+          "width": 0.17400000000000002,
+          "height": 0.0535714285714286
+        },
+        {
+          "text": "GROUP BY account_id;",
+          "x": 0.022000001014285717,
+          "y": 0.7976190480442178,
+          "width": 0.194,
+          "height": 0.059523809523809534
+        }
+      ]
+    },
+    {
+      "id": "json-medium-light-16",
+      "complexity": "medium",
+      "elapsed": 0.0789636250001422,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9621421975992613,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"items\": {\n        \"item_0\": {\n            \"value\": 0,\n            \"active\": true\n        },\n        \"item_1\": {\n            \"value\": 1,\n            \"active\": false\n        },\n        \"item_2\": {\n            \"value\": 2,\n            \"active\": true\n        },\n        \"item_3\": {\n            \"value\": 3,\n            \"active\": false\n        },\n        \"item_4\": {\n            \"value\": 4,\n            \"active\": true\n        },\n        \"item_5\": {\n            \"value\": 5,\n            \"active\": false\n        }\n    }\n}\n",
+      "actual": "{\n    \"паme\": \"Тест\",\n    \"enabled\": true,\n    \"items\": {\n        \"item_0\": {\n           \"value\": 0,\n           \"active\": true\n       },\n        \"item_1\": {\n           \"value\": 1,\n           \"active\": false\n       },\n       \"item_2\": {\n           \"value\": 2,\n           \"active\": true\n       },\n        \"item_3\": {\n           \"value\": 3,\n           \"active\": false\n       },\n        \"item_4\": {\n           \"value\": 4,\n           \"active\": true\n       },\n        \"item_5\": {\n           \"value\": 5,\n           \"active\": false",
+      "blocks": [
+        {
+          "text": "{",
+          "x": 0.023999999900000003,
+          "y": 0.030303029966329942,
+          "width": 0.010000000000000005,
+          "height": 0.020202018997885984
+        },
+        {
+          "text": "\"паme\": \"Тест\",",
+          "x": 0.06000000182499997,
+          "y": 0.06186868690025249,
+          "width": 0.14600000000000002,
+          "height": 0.022727272727272707
+        },
+        {
+          "text": "\"enabled\": true,",
+          "x": 0.062000001924999965,
+          "y": 0.09217171720328288,
+          "width": 0.154,
+          "height": 0.022727272727272707
+        },
+        {
+          "text": "\"items\": {",
+          "x": 0.059999998333333394,
+          "y": 0.12121212121212122,
+          "width": 0.1,
+          "height": 0.02020202020202011
+        },
+        {
+          "text": "\"item_0\": {",
+          "x": 0.09999999865000003,
+          "y": 0.15277777774621215,
+          "width": 0.10800000000000001,
+          "height": 0.022727272727272707
+        },
+        {
+          "text": "\"value\": 0,",
+          "x": 0.13793115483329213,
+          "y": 0.18308080806234217,
+          "width": 0.10613768768310547,
+          "height": 0.023774479374740976
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13799999830000004,
+          "y": 0.2121212121212121,
+          "width": 0.13599999999999995,
+          "height": 0.02020202020202022
+        },
+        {
+          "text": "},",
+          "x": 0.09799999977500001,
+          "y": 0.24494949463383836,
+          "width": 0.021999999999999992,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"item_1\": {",
+          "x": 0.10000000015,
+          "y": 0.27398989927398987,
+          "width": 0.108,
+          "height": 0.022727272727272707
+        },
+        {
+          "text": "\"value\": 1,",
+          "x": 0.13782474341308426,
+          "y": 0.3055555554302952,
+          "width": 0.10635050964355469,
+          "height": 0.027714211531359778
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13799999817500003,
+          "y": 0.33333333333333337,
+          "width": 0.14600000000000002,
+          "height": 0.02020202020202011
+        },
+        {
+          "text": "},",
+          "x": 0.09799999977500001,
+          "y": 0.36616161584595963,
+          "width": 0.021999999999999992,
+          "height": 0.025252525252525304
+        },
+        {
+          "text": "\"item_2\": {",
+          "x": 0.09800000014,
+          "y": 0.3964646467171717,
+          "width": 0.11,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"value\": 2,",
+          "x": 0.1380000003,
+          "y": 0.42424242382154886,
+          "width": 0.10600000000000001,
+          "height": 0.025252525252525304
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13799999830000004,
+          "y": 0.45454545454545453,
+          "width": 0.13599999999999995,
+          "height": 0.02020202020202022
+        },
+        {
+          "text": "},",
+          "x": 0.09799999977500001,
+          "y": 0.4873737370580808,
+          "width": 0.021999999999999992,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"item_3\": {",
+          "x": 0.09999999865000003,
+          "y": 0.5164141413825758,
+          "width": 0.10800000000000001,
+          "height": 0.022727272727272707
+        },
+        {
+          "text": "\"value\": 3,",
+          "x": 0.1380000003,
+          "y": 0.5454545450336701,
+          "width": 0.10600000000000001,
+          "height": 0.025252525252525304
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13799999817500003,
+          "y": 0.5757575757575757,
+          "width": 0.14600000000000002,
+          "height": 0.02020202020202022
+        },
+        {
+          "text": "},",
+          "x": 0.09799999977500001,
+          "y": 0.608585858270202,
+          "width": 0.021999999999999992,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"item_4\": {",
+          "x": 0.09999999865000003,
+          "y": 0.637626262594697,
+          "width": 0.10800000000000001,
+          "height": 0.022727272727272707
+        },
+        {
+          "text": "\"value\": 4,",
+          "x": 0.1380000003,
+          "y": 0.6666666662457912,
+          "width": 0.10600000000000001,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13799999830000004,
+          "y": 0.696969696969697,
+          "width": 0.13599999999999995,
+          "height": 0.02020202020202022
+        },
+        {
+          "text": "},",
+          "x": 0.09799999977500001,
+          "y": 0.7297979794823233,
+          "width": 0.021999999999999992,
+          "height": 0.025252525252525304
+        },
+        {
+          "text": "\"item_5\": {",
+          "x": 0.09999999865000003,
+          "y": 0.7588383838068182,
+          "width": 0.10800000000000001,
+          "height": 0.022727272727272707
+        },
+        {
+          "text": "\"value\": 5,",
+          "x": 0.13799999823333337,
+          "y": 0.7878787878787878,
+          "width": 0.10600000000000001,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13799999817500003,
+          "y": 0.8181818181818181,
+          "width": 0.14600000000000002,
+          "height": 0.02020202020202022
+        }
+      ]
+    },
+    {
+      "id": "json-medium-dark-16",
+      "complexity": "medium",
+      "elapsed": 0.09569141700012551,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9305423406279734,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"items\": {\n        \"item_0\": {\n            \"value\": 0,\n            \"active\": true\n        },\n        \"item_1\": {\n            \"value\": 1,\n            \"active\": false\n        },\n        \"item_2\": {\n            \"value\": 2,\n            \"active\": true\n        },\n        \"item_3\": {\n            \"value\": 3,\n            \"active\": false\n        },\n        \"item_4\": {\n            \"value\": 4,\n            \"active\": true\n        },\n        \"item_5\": {\n            \"value\": 5,\n            \"active\": false\n        }\n    }\n}\n",
+      "actual": "{\n    \"паme\": \"Тест\",\n    \"enabled\": true,\n   \"items\": {\n       \"item_0\": {\n           \"value\": 0,\n           \"active\": true\n       },\n       \"item_1\": {\n           \"value\": 1,\n           \"active\": false\n       },\n       \"item_2\": {\n           \"value\": 2,\n           \"active\": true\n\n       \"item_3\": {\n           \"value\": 3,\n           \"active\": false\n\n       \"item_4\": {\n           \"value\": 4,\n           \"active\": true\n\n       \"item_5\": {\n           \"value\": 5,\n            \"active\": false",
+      "blocks": [
+        {
+          "text": "{",
+          "x": 0.023999999900000003,
+          "y": 0.030303029966329942,
+          "width": 0.010000000000000005,
+          "height": 0.020202018997885984
+        },
+        {
+          "text": "\"паme\": \"Тест\",",
+          "x": 0.06200000233333327,
+          "y": 0.06313131355218854,
+          "width": 0.144,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"enabled\": true,",
+          "x": 0.062000001924999965,
+          "y": 0.09217171720328288,
+          "width": 0.154,
+          "height": 0.022727272727272707
+        },
+        {
+          "text": "\"items\": {",
+          "x": 0.057999998700000034,
+          "y": 0.12247474750631315,
+          "width": 0.10400000000000001,
+          "height": 0.022727272727272707
+        },
+        {
+          "text": "\"item_0\": {",
+          "x": 0.09799999862500004,
+          "y": 0.15404040404040403,
+          "width": 0.11,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"value\": 0,",
+          "x": 0.13599999865000004,
+          "y": 0.18560606057449497,
+          "width": 0.10800000000000001,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13600000001999998,
+          "y": 0.21212121186868688,
+          "width": 0.13800000000000004,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "},",
+          "x": 0.09800000027499998,
+          "y": 0.24494949494949492,
+          "width": 0.022000000000000006,
+          "height": 0.025252525252525304
+        },
+        {
+          "text": "\"item_1\": {",
+          "x": 0.09800000139999997,
+          "y": 0.2727272726010101,
+          "width": 0.112,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"value\": 1,",
+          "x": 0.13599999865000004,
+          "y": 0.30681818178661613,
+          "width": 0.10800000000000001,
+          "height": 0.0277777777777779
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13599999992,
+          "y": 0.3333333330808081,
+          "width": 0.14799999999999996,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "},",
+          "x": 0.09800000027499998,
+          "y": 0.3661616161616162,
+          "width": 0.022000000000000006,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"item_2\": {",
+          "x": 0.09799999894000001,
+          "y": 0.39393939368686876,
+          "width": 0.11,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"value\": 2,",
+          "x": 0.13599999865000004,
+          "y": 0.42803030299873734,
+          "width": 0.10800000000000001,
+          "height": 0.02777777777777768
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13600000001999998,
+          "y": 0.45454545429292936,
+          "width": 0.13800000000000004,
+          "height": 0.025252525252525304
+        },
+        {
+          "text": "\"item_3\": {",
+          "x": 0.09800000132499997,
+          "y": 0.5164141417613637,
+          "width": 0.10999999999999999,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "\"value\": 3,",
+          "x": 0.138000000125,
+          "y": 0.5479797976010101,
+          "width": 0.10599999999999998,
+          "height": 0.030303030303030276
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13599999992,
+          "y": 0.5757575755050506,
+          "width": 0.14799999999999996,
+          "height": 0.025252525252525193
+        },
+        {
+          "text": "\"item_4\": {",
+          "x": 0.0979813691440227,
+          "y": 0.6388888886021822,
+          "width": 0.11003726196289063,
+          "height": 0.025512602594163658
+        },
+        {
+          "text": "\"value\": 4,",
+          "x": 0.1379999991166667,
+          "y": 0.6704545454755892,
+          "width": 0.10600000000000001,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13800000005000002,
+          "y": 0.6957070704229797,
+          "width": 0.136,
+          "height": 0.022727272727272707
+        },
+        {
+          "text": "\"item_5\": {",
+          "x": 0.09799999890000004,
+          "y": 0.7588383838636363,
+          "width": 0.11,
+          "height": 0.022727272727272818
+        },
+        {
+          "text": "\"value\": 5,",
+          "x": 0.13799999894,
+          "y": 0.7916666666919192,
+          "width": 0.10600000000000001,
+          "height": 0.02777777777777768
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13999999989999998,
+          "y": 0.816919191635101,
+          "width": 0.144,
+          "height": 0.022727272727272707
+        }
+      ]
+    },
+    {
+      "id": "python-long-light-16",
+      "complexity": "long",
+      "elapsed": 0.2270000840007924,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.98989898989899,
+      "expected": "def collect(values):\n    result = []\n    # Проверка 1\n    if len(values) > 0:\n        result.append((\"item_0\", values[0]))\n    # Проверка 2\n    if len(values) > 1:\n        result.append((\"item_1\", values[1]))\n    # Проверка 3\n    if len(values) > 2:\n        result.append((\"item_2\", values[2]))\n    # Проверка 4\n    if len(values) > 3:\n        result.append((\"item_3\", values[3]))\n    # Проверка 5\n    if len(values) > 4:\n        result.append((\"item_4\", values[4]))\n    # Проверка 6\n    if len(values) > 5:\n        result.append((\"item_5\", values[5]))\n    # Проверка 7\n    if len(values) > 6:\n        result.append((\"item_6\", values[6]))\n    # Проверка 8\n    if len(values) > 7:\n        result.append((\"item_7\", values[7]))\n    # Проверка 9\n    if len(values) > 8:\n        result.append((\"item_8\", values[8]))\n    # Проверка 10\n    if len(values) > 9:\n        result.append((\"item_9\", values[9]))\n    # Проверка 11\n    if len(values) > 10:\n        result.append((\"item_10\", values[10]))\n    # Проверка 12\n    if len(values) > 11:\n        result.append((\"item_11\", values[11]))\n    # Проверка 13\n    if len(values) > 12:\n        result.append((\"item_12\", values[12]))\n    # Проверка 14\n    if len(values) > 13:\n        result.append((\"item_13\", values[13]))\n    # Проверка 15\n    if len(values) > 14:\n        result.append((\"item_14\", values[14]))\n    # Проверка 16\n    if len(values) > 15:\n        result.append((\"item_15\", values[15]))\n    # Проверка 17\n    if len(values) > 16:\n        result.append((\"item_16\", values[16]))\n    # Проверка 18\n    if len(values) > 17:\n        result.append((\"item_17\", values[17]))\n    # Проверка 19\n    if len(values) > 18:\n        result.append((\"item_18\", values[18]))\n    # Проверка 20\n    if len(values) > 19:\n        result.append((\"item_19\", values[19]))\n    return result\n",
+      "actual": "def collect(values):\n    result = |]\n    # Проверка 1\n    if len (values) > 0:\n        result.append((\"item_0\", values[0]))\n    # Проверка 2\n    if len(values) > 1:\n        result.append ((\"item_1\", values[1]))\n    # Проверка 3\n    if len(values) > 2:\n        result.append((\"item_2\", values [2]))\n    # Проверка 4 |\n    if len (values) > 3:\n        result.append((\"item_3\", values [3]))\n    # Проверка 5\n    if len (values) > 4:\n        result.append( (\"item_4\", values [4]))\n    # Проверка 6\n    if len(values) > 5:\n        result.append ((\"item_5\", values [5]))\n    # Проверка 7\n    if len (values) > 6:\n        result.append((\"item_6\", values [6]))\n    # Проверка 8\n    if len (values) > 7:\n        result.append((\"item_7\", values[7]))\n    # Проверка 9\n    if len(values) > 8:\n        result.append((\"item_8\", values [8]))\n    # Проверка 10\n    if len(values) > 9:\n        result.append ((\"item_9\", values [9]))\n    # Проверка 11\n    if len (values) > 10:\n        result.append((\"item_10\", values [10]))\n    # Проверка 12\n    if len(values) > 11:\n        result.append((\"item_11\", values [11]))\n    # Проверка 13\n    if len(values) > 12:\n        result.append((\"item_12\", values [12]))\n    # Проверка 14\n    if len(values) > 13:\n        result.append((\"item_13\", values [13]))\n    # Проверка 15\n    if len (values) > 14:\n        result.append((\"item_14\", values [14]))\n    # Проверка 16\n    if len(values) > 15:\n        result.append((\"item_15\", values [15]))\n    # Проверка 17\n    if len(values) > 16:\n        result.append((\"item_16\", values [16]))\n    # Проверка 18\n    if len (values) > 17:\n        result.append ((\"item_17\", values [17]))\n    # Проверка 19\n    if len (values) > 18:\n        result.append((\"item_18\", values [18]))\n    # Проверка 20\n    if len(values) > 19:\n       result.append((\"item_19\", values [19]))\n    return result",
+      "blocks": [
+        {
+          "text": "def collect(values):",
+          "x": 0.02298851215056456,
+          "y": 0.01522492374456641,
+          "width": 0.1931034393310547,
+          "height": 0.010247827178299973
+        },
+        {
+          "text": "result = |]",
+          "x": 0.06206896856232501,
+          "y": 0.03125000016957363,
+          "width": 0.10574712371826171,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# Проверка 1",
+          "x": 0.062068966952737725,
+          "y": 0.046401515162316775,
+          "width": 0.1172413787841797,
+          "height": 0.011994949494949503
+        },
+        {
+          "text": "if len (values) > 0:",
+          "x": 0.06206897270566739,
+          "y": 0.06117130608546384,
+          "width": 0.1839080352783203,
+          "height": 0.008970519207944783
+        },
+        {
+          "text": "result.append((\"item_0\", values[0]))",
+          "x": 0.09885057735798682,
+          "y": 0.07630813931686048,
+          "width": 0.3471264343261719,
+          "height": 0.013081395264827766
+        },
+        {
+          "text": "# Проверка 2",
+          "x": 0.06206896602085857,
+          "y": 0.09225246663190023,
+          "width": 0.11954022979736328,
+          "height": 0.010262509187062507
+        },
+        {
+          "text": "if len(values) > 1:",
+          "x": 0.06206897385509262,
+          "y": 0.10678000939084259,
+          "width": 0.18390803527832034,
+          "height": 0.010277189991690805
+        },
+        {
+          "text": "result.append ((\"item_1\", values[1]))",
+          "x": 0.09885057015492191,
+          "y": 0.12279040409907688,
+          "width": 0.34712643432617185,
+          "height": 0.013257575757575801
+        },
+        {
+          "text": "# Проверка 3",
+          "x": 0.06206896456491989,
+          "y": 0.1374721045841511,
+          "width": 0.11954022979736328,
+          "height": 0.010409325662285362
+        },
+        {
+          "text": "if len(values) > 2:",
+          "x": 0.06206897270566739,
+          "y": 0.15199964746849715,
+          "width": 0.1839080352783203,
+          "height": 0.010394644255590002
+        },
+        {
+          "text": "result.append((\"item_2\", values [2]))",
+          "x": 0.09885057015492191,
+          "y": 0.16787790704941863,
+          "width": 0.34712643432617185,
+          "height": 0.013081395264827878
+        },
+        {
+          "text": "# Проверка 4 |",
+          "x": 0.062068971006280234,
+          "y": 0.18241279087758394,
+          "width": 0.12413792419433595,
+          "height": 0.010174418338621538
+        },
+        {
+          "text": "if len (values) > 3:",
+          "x": 0.06206897316543751,
+          "y": 0.19694767436409882,
+          "width": 0.18390803527832034,
+          "height": 0.010174418940688601
+        },
+        {
+          "text": "result.append((\"item_3\", values [3]))",
+          "x": 0.09885057015492191,
+          "y": 0.21304615924175296,
+          "width": 0.34712643432617185,
+          "height": 0.013301620579729168
+        },
+        {
+          "text": "# Проверка 5",
+          "x": 0.062068969654634515,
+          "y": 0.22821969702347983,
+          "width": 0.12183907318115234,
+          "height": 0.011994949494949503
+        },
+        {
+          "text": "if len (values) > 4:",
+          "x": 0.06206897385509262,
+          "y": 0.2435547337459103,
+          "width": 0.18390803527832034,
+          "height": 0.010365280238064933
+        },
+        {
+          "text": "result.append( (\"item_4\", values [4]))",
+          "x": 0.09885057735798682,
+          "y": 0.2586254987395548,
+          "width": 0.3471264343261719,
+          "height": 0.014725745326340856
+        },
+        {
+          "text": "# Проверка 6",
+          "x": 0.059770116704443044,
+          "y": 0.27325581375968994,
+          "width": 0.12183907318115234,
+          "height": 0.01162790650069112
+        },
+        {
+          "text": "if len(values) > 5:",
+          "x": 0.06206897270566739,
+          "y": 0.2878641061549241,
+          "width": 0.1839080352783203,
+          "height": 0.008867747253841873
+        },
+        {
+          "text": "result.append ((\"item_5\", values [5]))",
+          "x": 0.09885057789438526,
+          "y": 0.3046012451212333,
+          "width": 0.34712643432617185,
+          "height": 0.013272257164271162
+        },
+        {
+          "text": "# Проверка 7",
+          "x": 0.06206896480331247,
+          "y": 0.3189452667852589,
+          "width": 0.11724137878417967,
+          "height": 0.010365280840131996
+        },
+        {
+          "text": "if len (values) > 6:",
+          "x": 0.06206897270566739,
+          "y": 0.3334728096986748,
+          "width": 0.1839080352783203,
+          "height": 0.010379962246827357
+        },
+        {
+          "text": "result.append((\"item_6\", values [6]))",
+          "x": 0.0988505929889733,
+          "y": 0.34945384070979735,
+          "width": 0.34942526245117184,
+          "height": 0.013301620579729168
+        },
+        {
+          "text": "# Проверка 8",
+          "x": 0.062068966952737725,
+          "y": 0.3641649046708916,
+          "width": 0.1172413787841797,
+          "height": 0.010306554009215985
+        },
+        {
+          "text": "if len (values) > 7:",
+          "x": 0.06206897316543751,
+          "y": 0.3786924477066427,
+          "width": 0.18390803527832034,
+          "height": 0.010291872602520513
+        },
+        {
+          "text": "result.append((\"item_7\", values[7]))",
+          "x": 0.09885057015492191,
+          "y": 0.3946220930959302,
+          "width": 0.34712643432617185,
+          "height": 0.013081395264827878
+        },
+        {
+          "text": "# Проверка 9",
+          "x": 0.06206896705534132,
+          "y": 0.40986903911349204,
+          "width": 0.11954022979736328,
+          "height": 0.011657269916149016
+        },
+        {
+          "text": "if len(values) > 8:",
+          "x": 0.06206897270566739,
+          "y": 0.4243011509311913,
+          "width": 0.1839080352783203,
+          "height": 0.00895583750021578
+        },
+        {
+          "text": "result.append((\"item_8\", values [8]))",
+          "x": 0.09885057015492191,
+          "y": 0.4403409089573384,
+          "width": 0.34712643432617185,
+          "height": 0.011994949494949503
+        },
+        {
+          "text": "# Проверка 10",
+          "x": 0.0620689664298784,
+          "y": 0.4548611110293252,
+          "width": 0.12873562622070311,
+          "height": 0.011994949494949503
+        },
+        {
+          "text": "if len(values) > 9:",
+          "x": 0.06206897316543751,
+          "y": 0.4702475334407742,
+          "width": 0.18390803527832034,
+          "height": 0.010262509187062507
+        },
+        {
+          "text": "result.append ((\"item_9\", values [9]))",
+          "x": 0.10114943198578931,
+          "y": 0.4861918606286338,
+          "width": 0.34482757568359373,
+          "height": 0.013081395264827766
+        },
+        {
+          "text": "# Проверка 11",
+          "x": 0.062068970108039224,
+          "y": 0.5006973806797455,
+          "width": 0.12873562622070314,
+          "height": 0.010233145771604613
+        },
+        {
+          "text": "if len (values) > 10:",
+          "x": 0.06206897192067953,
+          "y": 0.5152249237154967,
+          "width": 0.1931034393310547,
+          "height": 0.010247827178300084
+        },
+        {
+          "text": "result.append((\"item_10\", values [10]))",
+          "x": 0.10114942019222577,
+          "y": 0.531250000054506,
+          "width": 0.36551724243164063,
+          "height": 0.013257575757575801
+        },
+        {
+          "text": "# Проверка 12",
+          "x": 0.062068970108039224,
+          "y": 0.5457702022233917,
+          "width": 0.12873562622070314,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "if len(values) > 11:",
+          "x": 0.06206896921241722,
+          "y": 0.5602904040021777,
+          "width": 0.1954022979736328,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "result.append((\"item_11\", values [11]))",
+          "x": 0.09885057928106687,
+          "y": 0.5763081396075581,
+          "width": 0.3678160705566406,
+          "height": 0.013081395264827878
+        },
+        {
+          "text": "# Проверка 13",
+          "x": 0.062068970282595046,
+          "y": 0.5915697672965117,
+          "width": 0.13333332824707034,
+          "height": 0.01162790650069112
+        },
+        {
+          "text": "if len(values) > 12:",
+          "x": 0.06206896723102443,
+          "y": 0.6053852478115518,
+          "width": 0.1931034393310547,
+          "height": 0.010189099745316899
+        },
+        {
+          "text": "result.append((\"item_12\", values [12]))",
+          "x": 0.10114942933015658,
+          "y": 0.6221590909820998,
+          "width": 0.36551724243164063,
+          "height": 0.011994949494949503
+        },
+        {
+          "text": "# Проверка 14",
+          "x": 0.06206896664881907,
+          "y": 0.6374721050045322,
+          "width": 0.13103448486328123,
+          "height": 0.010409325662285362
+        },
+        {
+          "text": "if len(values) > 13:",
+          "x": 0.06206896921241722,
+          "y": 0.6519996477695307,
+          "width": 0.1954022979736328,
+          "height": 0.010394643653522828
+        },
+        {
+          "text": "result.append((\"item_13\", values [13]))",
+          "x": 0.10114942019222577,
+          "y": 0.6671585038677532,
+          "width": 0.36551724243164063,
+          "height": 0.011642588509453655
+        },
+        {
+          "text": "# Проверка 15",
+          "x": 0.06206896664881907,
+          "y": 0.6824127908775839,
+          "width": 0.13103448486328123,
+          "height": 0.010174418338621538
+        },
+        {
+          "text": "if len (values) > 14:",
+          "x": 0.06206896921241722,
+          "y": 0.6969476743943799,
+          "width": 0.1954022979736328,
+          "height": 0.010174417736554475
+        },
+        {
+          "text": "result.append((\"item_14\", values [14]))",
+          "x": 0.09885057928106687,
+          "y": 0.713046159241753,
+          "width": 0.3678160705566406,
+          "height": 0.013301620579729168
+        },
+        {
+          "text": "# Проверка 16",
+          "x": 0.06206896664881907,
+          "y": 0.7282196967327823,
+          "width": 0.13103448486328123,
+          "height": 0.011994949494949503
+        },
+        {
+          "text": "if len(values) > 15:",
+          "x": 0.06206896921241722,
+          "y": 0.7419177233818561,
+          "width": 0.1954022979736328,
+          "height": 0.010350598831369462
+        },
+        {
+          "text": "result.append((\"item_15\", values [15]))",
+          "x": 0.09885057928106687,
+          "y": 0.7578987548684308,
+          "width": 0.3678160705566406,
+          "height": 0.013272257766338225
+        },
+        {
+          "text": "# Проверка 17",
+          "x": 0.062068969786200155,
+          "y": 0.7732558138662791,
+          "width": 0.12873562622070314,
+          "height": 0.01162790650069112
+        },
+        {
+          "text": "if len(values) > 16:",
+          "x": 0.062068968398241,
+          "y": 0.787864106140389,
+          "width": 0.1954022979736328,
+          "height": 0.008867747253841762
+        },
+        {
+          "text": "result.append((\"item_16\", values [16]))",
+          "x": 0.09885058679064514,
+          "y": 0.8030523253633721,
+          "width": 0.3678160705566406,
+          "height": 0.013081395264827766
+        },
+        {
+          "text": "# Проверка 18",
+          "x": 0.06206897064443766,
+          "y": 0.8189452663025392,
+          "width": 0.12873562622070311,
+          "height": 0.010365280238064822
+        },
+        {
+          "text": "if len (values) > 17:",
+          "x": 0.062068967575852015,
+          "y": 0.8334728094957518,
+          "width": 0.19310343933105467,
+          "height": 0.01037996284889453
+        },
+        {
+          "text": "result.append ((\"item_17\", values [17]))",
+          "x": 0.10114942019222577,
+          "y": 0.8494538408854272,
+          "width": 0.36551724243164063,
+          "height": 0.013301620579729168
+        },
+        {
+          "text": "# Проверка 19",
+          "x": 0.06206896384974223,
+          "y": 0.864164904804128,
+          "width": 0.12643678283691406,
+          "height": 0.010306554009216096
+        },
+        {
+          "text": "if len (values) > 18:",
+          "x": 0.06206897192067953,
+          "y": 0.8786924476884741,
+          "width": 0.1931034393310547,
+          "height": 0.010291872602520624
+        },
+        {
+          "text": "result.append((\"item_18\", values [18]))",
+          "x": 0.0988505900090359,
+          "y": 0.8946220929324129,
+          "width": 0.3678160705566406,
+          "height": 0.013081395264827878
+        },
+        {
+          "text": "# Проверка 20",
+          "x": 0.05977011170629048,
+          "y": 0.9091422948080978,
+          "width": 0.13103448486328126,
+          "height": 0.010203781754079544
+        },
+        {
+          "text": "if len(values) > 19:",
+          "x": 0.06206897192067953,
+          "y": 0.9236698380104349,
+          "width": 0.1931034393310547,
+          "height": 0.010218463762842078
+        },
+        {
+          "text": "result.append((\"item_19\", values [19]))",
+          "x": 0.0965517246341073,
+          "y": 0.939709596046272,
+          "width": 0.37011492919921873,
+          "height": 0.013257575757575801
+        },
+        {
+          "text": "return result",
+          "x": 0.06206896995478249,
+          "y": 0.9542297981182588,
+          "width": 0.12873562622070311,
+          "height": 0.010732323232323204
+        }
+      ]
+    },
+    {
+      "id": "python-long-dark-16",
+      "complexity": "long",
+      "elapsed": 0.22663733299941669,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9751792608935466,
+      "expected": "def collect(values):\n    result = []\n    # Проверка 1\n    if len(values) > 0:\n        result.append((\"item_0\", values[0]))\n    # Проверка 2\n    if len(values) > 1:\n        result.append((\"item_1\", values[1]))\n    # Проверка 3\n    if len(values) > 2:\n        result.append((\"item_2\", values[2]))\n    # Проверка 4\n    if len(values) > 3:\n        result.append((\"item_3\", values[3]))\n    # Проверка 5\n    if len(values) > 4:\n        result.append((\"item_4\", values[4]))\n    # Проверка 6\n    if len(values) > 5:\n        result.append((\"item_5\", values[5]))\n    # Проверка 7\n    if len(values) > 6:\n        result.append((\"item_6\", values[6]))\n    # Проверка 8\n    if len(values) > 7:\n        result.append((\"item_7\", values[7]))\n    # Проверка 9\n    if len(values) > 8:\n        result.append((\"item_8\", values[8]))\n    # Проверка 10\n    if len(values) > 9:\n        result.append((\"item_9\", values[9]))\n    # Проверка 11\n    if len(values) > 10:\n        result.append((\"item_10\", values[10]))\n    # Проверка 12\n    if len(values) > 11:\n        result.append((\"item_11\", values[11]))\n    # Проверка 13\n    if len(values) > 12:\n        result.append((\"item_12\", values[12]))\n    # Проверка 14\n    if len(values) > 13:\n        result.append((\"item_13\", values[13]))\n    # Проверка 15\n    if len(values) > 14:\n        result.append((\"item_14\", values[14]))\n    # Проверка 16\n    if len(values) > 15:\n        result.append((\"item_15\", values[15]))\n    # Проверка 17\n    if len(values) > 16:\n        result.append((\"item_16\", values[16]))\n    # Проверка 18\n    if len(values) > 17:\n        result.append((\"item_17\", values[17]))\n    # Проверка 19\n    if len(values) > 18:\n        result.append((\"item_18\", values[18]))\n    # Проверка 20\n    if len(values) > 19:\n        result.append((\"item_19\", values[19]))\n    return result\n",
+      "actual": "def collect(values):\n    result = []\n    # Проверка 1\n    if len (values) > 0:\n        result.append((\"item_0\", values[0]))\n    # Проверка 2\n    if len(values) > 1:\n        result.append( (\"item_1\", values[1]))\n    # Проверка 3\n    if len(values) > 2:\n        result.append ( (\"item_2\", values [2]))\n    # Проверка 4\n    if len (values) > 3:\n        result.append( (\"item_3\", values [3]))\n    # Проверка 5\n    if len (values) > 4:\n        result.append( (\"item_4\", values[4]))\n    # Проверка 6\n    if len(values) > 5:\n        result.append( (\"item_5\", values[5]))\n    # Проверка 7\n    if len (values) > 6:\n        result.append( (\"item_6\", values[6]))\n    # Проверка 8\n    if len (values) > 7:\n        result.append((\"item_7\", values[7]))\n    # Проверка 9\n    if len(values) > 8:\n        result. append ( (\"item_8\", values [8]))\n    # Проверка 10\n    if len(values) > 9:\n        result.append ( (\"item_9\", values [9]))\n    # Проверка 11\n    if len (values) > 10:\n        result.append( (\"item_10\", values [10]))\n    # Проверка 12\n    if len(values) > 11:\n        result.append((\"item_11\", values [11]))\n    # Проверка 13\n    if len(values) > 12:\n        result.append( (\"item_12\", values [12]))\n    # Проверка 14\n    if len(values) > 13:\n\n    # Проверка 15\n    if len (values) > 14:\n        result.append( (\"item_14\", values [14]))\n    # Проверка 16\n    if len(values) > 15:\n        result.append( (\"item_15\", values [15]))\n    # Проверка 17\n    if len(values) > 16:\n        result.append( (\"item_16\", values [16]))\n    # Проверка 18\n    if len (values) > 17:\n        result.append( (\"item_17\", values [171))\n    # Проверка 19\n    if len (values) > 18:\n        result.append((\"item_18\", values [18]))\n    # Проверка 20\n    if len(values) > 19:\n        result.append( (\"item_19\", values [19]))\n    return result",
+      "blocks": [
+        {
+          "text": "def collect(values):",
+          "x": 0.02298851215056456,
+          "y": 0.01522492374456641,
+          "width": 0.1931034393310547,
+          "height": 0.010247827178299973
+        },
+        {
+          "text": "result = []",
+          "x": 0.06206896856232501,
+          "y": 0.03125000016957363,
+          "width": 0.10574712371826171,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# Проверка 1",
+          "x": 0.06206896724584115,
+          "y": 0.046401515176851704,
+          "width": 0.11724137878417967,
+          "height": 0.011994949494949503
+        },
+        {
+          "text": "if len (values) > 0:",
+          "x": 0.06206897385509262,
+          "y": 0.061802619398985126,
+          "width": 0.18390803527832034,
+          "height": 0.010233144567470376
+        },
+        {
+          "text": "result.append((\"item_0\", values[0]))",
+          "x": 0.10114943198578931,
+          "y": 0.07718170097990618,
+          "width": 0.34482757568359373,
+          "height": 0.014828516979410233
+        },
+        {
+          "text": "# Проверка 2",
+          "x": 0.06206896724584115,
+          "y": 0.09225246641387697,
+          "width": 0.11724137878417967,
+          "height": 0.010262509187062507
+        },
+        {
+          "text": "if len(values) > 1:",
+          "x": 0.06206897385509262,
+          "y": 0.10678000939084259,
+          "width": 0.18390803527832034,
+          "height": 0.010277189991690805
+        },
+        {
+          "text": "result.append( (\"item_1\", values[1]))",
+          "x": 0.10114942962946748,
+          "y": 0.12212238673005749,
+          "width": 0.34482757568359373,
+          "height": 0.014593610257813472
+        },
+        {
+          "text": "# Проверка 3",
+          "x": 0.059770116480628674,
+          "y": 0.1374721047337797,
+          "width": 0.11954022979736327,
+          "height": 0.010409326264352536
+        },
+        {
+          "text": "if len(values) > 2:",
+          "x": 0.06206897270566739,
+          "y": 0.15199964746849715,
+          "width": 0.1839080352783203,
+          "height": 0.010394644255590002
+        },
+        {
+          "text": "result.append ( (\"item_2\", values [2]))",
+          "x": 0.10114943198578931,
+          "y": 0.16787790714026163,
+          "width": 0.34482757568359373,
+          "height": 0.013081395264827878
+        },
+        {
+          "text": "# Проверка 4",
+          "x": 0.062068966952737725,
+          "y": 0.182412790625,
+          "width": 0.1172413787841797,
+          "height": 0.010174418940688601
+        },
+        {
+          "text": "if len (values) > 3:",
+          "x": 0.06206897316543751,
+          "y": 0.19694767436409882,
+          "width": 0.18390803527832034,
+          "height": 0.010174418940688601
+        },
+        {
+          "text": "result.append( (\"item_3\", values [3]))",
+          "x": 0.10114942710073194,
+          "y": 0.21304615924175296,
+          "width": 0.34482757568359373,
+          "height": 0.013301620579729168
+        },
+        {
+          "text": "# Проверка 5",
+          "x": 0.0597701194140999,
+          "y": 0.22821969702347983,
+          "width": 0.11954022216796875,
+          "height": 0.011994949494949503
+        },
+        {
+          "text": "if len (values) > 4:",
+          "x": 0.061884843622803914,
+          "y": 0.2426841174876318,
+          "width": 0.18427833557128906,
+          "height": 0.011879282768326616
+        },
+        {
+          "text": "result.append( (\"item_4\", values[4]))",
+          "x": 0.10114942962946748,
+          "y": 0.2586254987395548,
+          "width": 0.34482757568359373,
+          "height": 0.014725745326340856
+        },
+        {
+          "text": "# Проверка 6",
+          "x": 0.05977011619327234,
+          "y": 0.27325581380813957,
+          "width": 0.11954022979736327,
+          "height": 0.011627906500691232
+        },
+        {
+          "text": "if len(values) > 5:",
+          "x": 0.06206897316543751,
+          "y": 0.28851744180595934,
+          "width": 0.18390803527832034,
+          "height": 0.010174418940688601
+        },
+        {
+          "text": "result.append( (\"item_5\", values[5]))",
+          "x": 0.10114943198578931,
+          "y": 0.3046012450667275,
+          "width": 0.34482757568359373,
+          "height": 0.013272257164271162
+        },
+        {
+          "text": "# Проверка 7",
+          "x": 0.059770116480628674,
+          "y": 0.3189452666338539,
+          "width": 0.11954022979736327,
+          "height": 0.010365280840131996
+        },
+        {
+          "text": "if len (values) > 6:",
+          "x": 0.06206897316543751,
+          "y": 0.3334728096877737,
+          "width": 0.18390803527832034,
+          "height": 0.010379962246827468
+        },
+        {
+          "text": "result.append( (\"item_6\", values[6]))",
+          "x": 0.10114943198578931,
+          "y": 0.3494538406934053,
+          "width": 0.34482757568359373,
+          "height": 0.013301621181796341
+        },
+        {
+          "text": "# Проверка 8",
+          "x": 0.05977011680873599,
+          "y": 0.36416490511727395,
+          "width": 0.11954022216796874,
+          "height": 0.010306553407148922
+        },
+        {
+          "text": "if len (values) > 7:",
+          "x": 0.06206897316543751,
+          "y": 0.3786924477066427,
+          "width": 0.18390803527832034,
+          "height": 0.010291872602520513
+        },
+        {
+          "text": "result.append((\"item_7\", values[7]))",
+          "x": 0.10114942710073194,
+          "y": 0.3946220930959302,
+          "width": 0.34482757568359373,
+          "height": 0.013081395264827878
+        },
+        {
+          "text": "# Проверка 9",
+          "x": 0.05977011680873599,
+          "y": 0.40986903927095314,
+          "width": 0.11954022216796874,
+          "height": 0.011657269916149127
+        },
+        {
+          "text": "if len(values) > 8:",
+          "x": 0.0620689720160122,
+          "y": 0.42366983758343235,
+          "width": 0.1839080352783203,
+          "height": 0.010218463160774904
+        },
+        {
+          "text": "result. append ( (\"item_8\", values [8]))",
+          "x": 0.10114942710073194,
+          "y": 0.4403409089960981,
+          "width": 0.34482757568359373,
+          "height": 0.011994949494949392
+        },
+        {
+          "text": "# Проверка 10",
+          "x": 0.06206896384974223,
+          "y": 0.4557199905382595,
+          "width": 0.12643678283691406,
+          "height": 0.010277190593757979
+        },
+        {
+          "text": "if len(values) > 9:",
+          "x": 0.06206897385509262,
+          "y": 0.4702475336648536,
+          "width": 0.18390803527832034,
+          "height": 0.010262507982928382
+        },
+        {
+          "text": "result.append ( (\"item_9\", values [9]))",
+          "x": 0.10114943198578931,
+          "y": 0.4861918606286338,
+          "width": 0.34482757568359373,
+          "height": 0.013081395264827766
+        },
+        {
+          "text": "# Проверка 11",
+          "x": 0.0597701157785374,
+          "y": 0.5006973805422295,
+          "width": 0.12873562622070311,
+          "height": 0.010233145169537439
+        },
+        {
+          "text": "if len (values) > 10:",
+          "x": 0.06206897192067953,
+          "y": 0.5152249237445663,
+          "width": 0.1931034393310547,
+          "height": 0.010247827178299973
+        },
+        {
+          "text": "result.append( (\"item_10\", values [10]))",
+          "x": 0.10114942933015658,
+          "y": 0.5312499999091569,
+          "width": 0.36551724243164063,
+          "height": 0.01325757575757569
+        },
+        {
+          "text": "# Проверка 12",
+          "x": 0.06206896384974223,
+          "y": 0.5457702017727297,
+          "width": 0.12643678283691406,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "if len(values) > 11:",
+          "x": 0.06206897240343812,
+          "y": 0.5602904039718967,
+          "width": 0.19310343933105467,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "result.append((\"item_11\", values [11]))",
+          "x": 0.10114942933015658,
+          "y": 0.5763081394440407,
+          "width": 0.36551724243164063,
+          "height": 0.013081395264827878
+        },
+        {
+          "text": "# Проверка 13",
+          "x": 0.062068969091642515,
+          "y": 0.5915697675872091,
+          "width": 0.12643677520751956,
+          "height": 0.01162790650069112
+        },
+        {
+          "text": "if len(values) > 12:",
+          "x": 0.06206897192067953,
+          "y": 0.6053852476364872,
+          "width": 0.1931034393310547,
+          "height": 0.010189100347384072
+        },
+        {
+          "text": "result.append( (\"item_12\", values [12]))",
+          "x": 0.10114942349682338,
+          "y": 0.6214910735179574,
+          "width": 0.36551724243164063,
+          "height": 0.013330984597254236
+        },
+        {
+          "text": "# Проверка 14",
+          "x": 0.062068970212332146,
+          "y": 0.6366792932115477,
+          "width": 0.12643677520751953,
+          "height": 0.011994949494949503
+        },
+        {
+          "text": "if len(values) > 13:",
+          "x": 0.06206897159884045,
+          "y": 0.6519996474806096,
+          "width": 0.19310343933105467,
+          "height": 0.010394644255589891
+        },
+        {
+          "text": "# Проверка 15",
+          "x": 0.06206897051884553,
+          "y": 0.6816860466188629,
+          "width": 0.12643677520751953,
+          "height": 0.011627907102758295
+        },
+        {
+          "text": "if len (values) > 14:",
+          "x": 0.06206897240343812,
+          "y": 0.696947674364099,
+          "width": 0.19310343933105467,
+          "height": 0.010174418940688601
+        },
+        {
+          "text": "result.append( (\"item_14\", values [14]))",
+          "x": 0.10114943085314497,
+          "y": 0.7130461593489882,
+          "width": 0.36551724243164063,
+          "height": 0.01330162118179623
+        },
+        {
+          "text": "# Проверка 16",
+          "x": 0.0597701157785374,
+          "y": 0.7273901807622063,
+          "width": 0.12873562622070311,
+          "height": 0.010335916822606817
+        },
+        {
+          "text": "if len(values) > 15:",
+          "x": 0.06206897192067953,
+          "y": 0.7419177236635098,
+          "width": 0.1931034393310547,
+          "height": 0.010350599433436525
+        },
+        {
+          "text": "result.append( (\"item_15\", values [15]))",
+          "x": 0.10114942933015658,
+          "y": 0.757898755005947,
+          "width": 0.36551724243164063,
+          "height": 0.013272257164271162
+        },
+        {
+          "text": "# Проверка 17",
+          "x": 0.05977011838390129,
+          "y": 0.773255814147287,
+          "width": 0.12873562622070314,
+          "height": 0.01162790650069112
+        },
+        {
+          "text": "if len(values) > 16:",
+          "x": 0.06206897098581362,
+          "y": 0.7877906974806201,
+          "width": 0.1931034393310547,
+          "height": 0.01162790650069112
+        },
+        {
+          "text": "result.append( (\"item_16\", values [16]))",
+          "x": 0.10114942933015658,
+          "y": 0.8038745009091854,
+          "width": 0.36551724243164063,
+          "height": 0.014725745326340745
+        },
+        {
+          "text": "# Проверка 18",
+          "x": 0.06206896730045483,
+          "y": 0.8183139532945736,
+          "width": 0.12643677520751953,
+          "height": 0.01162790650069112
+        },
+        {
+          "text": "if len (values) > 17:",
+          "x": 0.062068973131407405,
+          "y": 0.8334728093097861,
+          "width": 0.19310343933105467,
+          "height": 0.010379962246827357
+        },
+        {
+          "text": "result.append( (\"item_17\", values [171))",
+          "x": 0.10114942381291536,
+          "y": 0.8488225274129106,
+          "width": 0.36551724243164063,
+          "height": 0.014564246240288292
+        },
+        {
+          "text": "# Проверка 19",
+          "x": 0.05977011631493583,
+          "y": 0.864164904798072,
+          "width": 0.12873562622070311,
+          "height": 0.010306554009215985
+        },
+        {
+          "text": "if len (values) > 18:",
+          "x": 0.06206897192067953,
+          "y": 0.8786924476884741,
+          "width": 0.1931034393310547,
+          "height": 0.010291872602520624
+        },
+        {
+          "text": "result.append((\"item_18\", values [18]))",
+          "x": 0.10114942933015658,
+          "y": 0.8946220929324129,
+          "width": 0.36551724243164063,
+          "height": 0.013081395264827878
+        },
+        {
+          "text": "# Проверка 20",
+          "x": 0.06206896384974223,
+          "y": 0.9091422950970189,
+          "width": 0.12643678283691406,
+          "height": 0.010203782356146607
+        },
+        {
+          "text": "if len(values) > 19:",
+          "x": 0.06206897240343812,
+          "y": 0.9236698379995336,
+          "width": 0.19310343933105467,
+          "height": 0.010218463762842078
+        },
+        {
+          "text": "result.append( (\"item_19\", values [19]))",
+          "x": 0.10114942933015658,
+          "y": 0.9397095958827546,
+          "width": 0.36551724243164063,
+          "height": 0.013257575757575801
+        },
+        {
+          "text": "return result",
+          "x": 0.06206896713761958,
+          "y": 0.9542297977766083,
+          "width": 0.12643677520751953,
+          "height": 0.010732323232323204
+        }
+      ]
+    },
+    {
+      "id": "sql-long-light-16",
+      "complexity": "long",
+      "elapsed": 0.22257662500032893,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9906947890818859,
+      "expected": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_0,\n    SUM(CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,\n    SUM(CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,\n    SUM(CASE WHEN category = 'group_3' THEN amount ELSE 0 END) AS total_3,\n    SUM(CASE WHEN category = 'group_4' THEN amount ELSE 0 END) AS total_4,\n    SUM(CASE WHEN category = 'group_5' THEN amount ELSE 0 END) AS total_5,\n    SUM(CASE WHEN category = 'group_6' THEN amount ELSE 0 END) AS total_6,\n    SUM(CASE WHEN category = 'group_7' THEN amount ELSE 0 END) AS total_7,\n    SUM(CASE WHEN category = 'group_8' THEN amount ELSE 0 END) AS total_8,\n    SUM(CASE WHEN category = 'group_9' THEN amount ELSE 0 END) AS total_9,\n    SUM(CASE WHEN category = 'group_10' THEN amount ELSE 0 END) AS total_10,\n    SUM(CASE WHEN category = 'group_11' THEN amount ELSE 0 END) AS total_11,\n    SUM(CASE WHEN category = 'group_12' THEN amount ELSE 0 END) AS total_12,\n    SUM(CASE WHEN category = 'group_13' THEN amount ELSE 0 END) AS total_13,\n    SUM(CASE WHEN category = 'group_14' THEN amount ELSE 0 END) AS total_14,\n    SUM(CASE WHEN category = 'group_15' THEN amount ELSE 0 END) AS total_15,\n    SUM(CASE WHEN category = 'group_16' THEN amount ELSE 0 END) AS total_16,\n    SUM(CASE WHEN category = 'group_17' THEN amount ELSE 0 END) AS total_17,\n    SUM(CASE WHEN category = 'group_18' THEN amount ELSE 0 END) AS total_18,\n    SUM(CASE WHEN category = 'group_19' THEN amount ELSE 0 END) AS total_19\nFROM transactions\nWHERE active = 1\n    AND owner = 'Иван'\nGROUP BY account_id;\n",
+      "actual": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE O END) AS total_0,\n    SUM ( CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,\n    SUM(CASE WHEN category = 'group_2' THEN amount ELSE Ø END) AS total_2,\n    SUM(CASE WHEN category = 'group_3' THEN amount ELSE Ø END) AS total_3,\n    SUM(CASE WHEN category = 'group_4' THEN amount ELSE Ø END) AS total_4,\n    SUM(CASE WHEN category = 'group_5' THEN amount ELSE Ø END) AS total_5,\n    SUM ( CASE WHEN category = 'group_6' THEN amount ELSE 0 END) AS total_6,\n    SUM( CASE WHEN category = 'group_7' THEN amount ELSE Ø END) AS total_7,\n    SUM(CASE WHEN category = 'group_8' THEN amount ELSE O END) AS total_8,\n    SUM(CASE WHEN category = 'group_9' THEN amount ELSE 0 END) AS total_9,\n    SUM(CASE WHEN category = 'group_10' THEN amount ELSE 0 END) AS total_10,\n    SUM ( CASE WHEN category = 'group_11' THEN amount ELSE 0 END) AS total_11,\n    SUM ( CASE WHEN category = 'group_12' THEN amount ELSE 0 END) AS total_12,\n    SUM ( CASE WHEN category = 'group_13' THEN amount ELSE 0 END) AS total_13,\n    SUM(CASE WHEN category = 'group_14' THEN amount ELSE 0 END) AS total_14,\n    SUM(CASE WHEN category = 'group_15' THEN amount ELSE 0 END) AS total_15,\n    SUM(CASE WHEN category = 'group_16' THEN amount ELSE 0 END) AS total_16,\n    SUM ( CASE WHEN category = 'group_17' THEN amount ELSE 0 END) AS total_17,\n    SUM ( CASE WHEN category = 'group_18' THEN amount ELSE 0 END) AS total_18,\n    SUM(CASE WHEN category = 'group_19' THEN amount ELSE 0 END) AS total_19\nFROM transactions\nWHERE active = 1\n    AND owner = 'Иван'\nGROUP BY account_id;",
+      "blocks": [
+        {
+          "text": "SELECT",
+          "x": 0.021929096842620253,
+          "y": 0.03869047607975623,
+          "width": 0.06214180755615235,
+          "height": 0.0246408383051554
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_0' THEN amount ELSE O END) AS total_0,",
+          "x": 0.06200000673999989,
+          "y": 0.07291666663690471,
+          "width": 0.6739999999999999,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "SUM ( CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,",
+          "x": 0.059999999550000044,
+          "y": 0.10863095197172618,
+          "width": 0.6759999999999999,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_2' THEN amount ELSE Ø END) AS total_2,",
+          "x": 0.062000011233332944,
+          "y": 0.14583333333333331,
+          "width": 0.674,
+          "height": 0.029761904761904767
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_3' THEN amount ELSE Ø END) AS total_3,",
+          "x": 0.05833332489583347,
+          "y": 0.17920524790552061,
+          "width": 0.675,
+          "height": 0.03742283866519025
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_4' THEN amount ELSE Ø END) AS total_4,",
+          "x": 0.05833333222222234,
+          "y": 0.21632495689350306,
+          "width": 0.6749999999999999,
+          "height": 0.037588181949797184
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_5' THEN amount ELSE Ø END) AS total_5,",
+          "x": 0.060000005616666616,
+          "y": 0.2529761904265873,
+          "width": 0.6739999999999999,
+          "height": 0.029761904761904767
+        },
+        {
+          "text": "SUM ( CASE WHEN category = 'group_6' THEN amount ELSE 0 END) AS total_6,",
+          "x": 0.06000000675999985,
+          "y": 0.2901785713988095,
+          "width": 0.676,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "SUM( CASE WHEN category = 'group_7' THEN amount ELSE Ø END) AS total_7,",
+          "x": 0.05999999964000006,
+          "y": 0.32440476154761905,
+          "width": 0.676,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_8' THEN amount ELSE O END) AS total_8,",
+          "x": 0.058333364997829505,
+          "y": 0.35791446158627965,
+          "width": 0.6791666259765624,
+          "height": 0.03725749396142508
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_9' THEN amount ELSE 0 END) AS total_9,",
+          "x": 0.059856662142156326,
+          "y": 0.3954711535653458,
+          "width": 0.6763082885742188,
+          "height": 0.043476995967683285
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_10' THEN amount ELSE 0 END) AS total_10,",
+          "x": 0.05980975859522346,
+          "y": 0.43204378216890327,
+          "width": 0.6963958129882812,
+          "height": 0.04826618376232328
+        },
+        {
+          "text": "SUM ( CASE WHEN category = 'group_11' THEN amount ELSE 0 END) AS total_11,",
+          "x": 0.05993207750688424,
+          "y": 0.4677871301296017,
+          "width": 0.6961409301757813,
+          "height": 0.034803799220493925
+        },
+        {
+          "text": "SUM ( CASE WHEN category = 'group_12' THEN amount ELSE 0 END) AS total_12,",
+          "x": 0.06000000695999984,
+          "y": 0.5044642856845238,
+          "width": 0.696,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "SUM ( CASE WHEN category = 'group_13' THEN amount ELSE 0 END) AS total_13,",
+          "x": 0.06000000695999984,
+          "y": 0.5401785713988094,
+          "width": 0.696,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_14' THEN amount ELSE 0 END) AS total_14,",
+          "x": 0.062000008674999836,
+          "y": 0.5744047619047619,
+          "width": 0.694,
+          "height": 0.029761904761904767
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_15' THEN amount ELSE 0 END) AS total_15,",
+          "x": 0.06000000695999984,
+          "y": 0.6101190476190477,
+          "width": 0.696,
+          "height": 0.029761904761904767
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_16' THEN amount ELSE 0 END) AS total_16,",
+          "x": 0.06200001156666628,
+          "y": 0.6458333333333333,
+          "width": 0.694,
+          "height": 0.029761904761904767
+        },
+        {
+          "text": "SUM ( CASE WHEN category = 'group_17' THEN amount ELSE 0 END) AS total_17,",
+          "x": 0.06000000695999984,
+          "y": 0.6830357142559524,
+          "width": 0.696,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "SUM ( CASE WHEN category = 'group_18' THEN amount ELSE 0 END) AS total_18,",
+          "x": 0.06000000695999984,
+          "y": 0.718749999970238,
+          "width": 0.696,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_19' THEN amount ELSE 0 END) AS total_19",
+          "x": 0.06185575243796797,
+          "y": 0.751898551137818,
+          "width": 0.6842821655273439,
+          "height": 0.04504938352675658
+        },
+        {
+          "text": "FROM transactions",
+          "x": 0.023999998360000035,
+          "y": 0.7872023811011903,
+          "width": 0.164,
+          "height": 0.02083333333333337
+        },
+        {
+          "text": "WHERE active = 1",
+          "x": 0.023999998716666696,
+          "y": 0.8229166667906747,
+          "width": 0.15400000000000003,
+          "height": 0.02083333333333326
+        },
+        {
+          "text": "AND owner = 'Иван'",
+          "x": 0.06199999826000004,
+          "y": 0.8571428573214286,
+          "width": 0.174,
+          "height": 0.023809523809523836
+        },
+        {
+          "text": "GROUP BY account_id;",
+          "x": 0.024000002424999948,
+          "y": 0.8973214283854165,
+          "width": 0.19399999999999998,
+          "height": 0.0267857142857143
+        }
+      ]
+    },
+    {
+      "id": "sql-long-dark-16",
+      "complexity": "long",
+      "elapsed": 0.2276155830004427,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.9912826899128269,
+      "expected": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_0,\n    SUM(CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,\n    SUM(CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,\n    SUM(CASE WHEN category = 'group_3' THEN amount ELSE 0 END) AS total_3,\n    SUM(CASE WHEN category = 'group_4' THEN amount ELSE 0 END) AS total_4,\n    SUM(CASE WHEN category = 'group_5' THEN amount ELSE 0 END) AS total_5,\n    SUM(CASE WHEN category = 'group_6' THEN amount ELSE 0 END) AS total_6,\n    SUM(CASE WHEN category = 'group_7' THEN amount ELSE 0 END) AS total_7,\n    SUM(CASE WHEN category = 'group_8' THEN amount ELSE 0 END) AS total_8,\n    SUM(CASE WHEN category = 'group_9' THEN amount ELSE 0 END) AS total_9,\n    SUM(CASE WHEN category = 'group_10' THEN amount ELSE 0 END) AS total_10,\n    SUM(CASE WHEN category = 'group_11' THEN amount ELSE 0 END) AS total_11,\n    SUM(CASE WHEN category = 'group_12' THEN amount ELSE 0 END) AS total_12,\n    SUM(CASE WHEN category = 'group_13' THEN amount ELSE 0 END) AS total_13,\n    SUM(CASE WHEN category = 'group_14' THEN amount ELSE 0 END) AS total_14,\n    SUM(CASE WHEN category = 'group_15' THEN amount ELSE 0 END) AS total_15,\n    SUM(CASE WHEN category = 'group_16' THEN amount ELSE 0 END) AS total_16,\n    SUM(CASE WHEN category = 'group_17' THEN amount ELSE 0 END) AS total_17,\n    SUM(CASE WHEN category = 'group_18' THEN amount ELSE 0 END) AS total_18,\n    SUM(CASE WHEN category = 'group_19' THEN amount ELSE 0 END) AS total_19\nFROM transactions\nWHERE active = 1\n    AND owner = 'Иван'\nGROUP BY account_id;\n",
+      "actual": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_o,\n    SUM ( CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,\n    SUM( CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,\n    SUM(CASE WHEN category = 'group_3' THEN amount ELSE 0 END)AS total_3,\n    SUM(CASE WHEN category = 'group_4' THEN amount ELSE 0 END)AS total_4,\n    SUM(CASE WHEN category = \"group_5' THEN amount ELSE 0 END)AS total_5,\n    SUM(CASE WHEN category = 'group_6' THEN amount ELSE 0 END)AS total_6,\n    SUM(CASE WHEN category = 'group_7' THEN amount ELSE 0 END) AS total_7,\n    SUM( CASE WHEN category = 'group_8' THEN amount ELSE 0 END) AS total_8,\n    SUM(CASE WHEN category = 'group_9' THEN amount ELSE 0 END) AS total_9,\n    SUM(CASE WHEN category = 'group_10' THEN amount ELSE 0 END) AS total_10,\n    SUM ( CASE WHEN category = 'group_11' THEN amount ELSE 0 END) AS total_11,\n    SUM(CASE WHEN category = \"group_12'THEN amount ELSE 0 END) AS total_12,\n    SUM( CASE WHEN category = 'group_13'THEN amount ELSE 0 END) AS total_13,\n    SUM( CASE WHEN category = 'group_14'THEN amount ELSE 0 END) AS total_14,\n    SUM( CASE WHEN category = 'group_15' THEN amount ELSE 0 END) AS total_15,\n    SUM( CASE WHEN category = 'group_16' THEN amount ELSE 0 END) AS total_16,\n    SUM(CASE WHEN category = 'group_17' THEN amount ELSE 0 END) AS total_17,\n    SUM(CASE WHEN category = 'group_18' THEN amount ELSE 0 END) AS total_18,\n    SUM(CASE WHEN category = 'group_19' THEN amount ELSE 0 END) AS total_19\nFROM transactions\nWHERE active = 1\n    AND owner = \"Иван\"\nGROUP BY account_id;",
+      "blocks": [
+        {
+          "text": "SELECT",
+          "x": 0.02185326151750759,
+          "y": 0.03869047630587358,
+          "width": 0.06029347610473633,
+          "height": 0.025503493490673157
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_o,",
+          "x": 0.05999999946000003,
+          "y": 0.07440476226190479,
+          "width": 0.674,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "SUM ( CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,",
+          "x": 0.060000005616666616,
+          "y": 0.10863095235615078,
+          "width": 0.6739999999999999,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "SUM( CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,",
+          "x": 0.05999999810000003,
+          "y": 0.14434523776785713,
+          "width": 0.674,
+          "height": 0.032738095238095344
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_3' THEN amount ELSE 0 END)",
+          "x": 0.05978565892873434,
+          "y": 0.18007922823000178,
+          "width": 0.5624014892578125,
+          "height": 0.04911149683452787
+        },
+        {
+          "text": "AS total_3,",
+          "x": 0.6199768909434986,
+          "y": 0.18154761874868536,
+          "width": 0.11404621887207023,
+          "height": 0.03015646480378653
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_4' THEN amount ELSE 0 END)",
+          "x": 0.05978565892873434,
+          "y": 0.21579351394428758,
+          "width": 0.5624014892578125,
+          "height": 0.04911149683452787
+        },
+        {
+          "text": "AS total_4,",
+          "x": 0.6197820781738721,
+          "y": 0.2172619044775685,
+          "width": 0.11443584442138677,
+          "height": 0.03371429159527739
+        },
+        {
+          "text": "SUM(CASE WHEN category = \"group_5' THEN amount ELSE 0 END)",
+          "x": 0.061812476264670124,
+          "y": 0.25001970402900797,
+          "width": 0.5603478393554687,
+          "height": 0.04605542194275625
+        },
+        {
+          "text": "AS total_5,",
+          "x": 0.61999999886,
+          "y": 0.25297619059523807,
+          "width": 0.11399999999999999,
+          "height": 0.029761904761904767
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_6' THEN amount ELSE 0 END)",
+          "x": 0.059999999075000005,
+          "y": 0.2886904757440476,
+          "width": 0.562,
+          "height": 0.03571428571428559
+        },
+        {
+          "text": "AS total_6,",
+          "x": 0.61999999886,
+          "y": 0.2886904763095238,
+          "width": 0.11399999999999999,
+          "height": 0.029761904761904878
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_7' THEN amount ELSE 0 END) AS total_7,",
+          "x": 0.05999999946000003,
+          "y": 0.32440476226190473,
+          "width": 0.674,
+          "height": 0.03571428571428581
+        },
+        {
+          "text": "SUM( CASE WHEN category = 'group_8' THEN amount ELSE 0 END) AS total_8,",
+          "x": 0.05999999946000003,
+          "y": 0.3601190479761905,
+          "width": 0.674,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_9' THEN amount ELSE 0 END) AS total_9,",
+          "x": 0.06000000844999982,
+          "y": 0.3958333333333333,
+          "width": 0.6759999999999999,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_10' THEN amount ELSE 0 END) AS total_10,",
+          "x": 0.05999999926000004,
+          "y": 0.4315476194047619,
+          "width": 0.6940000000000001,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "SUM ( CASE WHEN category = 'group_11' THEN amount ELSE 0 END) AS total_11,",
+          "x": 0.059999997899999984,
+          "y": 0.4657738091964286,
+          "width": 0.694,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "SUM(CASE WHEN category = \"group_12'",
+          "x": 0.05978566914430582,
+          "y": 0.5008584797618376,
+          "width": 0.34038635253906246,
+          "height": 0.04154201348622644
+        },
+        {
+          "text": "THEN amount ELSE 0 END) AS total_12,",
+          "x": 0.40599999565000006,
+          "y": 0.5029761905505953,
+          "width": 0.34800000000000003,
+          "height": 0.029761904761904878
+        },
+        {
+          "text": "SUM( CASE WHEN category = 'group_13'",
+          "x": 0.06000000143999998,
+          "y": 0.5372023806249999,
+          "width": 0.3400000000000001,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "THEN amount ELSE 0 END) AS total_13,",
+          "x": 0.4059999965200001,
+          "y": 0.5386904763095239,
+          "width": 0.348,
+          "height": 0.029761904761904767
+        },
+        {
+          "text": "SUM( CASE WHEN category = 'group_14'",
+          "x": 0.06000000143999998,
+          "y": 0.5729166663392857,
+          "width": 0.3400000000000001,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "THEN amount ELSE 0 END) AS total_14,",
+          "x": 0.4059999965200001,
+          "y": 0.5744047620238095,
+          "width": 0.348,
+          "height": 0.029761904761904767
+        },
+        {
+          "text": "SUM( CASE WHEN category = 'group_15' THEN amount ELSE 0 END) AS total_15,",
+          "x": 0.059999997899999984,
+          "y": 0.6086309520535713,
+          "width": 0.694,
+          "height": 0.03273809523809523
+        },
+        {
+          "text": "SUM( CASE WHEN category = 'group_16' THEN amount ELSE 0 END) AS total_16,",
+          "x": 0.059999997899999984,
+          "y": 0.6458333329761905,
+          "width": 0.694,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_17' THEN amount ELSE 0 END) AS total_17,",
+          "x": 0.05999999742500006,
+          "y": 0.6815476186011904,
+          "width": 0.694,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_18' THEN amount ELSE 0 END) AS total_18,",
+          "x": 0.059999997899999984,
+          "y": 0.7172619044047619,
+          "width": 0.694,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "SUM(CASE WHEN category = 'group_19' THEN amount ELSE 0 END) AS total_19",
+          "x": 0.059999997980000046,
+          "y": 0.7529761901190477,
+          "width": 0.6859999999999999,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "FROM transactions",
+          "x": 0.024000001533333277,
+          "y": 0.78571428567225,
+          "width": 0.16399999999999998,
+          "height": 0.023809523099944663
+        },
+        {
+          "text": "WHERE active = 1",
+          "x": 0.023999998716666696,
+          "y": 0.8229166667906747,
+          "width": 0.15400000000000003,
+          "height": 0.02083333333333326
+        },
+        {
+          "text": "AND owner = \"Иван\"",
+          "x": 0.0620000001107143,
+          "y": 0.8556547618569301,
+          "width": 0.174,
+          "height": 0.0267857142857143
+        },
+        {
+          "text": "GROUP BY account_id;",
+          "x": 0.022000001724999947,
+          "y": 0.8973214281622024,
+          "width": 0.194,
+          "height": 0.03273809523809523
+        }
+      ]
+    },
+    {
+      "id": "json-long-light-16",
+      "complexity": "long",
+      "elapsed": 0.1330716249995021,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.15612489991993594,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"items\": {\n        \"item_0\": {\n            \"value\": 0,\n            \"active\": true\n        },\n        \"item_1\": {\n            \"value\": 1,\n            \"active\": false\n        },\n        \"item_2\": {\n            \"value\": 2,\n            \"active\": true\n        },\n        \"item_3\": {\n            \"value\": 3,\n            \"active\": false\n        },\n        \"item_4\": {\n            \"value\": 4,\n            \"active\": true\n        },\n        \"item_5\": {\n            \"value\": 5,\n            \"active\": false\n        },\n        \"item_6\": {\n            \"value\": 6,\n            \"active\": true\n        },\n        \"item_7\": {\n            \"value\": 7,\n            \"active\": false\n        },\n        \"item_8\": {\n            \"value\": 8,\n            \"active\": true\n        },\n        \"item_9\": {\n            \"value\": 9,\n            \"active\": false\n        },\n        \"item_10\": {\n            \"value\": 10,\n            \"active\": true\n        },\n        \"item_11\": {\n            \"value\": 11,\n            \"active\": false\n        },\n        \"item_12\": {\n            \"value\": 12,\n            \"active\": true\n        },\n        \"item_13\": {\n            \"value\": 13,\n            \"active\": false\n        },\n        \"item_14\": {\n            \"value\": 14,\n            \"active\": true\n        },\n        \"item_15\": {\n            \"value\": 15,\n            \"active\": false\n        },\n        \"item_16\": {\n            \"value\": 16,\n            \"active\": true\n        },\n        \"item_17\": {\n            \"value\": 17,\n            \"active\": false\n        },\n        \"item_18\": {\n            \"value\": 18,\n            \"active\": true\n        },\n        \"item_19\": {\n            \"value\": 19,\n            \"active\": false\n        }\n    }\n}\n",
+      "actual": "             0,\n             true\n},\n\n             1,\n             false\n},\n\n\n             true\n\n\"ite\n            3,\n             false\n},\n\"item4': {\n\n             true\n},\n\n\n             false\n},\n\n\n             true\n},\n\"item_7\": {\n    \"value\": 7,\n    \"active\": false\n},\nitem8:{\n    \"value\": 8,\n    \"active\": true\n},\n      ouln\n             9,\n             false\n\n\n             10,\n             true\n},\n\n             11,\n             false\n\n\n             12,\n             true\n},\n\n             13,\n             false\n\n\n             14,\n             true\n},\n\n             15,\n             false\n},\n\n            16,\n    \"active\": true\n},\n\"item_17\": {\n             17,\n             false\n},\n\n             18,\n             true\n},\n\n             19,\n    \"active\": false",
+      "blocks": [
+        {
+          "text": "0,",
+          "x": 0.2267080744697429,
+          "y": 0.06831395337936047,
+          "width": 0.021739130020141578,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "true",
+          "x": 0.23291925491774657,
+          "y": 0.07921511625311461,
+          "width": 0.04347826004028321,
+          "height": 0.007267441642418326
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.09084302312863374,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "1,",
+          "x": 0.2267080744697429,
+          "y": 0.11337209291424416,
+          "width": 0.021739130020141578,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "false",
+          "x": 0.23291925561015445,
+          "y": 0.1235465115843023,
+          "width": 0.05279502868652344,
+          "height": 0.0087209301494926
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.13517441849563955,
+          "width": 0.021739130020141606,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"ite",
+          "x": 0.0962732927101088,
+          "y": 0.18968023243095927,
+          "width": 0.03726707839965822,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.22529069756540693,
+          "width": 0.021739130020141606,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"item4': {",
+          "x": 0.09906851204111186,
+          "y": 0.23691860463257092,
+          "width": 0.11242198181152344,
+          "height": 0.013014308522256601
+        },
+        {
+          "text": "true",
+          "x": 0.23291925491774657,
+          "y": 0.1693313953228821,
+          "width": 0.04347826004028321,
+          "height": 0.007267441642418326
+        },
+        {
+          "text": "3,",
+          "x": 0.22360248494338517,
+          "y": 0.2027616277797965,
+          "width": 0.02484471893310547,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "false",
+          "x": 0.23291925561015445,
+          "y": 0.21366279065406973,
+          "width": 0.05279502868652344,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "true",
+          "x": 0.23291925445190811,
+          "y": 0.25872093008720937,
+          "width": 0.043478260040283184,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.2710755812681686,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "false",
+          "x": 0.23291925560309626,
+          "y": 0.3037790697278012,
+          "width": 0.05279502868652344,
+          "height": 0.0087209301494926
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.3154069766351744,
+          "width": 0.021739130020141606,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "true",
+          "x": 0.23291925492969118,
+          "y": 0.3481104650883273,
+          "width": 0.04347826004028321,
+          "height": 0.007267441642418326
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.36119186033793604,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090241
+        },
+        {
+          "text": "\"item_7\": {",
+          "x": 0.09878716877448074,
+          "y": 0.3710238228823405,
+          "width": 0.11273925018310546,
+          "height": 0.011987416931752426
+        },
+        {
+          "text": "\"value\": 7,",
+          "x": 0.13626481402883395,
+          "y": 0.38177492185720996,
+          "width": 0.11263869476318358,
+          "height": 0.011704368091254747
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13664596504333376,
+          "y": 0.3925425702920776,
+          "width": 0.14906831359863282,
+          "height": 0.00892235009411313
+        },
+        {
+          "text": "},",
+          "x": 0.09937888236695916,
+          "y": 0.40479651145833334,
+          "width": 0.018633539199829102,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "item8:{",
+          "x": 0.09893018229779188,
+          "y": 0.4160708672778982,
+          "width": 0.11244683837890623,
+          "height": 0.011290914556953302
+        },
+        {
+          "text": "\"value\": 8,",
+          "x": 0.13562424463448772,
+          "y": 0.42637780404620784,
+          "width": 0.1141240005493164,
+          "height": 0.01430789004550892
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.1366459607380932,
+          "y": 0.438202247225046,
+          "width": 0.1397515563964844,
+          "height": 0.007490636480881441
+        },
+        {
+          "text": "},",
+          "x": 0.09937888183257931,
+          "y": 0.4498546509932171,
+          "width": 0.021739130020141592,
+          "height": 0.010174418210090241
+        },
+        {
+          "text": "ouln",
+          "x": 0.1552795029222445,
+          "y": 0.45930232555717054,
+          "width": 0.031055900573730477,
+          "height": 0.002906976790910454
+        },
+        {
+          "text": "9,",
+          "x": 0.2267080744697429,
+          "y": 0.47238372082122093,
+          "width": 0.021739130020141578,
+          "height": 0.008720930149492823
+        },
+        {
+          "text": "false",
+          "x": 0.23291925378044556,
+          "y": 0.48328488369955536,
+          "width": 0.05279503250122072,
+          "height": 0.007267441642418326
+        },
+        {
+          "text": "10,",
+          "x": 0.22670807433602738,
+          "y": 0.5181686045784883,
+          "width": 0.03105590057373045,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "true",
+          "x": 0.23291925491774657,
+          "y": 0.528343023225533,
+          "width": 0.04347826004028321,
+          "height": 0.007267441642418326
+        },
+        {
+          "text": "},",
+          "x": 0.09937888183257931,
+          "y": 0.5399709300629845,
+          "width": 0.021739130020141592,
+          "height": 0.010174418210090241
+        },
+        {
+          "text": "11,",
+          "x": 0.22670807433602738,
+          "y": 0.563226744113372,
+          "width": 0.03105590057373045,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "false",
+          "x": 0.23291925484285536,
+          "y": 0.5726744184956396,
+          "width": 0.05590061950683595,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "12,",
+          "x": 0.22670807473731053,
+          "y": 0.6075581394725913,
+          "width": 0.027950309753418,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "true",
+          "x": 0.23291925491774657,
+          "y": 0.6184593022996263,
+          "width": 0.04347826004028321,
+          "height": 0.007267441642418326
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.6300872091751455,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "13,",
+          "x": 0.22670807433602738,
+          "y": 0.6526162790074751,
+          "width": 0.03105590057373045,
+          "height": 0.0087209301494926
+        },
+        {
+          "text": "false",
+          "x": 0.2329192551879209,
+          "y": 0.662790697625969,
+          "width": 0.05590061950683595,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "14,",
+          "x": 0.22670807433602738,
+          "y": 0.6976744185423589,
+          "width": 0.03105590057373045,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "true",
+          "x": 0.23291925491774657,
+          "y": 0.7085755813693938,
+          "width": 0.04347826004028321,
+          "height": 0.007267441642418326
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.7194767440770349,
+          "width": 0.021739130020141606,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "15,",
+          "x": 0.22670807540800994,
+          "y": 0.7420058137839147,
+          "width": 0.03105589866638178,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "false",
+          "x": 0.23291925521552612,
+          "y": 0.7529069767005814,
+          "width": 0.05590061950683592,
+          "height": 0.0087209301494926
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.7652616277797966,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "16,",
+          "x": 0.22360248437151986,
+          "y": 0.7870639533866279,
+          "width": 0.031055900573730477,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.1366459602979902,
+          "y": 0.7979868913805779,
+          "width": 0.14285714721679688,
+          "height": 0.008895131086142372
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.8095930231468023,
+          "width": 0.021739130020141606,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"item_17\": {",
+          "x": 0.09902224281290592,
+          "y": 0.8202019471724569,
+          "width": 0.12160077667236327,
+          "height": 0.011125027910153906
+        },
+        {
+          "text": "17,",
+          "x": 0.22670807432493603,
+          "y": 0.8321220928960757,
+          "width": 0.03105590057373045,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "false",
+          "x": 0.23291925530869384,
+          "y": 0.8430232557867006,
+          "width": 0.05590061950683595,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.8553779068495639,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "18,",
+          "x": 0.2267080747816761,
+          "y": 0.8771802324563953,
+          "width": 0.027950309753417946,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "true",
+          "x": 0.23159707133190216,
+          "y": 0.8883044558864385,
+          "width": 0.04633786773681642,
+          "height": 0.010289645820074744
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.8997093022165696,
+          "width": 0.021739130020141606,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "19,",
+          "x": 0.22670807437151985,
+          "y": 0.922238371991279,
+          "width": 0.031055900573730477,
+          "height": 0.010174418210090241
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.1366459592388448,
+          "y": 0.9324127906892238,
+          "width": 0.1521739196777344,
+          "height": 0.007267441642418326
+        }
+      ]
+    },
+    {
+      "id": "json-long-dark-16",
+      "complexity": "long",
+      "elapsed": 0.16512650000004214,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.878269292864062,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"items\": {\n        \"item_0\": {\n            \"value\": 0,\n            \"active\": true\n        },\n        \"item_1\": {\n            \"value\": 1,\n            \"active\": false\n        },\n        \"item_2\": {\n            \"value\": 2,\n            \"active\": true\n        },\n        \"item_3\": {\n            \"value\": 3,\n            \"active\": false\n        },\n        \"item_4\": {\n            \"value\": 4,\n            \"active\": true\n        },\n        \"item_5\": {\n            \"value\": 5,\n            \"active\": false\n        },\n        \"item_6\": {\n            \"value\": 6,\n            \"active\": true\n        },\n        \"item_7\": {\n            \"value\": 7,\n            \"active\": false\n        },\n        \"item_8\": {\n            \"value\": 8,\n            \"active\": true\n        },\n        \"item_9\": {\n            \"value\": 9,\n            \"active\": false\n        },\n        \"item_10\": {\n            \"value\": 10,\n            \"active\": true\n        },\n        \"item_11\": {\n            \"value\": 11,\n            \"active\": false\n        },\n        \"item_12\": {\n            \"value\": 12,\n            \"active\": true\n        },\n        \"item_13\": {\n            \"value\": 13,\n            \"active\": false\n        },\n        \"item_14\": {\n            \"value\": 14,\n            \"active\": true\n        },\n        \"item_15\": {\n            \"value\": 15,\n            \"active\": false\n        },\n        \"item_16\": {\n            \"value\": 16,\n            \"active\": true\n        },\n        \"item_17\": {\n            \"value\": 17,\n            \"active\": false\n        },\n        \"item_18\": {\n            \"value\": 18,\n            \"active\": true\n        },\n        \"item_19\": {\n            \"value\": 19,\n            \"active\": false\n        }\n    }\n}\n",
+      "actual": "\"пame\": \"Тест\",\n\"enabled\": true,\n\"items\": {\n    \"item_0\": {\n        \"value\": 0,\n        \"active\": true\n\n    \"item_1\": {\n        \"value\": 1,\n        \"active\": false\n    },\n    \"item_2\": {\n        \"value\": 2,\n        \"active\": true\n\n    \"item_3\": {\n        \"value\": 3,\n        \"active\": false\n    },\n    \"item_4\": {\n        \"value\": 4,\n        \"active\": true\n\n    \"item_5\": {\n        \"value\": 5,\n        \"active\": false\n    },\n    \"item_6\": {\n        \"value\": 6,\n        \"active\": true\n    },\n    \"item_7\": {\n        \"value\": 7,\n        \"active\": false\n    },\n    \"item_8\": {\n        \"value\": 8,\n        \"active\": true\n    },\n    \"item 9\": {\n        \"value\": 9,\n        \"active\": false\n    },\n    \"item_10\": {\n        \"value\": 10,\n        \"active\": true\n    },\n    \"item_11\": {\n        \"value\": 11,\n        \"active\": false\n\n    \"item_12\": {\n        \"value\": 12,\n        \"active\": true\n    },\n    \"item_13\": {\n        \"value\": 13,\n        \"active\": false\n    },\n    \"item_14\": {\n        \"value\": 14,\n        \"active\": true\n    },\n    \"item_15\": {\n        \"value\": 15,\n        \"active\": false\n    },\n    \"item_16\": {\n        \"value\": 16,\n        \"active\": true\n    },\n    \"item_17\": {\n        \"value\": 17,\n        \"active\": false\n    },\n    \"item_18\": {\n        \"value\": 18,\n        \"active\": true\n    },\n    \"item_19\": {\n        \"value\": 19,\n        \"active\": false",
+      "blocks": [
+        {
+          "text": "\"пame\": \"Тест\",",
+          "x": 0.058450012355239604,
+          "y": 0.02237164444851747,
+          "width": 0.1503650360107422,
+          "height": 0.012485529599564726
+        },
+        {
+          "text": "\"enabled\": true,",
+          "x": 0.05864373800462348,
+          "y": 0.033742341250899754,
+          "width": 0.15922616577148435,
+          "height": 0.011349568206272864
+        },
+        {
+          "text": "\"items\": {",
+          "x": 0.059006212324046944,
+          "y": 0.04443482709701846,
+          "width": 0.10248446655273437,
+          "height": 0.010381282045600071
+        },
+        {
+          "text": "\"item_0\": {",
+          "x": 0.09937888343903807,
+          "y": 0.05668604649916947,
+          "width": 0.11180123901367188,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"value\": 0,",
+          "x": 0.13631068407729136,
+          "y": 0.06721089531684177,
+          "width": 0.10942577362060546,
+          "height": 0.009575691115990104
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13664596066343962,
+          "y": 0.07841760283411914,
+          "width": 0.13975155639648437,
+          "height": 0.00889513108614226
+        },
+        {
+          "text": "\"item_1\": {",
+          "x": 0.0959705432128816,
+          "y": 0.10136948188694933,
+          "width": 0.11245838928222655,
+          "height": 0.009949927472889697
+        },
+        {
+          "text": "\"value\": 1,",
+          "x": 0.1360078784053094,
+          "y": 0.11267037891081794,
+          "width": 0.10996813201904296,
+          "height": 0.010624977533290392
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13664595920443853,
+          "y": 0.12354651161579461,
+          "width": 0.1521739196777344,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.13517441849563955,
+          "width": 0.021739130020141606,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"item_2\": {",
+          "x": 0.09928184898498293,
+          "y": 0.14607558138013121,
+          "width": 0.11199530792236329,
+          "height": 0.010652350129259691
+        },
+        {
+          "text": "\"value\": 2,",
+          "x": 0.13664596416940628,
+          "y": 0.15776881370743906,
+          "width": 0.1118012390136719,
+          "height": 0.010305068912577542
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13664596067339344,
+          "y": 0.16860465114664086,
+          "width": 0.13975155639648443,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"item_3\": {",
+          "x": 0.09932923133957397,
+          "y": 0.1911337209153523,
+          "width": 0.11190054321289061,
+          "height": 0.010416207688578094
+        },
+        {
+          "text": "\"value\": 3,",
+          "x": 0.1362776066418781,
+          "y": 0.20225191174703067,
+          "width": 0.10962806701660155,
+          "height": 0.01055000694503494
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13664596461247358,
+          "y": 0.21300681558418733,
+          "width": 0.1521739044189453,
+          "height": 0.010315956694356476
+        },
+        {
+          "text": "},",
+          "x": 0.09937888197750684,
+          "y": 0.22529069758720927,
+          "width": 0.021739130020141592,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"item_4\": {",
+          "x": 0.09604293525694366,
+          "y": 0.23619186045262347,
+          "width": 0.11226195526123045,
+          "height": 0.011348871702558605
+        },
+        {
+          "text": "\"value\": 4,",
+          "x": 0.13664596455335914,
+          "y": 0.24770816989511218,
+          "width": 0.10869564819335936,
+          "height": 0.010397613271791895
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13664596073254753,
+          "y": 0.2586610487597456,
+          "width": 0.1397515563964844,
+          "height": 0.00889513108614226
+        },
+        {
+          "text": "\"item_5\": {",
+          "x": 0.09898243559246887,
+          "y": 0.280873785131385,
+          "width": 0.10934004211425781,
+          "height": 0.011059513699249401
+        },
+        {
+          "text": "\"value\": 5,",
+          "x": 0.13664596455335914,
+          "y": 0.2928779069608467,
+          "width": 0.10869564819335936,
+          "height": 0.010174418210090241
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.1366459596131009,
+          "y": 0.3037790697568066,
+          "width": 0.14906832885742188,
+          "height": 0.008720930149492823
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.3146802324309593,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "\"item_6\": {",
+          "x": 0.09888560195969373,
+          "y": 0.32593343565952243,
+          "width": 0.10973386383056641,
+          "height": 0.011946405810809746
+        },
+        {
+          "text": "\"value\": 6,",
+          "x": 0.13664596455335914,
+          "y": 0.3380068157378635,
+          "width": 0.10869564819335936,
+          "height": 0.010315956694356476
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.1366459607380932,
+          "y": 0.3488372092902132,
+          "width": 0.1397515563964844,
+          "height": 0.008720930149492823
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.36046511617005816,
+          "width": 0.021739130020141606,
+          "height": 0.0087209301494926
+        },
+        {
+          "text": "\"item_7\": {",
+          "x": 0.09933417900191267,
+          "y": 0.3713662790549218,
+          "width": 0.1118906478881836,
+          "height": 0.010391863990812267
+        },
+        {
+          "text": "\"value\": 7,",
+          "x": 0.13658252613763358,
+          "y": 0.38299418603108526,
+          "width": 0.10882252502441406,
+          "height": 0.010475585523169517
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13620782744314044,
+          "y": 0.3931513108793856,
+          "width": 0.14994635009765625,
+          "height": 0.010416536295458467
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.40479651150072676,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "\"item_8\": {",
+          "x": 0.09914538238899652,
+          "y": 0.4164244185884646,
+          "width": 0.10916265106201171,
+          "height": 0.011330614375711034
+        },
+        {
+          "text": "\"value\": 8,",
+          "x": 0.13664596416940628,
+          "y": 0.4279461719255365,
+          "width": 0.1118012390136719,
+          "height": 0.010386725490012738
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13664595918529823,
+          "y": 0.43749999989098837,
+          "width": 0.13975155639648437,
+          "height": 0.008895131086142372
+        },
+        {
+          "text": "},",
+          "x": 0.09937888197750684,
+          "y": 0.45058139526162794,
+          "width": 0.021739130020141592,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"item 9\": {",
+          "x": 0.09937888343903807,
+          "y": 0.4607558139410299,
+          "width": 0.11180123901367188,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"value\": 9,",
+          "x": 0.1366459645585057,
+          "y": 0.472383720917019,
+          "width": 0.10869564819335936,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.1366459655609321,
+          "y": 0.4824574296768003,
+          "width": 0.14906831359863285,
+          "height": 0.008922349647636274
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.4949127905704942,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090241
+        },
+        {
+          "text": "\"item_10\": {",
+          "x": 0.0990242469905805,
+          "y": 0.5061447230592822,
+          "width": 0.12204513549804687,
+          "height": 0.01261904087852439
+        },
+        {
+          "text": "\"value\": 10,",
+          "x": 0.13654016660833435,
+          "y": 0.5181686046362648,
+          "width": 0.11822401428222656,
+          "height": 0.010726509915755522
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.1366459663359143,
+          "y": 0.5276162789244188,
+          "width": 0.13975154113769528,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.5399709301053779,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "\"item_11\": {",
+          "x": 0.09931617114074828,
+          "y": 0.5501453484826369,
+          "width": 0.12124343109130858,
+          "height": 0.010506733079974517
+        },
+        {
+          "text": "\"value\": 11,",
+          "x": 0.13645130647509854,
+          "y": 0.5614227261301038,
+          "width": 0.12165582275390627,
+          "height": 0.009513056680057863
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13664595958193682,
+          "y": 0.572780572232154,
+          "width": 0.14906832885742188,
+          "height": 0.008933237429415208
+        },
+        {
+          "text": "\"item_12\": {",
+          "x": 0.09872759323760291,
+          "y": 0.5963325474238321,
+          "width": 0.12220030212402344,
+          "height": 0.012674608480617744
+        },
+        {
+          "text": "\"value\": 12,",
+          "x": 0.13643222204241925,
+          "y": 0.6068321045336675,
+          "width": 0.11853684997558592,
+          "height": 0.008807474307799601
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13664595918529823,
+          "y": 0.6177434458123022,
+          "width": 0.13975155639648437,
+          "height": 0.00889513108614226
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.6300872091751455,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "\"item_13\": {",
+          "x": 0.09937888230208727,
+          "y": 0.6402616278935893,
+          "width": 0.12111801147460938,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "\"value\": 13,",
+          "x": 0.13633685072597587,
+          "y": 0.651489048855008,
+          "width": 0.12179524993896482,
+          "height": 0.0097175599930438
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13664595919839992,
+          "y": 0.6626954315805395,
+          "width": 0.1521739196777344,
+          "height": 0.008911462312334084
+        },
+        {
+          "text": "},",
+          "x": 0.09627329247444105,
+          "y": 0.6751453487100292,
+          "width": 0.02484471893310547,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "\"item_14\": {",
+          "x": 0.09903386981177352,
+          "y": 0.6857548655946226,
+          "width": 0.12166618347167969,
+          "height": 0.0099353495608554
+        },
+        {
+          "text": "\"value\": 14,",
+          "x": 0.13606726070874417,
+          "y": 0.6969703629109871,
+          "width": 0.11916679382324216,
+          "height": 0.01058282432484714
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13664596062838488,
+          "y": 0.7078488371903437,
+          "width": 0.13975155639648432,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "},",
+          "x": 0.09937888197750684,
+          "y": 0.7194767440988372,
+          "width": 0.021739130020141592,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"item_15\": {",
+          "x": 0.09937888230208727,
+          "y": 0.7303370784514007,
+          "width": 0.12111801147460938,
+          "height": 0.010299625468164764
+        },
+        {
+          "text": "\"value\": 15,",
+          "x": 0.1362043842294194,
+          "y": 0.7416428454549231,
+          "width": 0.1220528793334961,
+          "height": 0.010305937756313388
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13664595920443853,
+          "y": 0.7530185742629243,
+          "width": 0.1521739196777344,
+          "height": 0.008944125211194254
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.7652616277797966,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "\"item_16\": {",
+          "x": 0.09886095705403107,
+          "y": 0.7751144451676562,
+          "width": 0.12201160430908205,
+          "height": 0.01234953233811742
+        },
+        {
+          "text": "\"value\": 16,",
+          "x": 0.1362278213060825,
+          "y": 0.7865955737372503,
+          "width": 0.11891327667236326,
+          "height": 0.010341028149208342
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.13664596067339344,
+          "y": 0.797986891380001,
+          "width": 0.13975155639648443,
+          "height": 0.008895131086142372
+        },
+        {
+          "text": "},",
+          "x": 0.09937888197750684,
+          "y": 0.8095930231686046,
+          "width": 0.021739130020141592,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"item_17\": {",
+          "x": 0.09937888230208727,
+          "y": 0.8204941860331243,
+          "width": 0.12111801147460938,
+          "height": 0.010174418210090352
+        },
+        {
+          "text": "\"value\": 17,",
+          "x": 0.13662372754192062,
+          "y": 0.8321220927852222,
+          "width": 0.11805689239501951,
+          "height": 0.010288031806660047
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.13664595923021328,
+          "y": 0.8429334333895486,
+          "width": 0.15217391967773441,
+          "height": 0.008900574977031783
+        },
+        {
+          "text": "},",
+          "x": 0.09937888192315901,
+          "y": 0.854651162681686,
+          "width": 0.021739130020141606,
+          "height": 0.008720930149492712
+        },
+        {
+          "text": "\"item_18\": {",
+          "x": 0.09937888230208727,
+          "y": 0.8656258167555859,
+          "width": 0.12111801147460938,
+          "height": 0.010321400585245999
+        },
+        {
+          "text": "\"value\": 18,",
+          "x": 0.13649408702903829,
+          "y": 0.8761973903144911,
+          "width": 0.11855184173583985,
+          "height": 0.010637753018725715
+        },
+        {
+          "text": "\"active\": true",
+          "x": 0.1360565531031334,
+          "y": 0.8881047864824414,
+          "width": 0.14082351684570313,
+          "height": 0.01215543461203128
+        },
+        {
+          "text": "},",
+          "x": 0.09937888193609896,
+          "y": 0.8989825579699613,
+          "width": 0.021739130020141606,
+          "height": 0.010174418210090241
+        },
+        {
+          "text": "\"item_19\": {",
+          "x": 0.09937888230208727,
+          "y": 0.9105805243727148,
+          "width": 0.12111801147460938,
+          "height": 0.010299625468164764
+        },
+        {
+          "text": "\"value\": 19,",
+          "x": 0.13664596303376897,
+          "y": 0.9222846440348571,
+          "width": 0.12111801147460938,
+          "height": 0.010299625468164764
+        },
+        {
+          "text": "\"active\": false",
+          "x": 0.1362817263506439,
+          "y": 0.9324127905076932,
+          "width": 0.15290237426757813,
+          "height": 0.010449476456374285
+        }
+      ]
+    }
+  ]
+}

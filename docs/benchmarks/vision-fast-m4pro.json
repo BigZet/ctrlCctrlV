@@ -1,0 +1,4680 @@
+{
+  "engine": "macOS Vision",
+  "system": "26.5.1",
+  "level": "fast",
+  "revision": 3,
+  "supported_languages": [
+    "en-US",
+    "fr-FR",
+    "it-IT",
+    "de-DE",
+    "es-ES",
+    "pt-BR"
+  ],
+  "language_correction": false,
+  "timing_scope": "image file decode + recognition + geometric reconstruction; no clipboard",
+  "layout": "estimated from recognized boxes only; no fixture geometry",
+  "results": [
+    {
+      "id": "python-light-14",
+      "complexity": "short",
+      "elapsed": 0.07345325000005687,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.75,
+      "expected": "def greet(name):\n    # Приветствие\n    if name == \"Женя\":\n        print(f\"Hello, {name}!\")\n\n    return {\"ok\": True, \"value\": None}\n",
+      "actual": "def greet Inamel\n   # npMBeTCTBMe\n   if n3me\n       printl f\"Hello, Iname} I' I\n\n   return {\"ok\": True,'value\": None}",
+      "blocks": [
+        {
+          "text": "def greet Inamel",
+          "x": 0.025,
+          "y": 0.12878787878787878,
+          "width": 0.122,
+          "height": 0.07575757575757569
+        },
+        {
+          "text": "# npMBeTCTBMe",
+          "x": 0.057,
+          "y": 0.24242424242424243,
+          "width": 0.11000000000000001,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "if n3me",
+          "x": 0.059,
+          "y": 0.3459595959595959,
+          "width": 0.05700000000000001,
+          "height": 0.05555555555555558
+        },
+        {
+          "text": "printl f\"Hello, Iname} I' I",
+          "x": 0.092,
+          "y": 0.46212121212121215,
+          "width": 0.19899999999999998,
+          "height": 0.07575757575757569
+        },
+        {
+          "text": "return {\"ok\": True,",
+          "x": 0.06,
+          "y": 0.6818181818181819,
+          "width": 0.154,
+          "height": 0.07070707070707061
+        },
+        {
+          "text": "'value\": None}",
+          "x": 0.231,
+          "y": 0.6818181818181819,
+          "width": 0.11100000000000002,
+          "height": 0.07070707070707061
+        }
+      ]
+    },
+    {
+      "id": "python-light-20",
+      "complexity": "short",
+      "elapsed": 0.015094790999683028,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.7232472324723247,
+      "expected": "def greet(name):\n    # Приветствие\n    if name == \"Женя\":\n        print(f\"Hello, {name}!\")\n\n    return {\"ok\": True, \"value\": None}\n",
+      "actual": "def greet I name)\n    # llpMBeTCTBMe\n    if name      XeHA\":\n         print I f Hello, Inamel I\" }\n\n    return l ok True,     'value\": Nonel",
+      "blocks": [
+        {
+          "text": "def greet I name)",
+          "x": 0.025,
+          "y": 0.09325396825396826,
+          "width": 0.17500000000000002,
+          "height": 0.08333333333333326
+        },
+        {
+          "text": "# llpMBeTCTBMe",
+          "x": 0.072,
+          "y": 0.20833333333333337,
+          "width": 0.15600000000000003,
+          "height": 0.07539682539682535
+        },
+        {
+          "text": "if name",
+          "x": 0.074,
+          "y": 0.30952380952380953,
+          "width": 0.081,
+          "height": 0.06349206349206349
+        },
+        {
+          "text": "XeHA\":",
+          "x": 0.216,
+          "y": 0.30952380952380953,
+          "width": 0.06799999999999998,
+          "height": 0.06349206349206349
+        },
+        {
+          "text": "print I f Hello, Inamel I\" }",
+          "x": 0.122,
+          "y": 0.42658730158730157,
+          "width": 0.28300000000000003,
+          "height": 0.08333333333333337
+        },
+        {
+          "text": "return l ok True,",
+          "x": 0.075,
+          "y": 0.6488095238095237,
+          "width": 0.22099999999999997,
+          "height": 0.08333333333333337
+        },
+        {
+          "text": "'value\": Nonel",
+          "x": 0.319,
+          "y": 0.6448412698412698,
+          "width": 0.16099999999999998,
+          "height": 0.07539682539682546
+        }
+      ]
+    },
+    {
+      "id": "python-dark-14",
+      "complexity": "short",
+      "elapsed": 0.010980666999785171,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.7580645161290323,
+      "expected": "def greet(name):\n    # Приветствие\n    if name == \"Женя\":\n        print(f\"Hello, {name}!\")\n\n    return {\"ok\": True, \"value\": None}\n",
+      "actual": "def greet Inamel\n   # npMBeTCTBMe\n   if nbme\n       printl f\"Hello, {name} I' I\n\n   return {\"ok\": True,'value\": None}",
+      "blocks": [
+        {
+          "text": "def greet Inamel",
+          "x": 0.025,
+          "y": 0.12878787878787878,
+          "width": 0.122,
+          "height": 0.07575757575757569
+        },
+        {
+          "text": "# npMBeTCTBMe",
+          "x": 0.057,
+          "y": 0.24242424242424243,
+          "width": 0.11000000000000001,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "if nbme",
+          "x": 0.059,
+          "y": 0.3459595959595959,
+          "width": 0.05700000000000001,
+          "height": 0.05555555555555558
+        },
+        {
+          "text": "printl f\"Hello, {name} I' I",
+          "x": 0.092,
+          "y": 0.46212121212121215,
+          "width": 0.19899999999999998,
+          "height": 0.07575757575757569
+        },
+        {
+          "text": "return {\"ok\": True,",
+          "x": 0.06,
+          "y": 0.6818181818181819,
+          "width": 0.154,
+          "height": 0.07070707070707061
+        },
+        {
+          "text": "'value\": None}",
+          "x": 0.231,
+          "y": 0.6818181818181819,
+          "width": 0.11100000000000002,
+          "height": 0.07070707070707061
+        }
+      ]
+    },
+    {
+      "id": "python-dark-20",
+      "complexity": "short",
+      "elapsed": 0.011576791999686975,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.7527675276752768,
+      "expected": "def greet(name):\n    # Приветствие\n    if name == \"Женя\":\n        print(f\"Hello, {name}!\")\n\n    return {\"ok\": True, \"value\": None}\n",
+      "actual": "def greet I name)\n    # llpMBeTCTBMe\n     if name      XeHA\":\n         print I f Hello, Inamel I\" }\n\n     return I\"ok\": True, \"value\": Nonel",
+      "blocks": [
+        {
+          "text": "def greet I name)",
+          "x": 0.025,
+          "y": 0.09325396825396826,
+          "width": 0.17500000000000002,
+          "height": 0.08333333333333326
+        },
+        {
+          "text": "# llpMBeTCTBMe",
+          "x": 0.072,
+          "y": 0.20833333333333337,
+          "width": 0.15600000000000003,
+          "height": 0.07539682539682535
+        },
+        {
+          "text": "if name",
+          "x": 0.074,
+          "y": 0.30952380952380953,
+          "width": 0.081,
+          "height": 0.06349206349206349
+        },
+        {
+          "text": "XeHA\":",
+          "x": 0.216,
+          "y": 0.30952380952380953,
+          "width": 0.06799999999999998,
+          "height": 0.06349206349206349
+        },
+        {
+          "text": "print I f Hello, Inamel I\" }",
+          "x": 0.122,
+          "y": 0.42658730158730157,
+          "width": 0.28300000000000003,
+          "height": 0.08333333333333337
+        },
+        {
+          "text": "return I\"ok\": True, \"value\": Nonel",
+          "x": 0.075,
+          "y": 0.6488095238095237,
+          "width": 0.40499999999999997,
+          "height": 0.08333333333333337
+        }
+      ]
+    },
+    {
+      "id": "sql-light-14",
+      "complexity": "short",
+      "elapsed": 0.011065375000725908,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8673469387755102,
+      "expected": "SELECT id, name, COUNT(*) AS total\nFROM users\nWHERE name = 'Иван' AND active = 1\nGROUP BY id, name;\n",
+      "actual": "SELECT id, name, COiNTl*l AS total\nFROM users\nWHERE name ' LIBaH' AND active\nGROUP BY id, name,'",
+      "blocks": [
+        {
+          "text": "SELECT id, name, COiNTl*l AS total",
+          "x": 0.025,
+          "y": 0.14166666666666666,
+          "width": 0.285,
+          "height": 0.08333333333333337
+        },
+        {
+          "text": "FROM users",
+          "x": 0.025,
+          "y": 0.2583333333333333,
+          "width": 0.08199999999999999,
+          "height": 0.061111111111111116
+        },
+        {
+          "text": "WHERE name",
+          "x": 0.024,
+          "y": 0.38055555555555554,
+          "width": 0.08399999999999999,
+          "height": 0.061111111111111116
+        },
+        {
+          "text": "' LIBaH' AND active",
+          "x": 0.136,
+          "y": 0.38055555555555554,
+          "width": 0.14,
+          "height": 0.061111111111111116
+        },
+        {
+          "text": "GROUP BY id, name,'",
+          "x": 0.024,
+          "y": 0.5083333333333333,
+          "width": 0.148,
+          "height": 0.07222222222222219
+        }
+      ]
+    },
+    {
+      "id": "sql-light-20",
+      "complexity": "short",
+      "elapsed": 0.01091933399948175,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8775510204081632,
+      "expected": "SELECT id, name, COUNT(*) AS total\nFROM users\nWHERE name = 'Иван' AND active = 1\nGROUP BY id, name;\n",
+      "actual": "SELECT id. name, COUNTl*l AS total\nFROM users\nWHERE name    'MBaH' AND active\nGROUP BY id. name;",
+      "blocks": [
+        {
+          "text": "SELECT id. name, COUNTl*l AS total",
+          "x": 0.025,
+          "y": 0.11989795918367346,
+          "width": 0.407,
+          "height": 0.1071428571428571
+        },
+        {
+          "text": "FROM users",
+          "x": 0.026,
+          "y": 0.2576530612244898,
+          "width": 0.11599999999999999,
+          "height": 0.07653061224489799
+        },
+        {
+          "text": "WHERE name",
+          "x": 0.024,
+          "y": 0.4005102040816326,
+          "width": 0.119,
+          "height": 0.07653061224489788
+        },
+        {
+          "text": "'MBaH' AND active",
+          "x": 0.185,
+          "y": 0.3979591836734694,
+          "width": 0.199,
+          "height": 0.08163265306122436
+        },
+        {
+          "text": "GROUP BY id. name;",
+          "x": 0.025,
+          "y": 0.5484693877551021,
+          "width": 0.211,
+          "height": 0.09693877551020413
+        }
+      ]
+    },
+    {
+      "id": "sql-dark-14",
+      "complexity": "short",
+      "elapsed": 0.010606666999592562,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8673469387755102,
+      "expected": "SELECT id, name, COUNT(*) AS total\nFROM users\nWHERE name = 'Иван' AND active = 1\nGROUP BY id, name;\n",
+      "actual": "SELECT id, name, COiNTl*l AS total\nFROM users\nWHERE name ' LIBaH' AND active\nGROUP BY id, name,'",
+      "blocks": [
+        {
+          "text": "SELECT id, name, COiNTl*l AS total",
+          "x": 0.025,
+          "y": 0.14166666666666666,
+          "width": 0.285,
+          "height": 0.08333333333333337
+        },
+        {
+          "text": "FROM users",
+          "x": 0.025,
+          "y": 0.2583333333333333,
+          "width": 0.08199999999999999,
+          "height": 0.061111111111111116
+        },
+        {
+          "text": "WHERE name",
+          "x": 0.024,
+          "y": 0.38055555555555554,
+          "width": 0.08399999999999999,
+          "height": 0.061111111111111116
+        },
+        {
+          "text": "' LIBaH' AND active",
+          "x": 0.136,
+          "y": 0.38055555555555554,
+          "width": 0.14,
+          "height": 0.061111111111111116
+        },
+        {
+          "text": "GROUP BY id, name,'",
+          "x": 0.024,
+          "y": 0.5083333333333333,
+          "width": 0.148,
+          "height": 0.07222222222222219
+        }
+      ]
+    },
+    {
+      "id": "sql-dark-20",
+      "complexity": "short",
+      "elapsed": 0.01098908299991308,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8979591836734694,
+      "expected": "SELECT id, name, COUNT(*) AS total\nFROM users\nWHERE name = 'Иван' AND active = 1\nGROUP BY id, name;\n",
+      "actual": "SELECT id. name, COUNT(*l AS total\nFROM users\nWHERE name    'MBaH' AND active\nGROUP BY id, name;",
+      "blocks": [
+        {
+          "text": "SELECT id. name, COUNT(*l AS total",
+          "x": 0.025,
+          "y": 0.11989795918367346,
+          "width": 0.407,
+          "height": 0.1071428571428571
+        },
+        {
+          "text": "FROM users",
+          "x": 0.026,
+          "y": 0.2576530612244898,
+          "width": 0.11599999999999999,
+          "height": 0.07653061224489799
+        },
+        {
+          "text": "WHERE name",
+          "x": 0.024,
+          "y": 0.4005102040816326,
+          "width": 0.119,
+          "height": 0.07653061224489788
+        },
+        {
+          "text": "'MBaH' AND active",
+          "x": 0.185,
+          "y": 0.3979591836734694,
+          "width": 0.199,
+          "height": 0.08163265306122436
+        },
+        {
+          "text": "GROUP BY id, name;",
+          "x": 0.025,
+          "y": 0.5510204081632653,
+          "width": 0.211,
+          "height": 0.10204081632653061
+        }
+      ]
+    },
+    {
+      "id": "json-light-14",
+      "complexity": "short",
+      "elapsed": 0.009257375000743195,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.6013071895424836,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"values\": [0, 1, 2],\n    \"path\": \"C:\\\\data\"\n}\n",
+      "actual": "'name\": \"TecT\"\n'enabled\": t rue,\n'V2lues\": 10. 1, 21\n'path\":",
+      "blocks": [
+        {
+          "text": "'name\": \"TecT\"",
+          "x": 0.062,
+          "y": 0.23484848484848486,
+          "width": 0.11199999999999999,
+          "height": 0.05555555555555558
+        },
+        {
+          "text": "'enabled\": t rue,",
+          "x": 0.062,
+          "y": 0.351010101010101,
+          "width": 0.127,
+          "height": 0.06565656565656575
+        },
+        {
+          "text": "'V2lues\": 10. 1, 21",
+          "x": 0.062,
+          "y": 0.45959595959595967,
+          "width": 0.152,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "'path\":",
+          "x": 0.062,
+          "y": 0.5757575757575758,
+          "width": 0.051000000000000004,
+          "height": 0.07070707070707072
+        }
+      ]
+    },
+    {
+      "id": "json-light-20",
+      "complexity": "short",
+      "elapsed": 0.010480667000592803,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.5987261146496815,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"values\": [0, 1, 2],\n    \"path\": \"C:\\\\data\"\n}\n",
+      "actual": "'name TecT\"\n'enabled t rue,\n'values 10, 1, 21\n'path   'C:Xldata\"",
+      "blocks": [
+        {
+          "text": "'name TecT\"",
+          "x": 0.079,
+          "y": 0.19841269841269837,
+          "width": 0.15899999999999997,
+          "height": 0.06349206349206349
+        },
+        {
+          "text": "'enabled t rue,",
+          "x": 0.079,
+          "y": 0.3174603174603175,
+          "width": 0.181,
+          "height": 0.07936507936507942
+        },
+        {
+          "text": "'values 10, 1, 21",
+          "x": 0.079,
+          "y": 0.4246031746031746,
+          "width": 0.21699999999999997,
+          "height": 0.07936507936507942
+        },
+        {
+          "text": "'path",
+          "x": 0.079,
+          "y": 0.5396825396825398,
+          "width": 0.052000000000000005,
+          "height": 0.07936507936507942
+        },
+        {
+          "text": "'C:Xldata\"",
+          "x": 0.175,
+          "y": 0.5357142857142857,
+          "width": 0.11099999999999999,
+          "height": 0.0714285714285714
+        }
+      ]
+    },
+    {
+      "id": "json-dark-14",
+      "complexity": "short",
+      "elapsed": 0.010374958999818773,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.6143790849673203,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"values\": [0, 1, 2],\n    \"path\": \"C:\\\\data\"\n}\n",
+      "actual": "'name\": \"TecT\"\n'enabled\": t rue,\n'vblues\": 10. 1, 21\n'path\":",
+      "blocks": [
+        {
+          "text": "'name\": \"TecT\"",
+          "x": 0.062,
+          "y": 0.23484848484848486,
+          "width": 0.11199999999999999,
+          "height": 0.05555555555555558
+        },
+        {
+          "text": "'enabled\": t rue,",
+          "x": 0.062,
+          "y": 0.351010101010101,
+          "width": 0.127,
+          "height": 0.06565656565656575
+        },
+        {
+          "text": "'vblues\": 10. 1, 21",
+          "x": 0.062,
+          "y": 0.45959595959595967,
+          "width": 0.152,
+          "height": 0.07070707070707072
+        },
+        {
+          "text": "'path\":",
+          "x": 0.062,
+          "y": 0.5757575757575758,
+          "width": 0.051000000000000004,
+          "height": 0.07070707070707072
+        }
+      ]
+    },
+    {
+      "id": "json-dark-20",
+      "complexity": "short",
+      "elapsed": 0.010127083000043058,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.6625,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"values\": [0, 1, 2],\n    \"path\": \"C:\\\\data\"\n}\n",
+      "actual": "'name\": \"TecT\"\n'enabled t rue,\n'values 10, 1, 21\n'path\": 'C:Xldata\"",
+      "blocks": [
+        {
+          "text": "'name\": \"TecT\"",
+          "x": 0.079,
+          "y": 0.19841269841269837,
+          "width": 0.15899999999999997,
+          "height": 0.06349206349206349
+        },
+        {
+          "text": "'enabled t rue,",
+          "x": 0.079,
+          "y": 0.3174603174603175,
+          "width": 0.181,
+          "height": 0.07936507936507942
+        },
+        {
+          "text": "'values 10, 1, 21",
+          "x": 0.079,
+          "y": 0.4246031746031746,
+          "width": 0.21699999999999997,
+          "height": 0.07936507936507942
+        },
+        {
+          "text": "'path\":",
+          "x": 0.079,
+          "y": 0.5396825396825398,
+          "width": 0.073,
+          "height": 0.07936507936507942
+        },
+        {
+          "text": "'C:Xldata\"",
+          "x": 0.175,
+          "y": 0.5357142857142857,
+          "width": 0.11099999999999999,
+          "height": 0.0714285714285714
+        }
+      ]
+    },
+    {
+      "id": "shell-light-14",
+      "complexity": "short",
+      "elapsed": 0.009610042000531394,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.688,
+      "expected": "#!/bin/sh\nvalue=\"a|b\"\nprintf '%s\\n' \"$value\"\n# [] {} () _ | : ; , .\n",
+      "actual": "#l /bin/sh\nvalue='a | b\"\nprintf '*sXn''$value\"\n# 11 11 11",
+      "blocks": [
+        {
+          "text": "#l /bin/sh",
+          "x": 0.024,
+          "y": 0.14166666666666666,
+          "width": 0.07500000000000001,
+          "height": 0.0722222222222223
+        },
+        {
+          "text": "value='a | b\"",
+          "x": 0.025,
+          "y": 0.26666666666666666,
+          "width": 0.09,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "printf '*sXn'",
+          "x": 0.025,
+          "y": 0.3888888888888889,
+          "width": 0.10500000000000001,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "# 11 11 11",
+          "x": 0.024,
+          "y": 0.5055555555555555,
+          "width": 0.08099999999999999,
+          "height": 0.07777777777777772
+        },
+        {
+          "text": "'$value\"",
+          "x": 0.146,
+          "y": 0.3861111111111111,
+          "width": 0.061,
+          "height": 0.0722222222222223
+        }
+      ]
+    },
+    {
+      "id": "shell-light-20",
+      "complexity": "short",
+      "elapsed": 0.011706083000717626,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.704,
+      "expected": "#!/bin/sh\nvalue=\"a|b\"\nprintf '%s\\n' \"$value\"\n# [] {} () _ | : ; , .\n",
+      "actual": "#!/bin/sh\nvalue='a I b\nprintf '*sXn'  '$value\"\n# 11 11 i)",
+      "blocks": [
+        {
+          "text": "#!/bin/sh",
+          "x": 0.024,
+          "y": 0.11734693877551017,
+          "width": 0.10700000000000001,
+          "height": 0.09183673469387754
+        },
+        {
+          "text": "value='a I b",
+          "x": 0.025,
+          "y": 0.26785714285714285,
+          "width": 0.118,
+          "height": 0.1071428571428571
+        },
+        {
+          "text": "printf '*sXn'",
+          "x": 0.026,
+          "y": 0.40816326530612246,
+          "width": 0.15,
+          "height": 0.1020408163265305
+        },
+        {
+          "text": "'$value\"",
+          "x": 0.199,
+          "y": 0.4056122448979592,
+          "width": 0.08699999999999997,
+          "height": 0.09693877551020402
+        },
+        {
+          "text": "# 11 11 i)",
+          "x": 0.024,
+          "y": 0.5433673469387755,
+          "width": 0.11600000000000002,
+          "height": 0.09693877551020402
+        }
+      ]
+    },
+    {
+      "id": "shell-dark-14",
+      "complexity": "short",
+      "elapsed": 0.019916166000257363,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.688,
+      "expected": "#!/bin/sh\nvalue=\"a|b\"\nprintf '%s\\n' \"$value\"\n# [] {} () _ | : ; , .\n",
+      "actual": "#l /bin/sh\nvalue='a | b\"\nprintf '*sln''$value\"\n# 11 11 11",
+      "blocks": [
+        {
+          "text": "#l /bin/sh",
+          "x": 0.024,
+          "y": 0.14166666666666666,
+          "width": 0.07500000000000001,
+          "height": 0.0722222222222223
+        },
+        {
+          "text": "value='a | b\"",
+          "x": 0.025,
+          "y": 0.26944444444444443,
+          "width": 0.09,
+          "height": 0.08333333333333337
+        },
+        {
+          "text": "printf '*sln'",
+          "x": 0.025,
+          "y": 0.3888888888888889,
+          "width": 0.10500000000000001,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "# 11 11 11",
+          "x": 0.024,
+          "y": 0.5055555555555555,
+          "width": 0.08099999999999999,
+          "height": 0.07777777777777772
+        },
+        {
+          "text": "'$value\"",
+          "x": 0.146,
+          "y": 0.3861111111111111,
+          "width": 0.061,
+          "height": 0.0722222222222223
+        }
+      ]
+    },
+    {
+      "id": "shell-dark-20",
+      "complexity": "short",
+      "elapsed": 0.016397958000197832,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.6984126984126984,
+      "expected": "#!/bin/sh\nvalue=\"a|b\"\nprintf '%s\\n' \"$value\"\n# [] {} () _ | : ; , .\n",
+      "actual": "#!/bin/sh\nvalue='a I b\nprintf '96sXn'  '$value\"\n# 11 11 i)",
+      "blocks": [
+        {
+          "text": "#!/bin/sh",
+          "x": 0.024,
+          "y": 0.11734693877551017,
+          "width": 0.10700000000000001,
+          "height": 0.09183673469387754
+        },
+        {
+          "text": "value='a I b",
+          "x": 0.025,
+          "y": 0.26785714285714285,
+          "width": 0.118,
+          "height": 0.1071428571428571
+        },
+        {
+          "text": "printf '96sXn'",
+          "x": 0.026,
+          "y": 0.40816326530612246,
+          "width": 0.15,
+          "height": 0.1020408163265305
+        },
+        {
+          "text": "'$value\"",
+          "x": 0.199,
+          "y": 0.4056122448979592,
+          "width": 0.08699999999999997,
+          "height": 0.09693877551020402
+        },
+        {
+          "text": "# 11 11 i)",
+          "x": 0.024,
+          "y": 0.5433673469387755,
+          "width": 0.11600000000000002,
+          "height": 0.09693877551020402
+        }
+      ]
+    },
+    {
+      "id": "text-light-14",
+      "complexity": "short",
+      "elapsed": 0.012147707999247359,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.27522935779816515,
+      "expected": "Перенос текста из удалённого редактора.\nEnglish and русский в одной строке.\n\n    Строка с четырьмя пробелами.\n",
+      "actual": "nepeHOC TeKCTa M3 yAanéHHoro peAaKTOPa.\nEnglish and PyCCKMM B OIIHOM CTPOKe.\n   CTPOKa c yeTWPbNA npo6enaNM.",
+      "blocks": [
+        {
+          "text": "nepeHOC TeKCTa M3 yAanéHHoro peAaKTOPa.",
+          "x": 0.025,
+          "y": 0.14444444444444443,
+          "width": 0.32399999999999995,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "English and PyCCKMM B OIIHOM CTPOKe.",
+          "x": 0.025,
+          "y": 0.26666666666666666,
+          "width": 0.29,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "CTPOKa c yeTWPbNA npo6enaNM.",
+          "x": 0.058,
+          "y": 0.5111111111111111,
+          "width": 0.23199999999999998,
+          "height": 0.07777777777777783
+        }
+      ]
+    },
+    {
+      "id": "text-light-20",
+      "complexity": "short",
+      "elapsed": 0.012925875000291853,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.2818181818181818,
+      "expected": "Перенос текста из удалённого редактора.\nEnglish and русский в одной строке.\n\n    Строка с четырьмя пробелами.\n",
+      "actual": "llepeHOC TeKCTa M3 yAanèHHoro peAaKTOPa.\nEnglish and PyCCKMM B OAHOM CTPOKe.\n    CTPOKa c 4eTblPbMA npo6enaMM.",
+      "blocks": [
+        {
+          "text": "llepeHOC TeKCTa M3 yAanèHHoro peAaKTOPa.",
+          "x": 0.025,
+          "y": 0.125,
+          "width": 0.46399999999999997,
+          "height": 0.09693877551020402
+        },
+        {
+          "text": "English and PyCCKMM B OAHOM CTPOKe.",
+          "x": 0.026,
+          "y": 0.2653061224489796,
+          "width": 0.415,
+          "height": 0.10204081632653061
+        },
+        {
+          "text": "CTPOKa c 4eTblPbMA npo6enaMM.",
+          "x": 0.073,
+          "y": 0.5510204081632653,
+          "width": 0.331,
+          "height": 0.10204081632653061
+        }
+      ]
+    },
+    {
+      "id": "text-dark-14",
+      "complexity": "short",
+      "elapsed": 0.01236508399961167,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.27522935779816515,
+      "expected": "Перенос текста из удалённого редактора.\nEnglish and русский в одной строке.\n\n    Строка с четырьмя пробелами.\n",
+      "actual": "nepeHOC TeKCTa M3 yAanéHHoro peAaKTOPa.\nEnglish and PyCCKMM B OIIHOM CTPOKe.\n   CTPOKa c yeTWPbNA npo6enaNM.",
+      "blocks": [
+        {
+          "text": "nepeHOC TeKCTa M3 yAanéHHoro peAaKTOPa.",
+          "x": 0.025,
+          "y": 0.14444444444444443,
+          "width": 0.32399999999999995,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "English and PyCCKMM B OIIHOM CTPOKe.",
+          "x": 0.025,
+          "y": 0.26666666666666666,
+          "width": 0.29,
+          "height": 0.07777777777777783
+        },
+        {
+          "text": "CTPOKa c yeTWPbNA npo6enaNM.",
+          "x": 0.058,
+          "y": 0.5111111111111111,
+          "width": 0.23199999999999998,
+          "height": 0.07777777777777783
+        }
+      ]
+    },
+    {
+      "id": "text-dark-20",
+      "complexity": "short",
+      "elapsed": 0.01285241700043116,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.2818181818181818,
+      "expected": "Перенос текста из удалённого редактора.\nEnglish and русский в одной строке.\n\n    Строка с четырьмя пробелами.\n",
+      "actual": "llepeHOC TeKCTa M3 yAanèHHoro peAaKTOPa.\nEnglish and PyCCKMM B OAHOM CTPOKe.\n    CTPOKa c 4eTblPbMA npo6enaMM.",
+      "blocks": [
+        {
+          "text": "llepeHOC TeKCTa M3 yAanèHHoro peAaKTOPa.",
+          "x": 0.025,
+          "y": 0.125,
+          "width": 0.46399999999999997,
+          "height": 0.09693877551020402
+        },
+        {
+          "text": "English and PyCCKMM B OAHOM CTPOKe.",
+          "x": 0.026,
+          "y": 0.2653061224489796,
+          "width": 0.415,
+          "height": 0.10204081632653061
+        },
+        {
+          "text": "CTPOKa c 4eTblPbMA npo6enaMM.",
+          "x": 0.073,
+          "y": 0.5510204081632653,
+          "width": 0.331,
+          "height": 0.10204081632653061
+        }
+      ]
+    },
+    {
+      "id": "python-medium-light-16",
+      "complexity": "medium",
+      "elapsed": 0.023206709000078263,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.7827616534740546,
+      "expected": "def collect(values):\n    result = []\n    # Проверка 1\n    if len(values) > 0:\n        result.append((\"item_0\", values[0]))\n    # Проверка 2\n    if len(values) > 1:\n        result.append((\"item_1\", values[1]))\n    # Проверка 3\n    if len(values) > 2:\n        result.append((\"item_2\", values[2]))\n    # Проверка 4\n    if len(values) > 3:\n        result.append((\"item_3\", values[3]))\n    # Проверка 5\n    if len(values) > 4:\n        result.append((\"item_4\", values[4]))\n    # Проверка 6\n    if len(values) > 5:\n        result.append((\"item_5\", values[5]))\n    return result\n",
+      "actual": "def collect I values I :\n    result\n    # npoBepKa I\n    if lenlvaluesl > O:\n        result.appendl I\"item 0 values10111\n    # npoBepKa 2\n    if lenlvaluesl > I:\n        result.appendll\"item I  values111 I I\n    # npoBepKa 3\n    if lenlvaluesl > 2:\n        result.appendll\"item 2  values12111\n    # npoBepKa 4\n    if lenlvaluesl > 3:\n        result.appendl I\"item 3 values13111\n    # npoBepKa 5\n    if lenlvaluesl > 4:\n        result.appendl I\"item 4 values14111\n    # npoBepKa 6\n    if lenlvaluesl > 5:\n        result.appendll\"item 5  values15111\n    retu rn result",
+      "blocks": [
+        {
+          "text": "def collect I values I :",
+          "x": 0.025,
+          "y": 0.04253472222222221,
+          "width": 0.188,
+          "height": 0.02604166666666674
+        },
+        {
+          "text": "result",
+          "x": 0.065,
+          "y": 0.08246527777777779,
+          "width": 0.05299999999999999,
+          "height": 0.02256944444444442
+        },
+        {
+          "text": "# npoBepKa I",
+          "x": 0.062,
+          "y": 0.12847222222222227,
+          "width": 0.11499999999999999,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if lenlvaluesl > O:",
+          "x": 0.064,
+          "y": 0.16666666666666663,
+          "width": 0.178,
+          "height": 0.02430555555555558
+        },
+        {
+          "text": "result.appendl I\"item 0",
+          "x": 0.104,
+          "y": 0.2109375,
+          "width": 0.20800000000000002,
+          "height": 0.02951388888888884
+        },
+        {
+          "text": "# npoBepKa 2",
+          "x": 0.062,
+          "y": 0.25347222222222227,
+          "width": 0.11499999999999999,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if lenlvaluesl > I:",
+          "x": 0.064,
+          "y": 0.2925347222222222,
+          "width": 0.178,
+          "height": 0.02604166666666674
+        },
+        {
+          "text": "result.appendll\"item I",
+          "x": 0.104,
+          "y": 0.3359375,
+          "width": 0.20800000000000002,
+          "height": 0.02951388888888884
+        },
+        {
+          "text": "# npoBepKa 3",
+          "x": 0.062,
+          "y": 0.3784722222222222,
+          "width": 0.11499999999999999,
+          "height": 0.0277777777777779
+        },
+        {
+          "text": "if lenlvaluesl > 2:",
+          "x": 0.064,
+          "y": 0.4175347222222222,
+          "width": 0.178,
+          "height": 0.02604166666666674
+        },
+        {
+          "text": "result.appendll\"item 2",
+          "x": 0.104,
+          "y": 0.4609375,
+          "width": 0.20800000000000002,
+          "height": 0.02951388888888884
+        },
+        {
+          "text": "# npoBepKa 4",
+          "x": 0.062,
+          "y": 0.5034722222222222,
+          "width": 0.11499999999999999,
+          "height": 0.0277777777777779
+        },
+        {
+          "text": "if lenlvaluesl > 3:",
+          "x": 0.064,
+          "y": 0.5425347222222222,
+          "width": 0.178,
+          "height": 0.02604166666666674
+        },
+        {
+          "text": "result.appendl I\"item 3",
+          "x": 0.104,
+          "y": 0.5859375,
+          "width": 0.20800000000000002,
+          "height": 0.02951388888888884
+        },
+        {
+          "text": "# npoBepKa 5",
+          "x": 0.062,
+          "y": 0.6284722222222223,
+          "width": 0.11499999999999999,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if lenlvaluesl > 4:",
+          "x": 0.064,
+          "y": 0.6666666666666666,
+          "width": 0.178,
+          "height": 0.02430555555555558
+        },
+        {
+          "text": "result.appendl I\"item 4",
+          "x": 0.104,
+          "y": 0.7109375,
+          "width": 0.20800000000000002,
+          "height": 0.02951388888888884
+        },
+        {
+          "text": "# npoBepKa 6",
+          "x": 0.062,
+          "y": 0.7534722222222223,
+          "width": 0.11499999999999999,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if lenlvaluesl > 5:",
+          "x": 0.064,
+          "y": 0.7925347222222222,
+          "width": 0.178,
+          "height": 0.02604166666666674
+        },
+        {
+          "text": "result.appendll\"item 5",
+          "x": 0.104,
+          "y": 0.8350694444444444,
+          "width": 0.20800000000000002,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "retu rn result",
+          "x": 0.065,
+          "y": 0.8741319444444444,
+          "width": 0.121,
+          "height": 0.02256944444444442
+        },
+        {
+          "text": "values10111",
+          "x": 0.342,
+          "y": 0.2092013888888889,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        },
+        {
+          "text": "values111 I I",
+          "x": 0.342,
+          "y": 0.3342013888888889,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        },
+        {
+          "text": "values12111",
+          "x": 0.342,
+          "y": 0.4592013888888889,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        },
+        {
+          "text": "values13111",
+          "x": 0.342,
+          "y": 0.5842013888888888,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        },
+        {
+          "text": "values14111",
+          "x": 0.342,
+          "y": 0.7092013888888888,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        },
+        {
+          "text": "values15111",
+          "x": 0.342,
+          "y": 0.8342013888888888,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        }
+      ]
+    },
+    {
+      "id": "python-medium-dark-16",
+      "complexity": "medium",
+      "elapsed": 0.02275879199987685,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.7845206684256816,
+      "expected": "def collect(values):\n    result = []\n    # Проверка 1\n    if len(values) > 0:\n        result.append((\"item_0\", values[0]))\n    # Проверка 2\n    if len(values) > 1:\n        result.append((\"item_1\", values[1]))\n    # Проверка 3\n    if len(values) > 2:\n        result.append((\"item_2\", values[2]))\n    # Проверка 4\n    if len(values) > 3:\n        result.append((\"item_3\", values[3]))\n    # Проверка 5\n    if len(values) > 4:\n        result.append((\"item_4\", values[4]))\n    # Проверка 6\n    if len(values) > 5:\n        result.append((\"item_5\", values[5]))\n    return result\n",
+      "actual": "def collect I values I :\n    result\n    # npoBepKa I\n    if lenlvaluesl > 0:\n        result.appendl I\"item 0 values10111\n    # npoBepKa 2\n    if lenlvaluesl > I:\n        result.appendll\"item I  values111 I I\n    # npoBepKa 3\n    if lenlvaluesl > 2:\n        result.appendll\"item 2  values12111\n    # npoBepKa 4\n    if lenlvaluesl > 3:\n        result.appendl I\"item 3 values13111\n    # npoBepKa 5\n    if lenlvaluesl > 4:\n        result.appendl I\"item 4 values14111\n    # npoBepKa 6\n    if lenlvaluesl > 5:\n        result.appendll\"item 5  values15111\n    retu rn result",
+      "blocks": [
+        {
+          "text": "def collect I values I :",
+          "x": 0.025,
+          "y": 0.04253472222222221,
+          "width": 0.188,
+          "height": 0.02604166666666674
+        },
+        {
+          "text": "result",
+          "x": 0.065,
+          "y": 0.08246527777777779,
+          "width": 0.05299999999999999,
+          "height": 0.02256944444444442
+        },
+        {
+          "text": "# npoBepKa I",
+          "x": 0.062,
+          "y": 0.12847222222222227,
+          "width": 0.11499999999999999,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if lenlvaluesl > 0:",
+          "x": 0.064,
+          "y": 0.16666666666666663,
+          "width": 0.178,
+          "height": 0.02430555555555558
+        },
+        {
+          "text": "result.appendl I\"item 0",
+          "x": 0.104,
+          "y": 0.2109375,
+          "width": 0.20800000000000002,
+          "height": 0.02951388888888884
+        },
+        {
+          "text": "# npoBepKa 2",
+          "x": 0.062,
+          "y": 0.25347222222222227,
+          "width": 0.11499999999999999,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if lenlvaluesl > I:",
+          "x": 0.064,
+          "y": 0.2925347222222222,
+          "width": 0.178,
+          "height": 0.02604166666666674
+        },
+        {
+          "text": "result.appendll\"item I",
+          "x": 0.104,
+          "y": 0.3359375,
+          "width": 0.20800000000000002,
+          "height": 0.02951388888888884
+        },
+        {
+          "text": "# npoBepKa 3",
+          "x": 0.062,
+          "y": 0.3784722222222222,
+          "width": 0.11499999999999999,
+          "height": 0.0277777777777779
+        },
+        {
+          "text": "if lenlvaluesl > 2:",
+          "x": 0.064,
+          "y": 0.4175347222222222,
+          "width": 0.178,
+          "height": 0.02604166666666674
+        },
+        {
+          "text": "result.appendll\"item 2",
+          "x": 0.104,
+          "y": 0.4609375,
+          "width": 0.20800000000000002,
+          "height": 0.02951388888888884
+        },
+        {
+          "text": "# npoBepKa 4",
+          "x": 0.062,
+          "y": 0.5034722222222222,
+          "width": 0.11499999999999999,
+          "height": 0.0277777777777779
+        },
+        {
+          "text": "if lenlvaluesl > 3:",
+          "x": 0.064,
+          "y": 0.5425347222222222,
+          "width": 0.178,
+          "height": 0.02604166666666674
+        },
+        {
+          "text": "result.appendl I\"item 3",
+          "x": 0.104,
+          "y": 0.5859375,
+          "width": 0.20800000000000002,
+          "height": 0.02951388888888884
+        },
+        {
+          "text": "# npoBepKa 5",
+          "x": 0.062,
+          "y": 0.6284722222222223,
+          "width": 0.11499999999999999,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if lenlvaluesl > 4:",
+          "x": 0.064,
+          "y": 0.6666666666666666,
+          "width": 0.178,
+          "height": 0.02430555555555558
+        },
+        {
+          "text": "result.appendl I\"item 4",
+          "x": 0.104,
+          "y": 0.7109375,
+          "width": 0.20800000000000002,
+          "height": 0.02951388888888884
+        },
+        {
+          "text": "# npoBepKa 6",
+          "x": 0.062,
+          "y": 0.7534722222222223,
+          "width": 0.11499999999999999,
+          "height": 0.02777777777777779
+        },
+        {
+          "text": "if lenlvaluesl > 5:",
+          "x": 0.064,
+          "y": 0.7925347222222222,
+          "width": 0.178,
+          "height": 0.02604166666666674
+        },
+        {
+          "text": "result.appendll\"item 5",
+          "x": 0.104,
+          "y": 0.8359375,
+          "width": 0.20800000000000002,
+          "height": 0.02951388888888884
+        },
+        {
+          "text": "retu rn result",
+          "x": 0.065,
+          "y": 0.8741319444444444,
+          "width": 0.121,
+          "height": 0.02256944444444442
+        },
+        {
+          "text": "values10111",
+          "x": 0.342,
+          "y": 0.2092013888888889,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        },
+        {
+          "text": "values111 I I",
+          "x": 0.342,
+          "y": 0.3342013888888889,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        },
+        {
+          "text": "values12111",
+          "x": 0.342,
+          "y": 0.4592013888888889,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        },
+        {
+          "text": "values13111",
+          "x": 0.342,
+          "y": 0.5842013888888888,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        },
+        {
+          "text": "values14111",
+          "x": 0.342,
+          "y": 0.7092013888888888,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        },
+        {
+          "text": "values15111",
+          "x": 0.342,
+          "y": 0.8342013888888888,
+          "width": 0.10199999999999998,
+          "height": 0.02604166666666663
+        }
+      ]
+    },
+    {
+      "id": "sql-medium-light-16",
+      "complexity": "medium",
+      "elapsed": 0.041580250000151864,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8816402609506058,
+      "expected": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_0,\n    SUM(CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,\n    SUM(CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,\n    SUM(CASE WHEN category = 'group_3' THEN amount ELSE 0 END) AS total_3,\n    SUM(CASE WHEN category = 'group_4' THEN amount ELSE 0 END) AS total_4,\n    SUM(CASE WHEN category = 'group_5' THEN amount ELSE 0 END) AS total_5\nFROM transactions\nWHERE active = 1\n    AND owner = 'Иван'\nGROUP BY account_id;\n",
+      "actual": "SELECT\n    SUM I CASE l¥HEN catego ry'group_0' THEN amount ELSE 0 ENDI AS total_0,\n    SUM I CASE l¥NEN catego ry'group_I' THEN amount ELSE O ENDI AS total_I,\n    SUM I CASE l¥NEN catego ry'group_2' THEN amount ELSE O ENDI AS total_2,\n    SUM I CASE l¥NEN catego ry'group_3' THEN amount ELSE O ENDI AS total_3,\n    SUM I CASE l¥NEN catego ry'group_4' THEN amount ELSE O ENDI AS total_4,\n    SUM I CASE l¥NEN catego ry'group_5' THEN amount ELSE 0 ENDI AS total_5\nFROM t ransact ions\n HERE active\n    AND (Mner   'MBaH'\nGROUP BY account id:",
+      "blocks": [
+        {
+          "text": "SELECT",
+          "x": 0.025,
+          "y": 0.07142857142857145,
+          "width": 0.057,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "SUM I CASE l¥HEN catego ry",
+          "x": 0.063,
+          "y": 0.1473214285714286,
+          "width": 0.21000000000000002,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.21875,
+          "width": 0.21000000000000002,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.2901785714285714,
+          "width": 0.21000000000000002,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.36160714285714285,
+          "width": 0.21000000000000002,
+          "height": 0.050595238095238027
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.43303571428571425,
+          "width": 0.21000000000000002,
+          "height": 0.050595238095238027
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.5044642857142858,
+          "width": 0.21000000000000002,
+          "height": 0.050595238095238027
+        },
+        {
+          "text": "FROM t ransact ions",
+          "x": 0.026,
+          "y": 0.5699404761904763,
+          "width": 0.16,
+          "height": 0.038690476190476164
+        },
+        {
+          "text": "HERE active",
+          "x": 0.032,
+          "y": 0.6413690476190477,
+          "width": 0.10700000000000001,
+          "height": 0.038690476190476164
+        },
+        {
+          "text": "AND (Mner",
+          "x": 0.062,
+          "y": 0.7142857142857142,
+          "width": 0.086,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "'MBaH'",
+          "x": 0.182,
+          "y": 0.7127976190476191,
+          "width": 0.05000000000000002,
+          "height": 0.038690476190476164
+        },
+        {
+          "text": "GROUP BY account id:",
+          "x": 0.025,
+          "y": 0.7872023809523809,
+          "width": 0.188,
+          "height": 0.044642857142857206
+        },
+        {
+          "text": "'group_0' THEN amount ELSE 0 ENDI AS total_0,",
+          "x": 0.307,
+          "y": 0.1473214285714286,
+          "width": 0.425,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "'group_I' THEN amount ELSE O ENDI AS total_I,",
+          "x": 0.307,
+          "y": 0.21875,
+          "width": 0.425,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "'group_2' THEN amount ELSE O ENDI AS total_2,",
+          "x": 0.307,
+          "y": 0.2901785714285714,
+          "width": 0.425,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "'group_3' THEN amount ELSE O ENDI AS total_3,",
+          "x": 0.307,
+          "y": 0.36160714285714285,
+          "width": 0.425,
+          "height": 0.050595238095238027
+        },
+        {
+          "text": "'group_4' THEN amount ELSE O ENDI AS total_4,",
+          "x": 0.307,
+          "y": 0.43303571428571425,
+          "width": 0.425,
+          "height": 0.050595238095238027
+        },
+        {
+          "text": "'group_5' THEN amount ELSE 0 ENDI AS total_5",
+          "x": 0.307,
+          "y": 0.5044642857142858,
+          "width": 0.419,
+          "height": 0.050595238095238027
+        }
+      ]
+    },
+    {
+      "id": "sql-medium-dark-16",
+      "complexity": "medium",
+      "elapsed": 0.02801362500031246,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8861940298507462,
+      "expected": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_0,\n    SUM(CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,\n    SUM(CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,\n    SUM(CASE WHEN category = 'group_3' THEN amount ELSE 0 END) AS total_3,\n    SUM(CASE WHEN category = 'group_4' THEN amount ELSE 0 END) AS total_4,\n    SUM(CASE WHEN category = 'group_5' THEN amount ELSE 0 END) AS total_5\nFROM transactions\nWHERE active = 1\n    AND owner = 'Иван'\nGROUP BY account_id;\n",
+      "actual": "SELECT\n    SUMI CASE l¥HEN catego ry'group_0' THEN amount ELSE 0 ENDI AS total_0,\n    SUM I CASE l¥NEN catego ry'group_I' THEN amount ELSE O ENDI AS total_I,\n    SUM I CASE l¥NEN catego ry'group_2' THEN amount ELSE O ENDI AS total_2,\n    SUM I CASE l¥NEN catego ry'group_3' THEN amount ELSE O ENDI AS total_3,\n    SUM I CASE l¥HEN catego ry'group_4' THEN amount ELSE 0 ENDI AS total_4,\n    SUM I CASE l¥NEN catego ry'group_5' THEN amount ELSE 0 ENDI AS total_5\nFROM t ransact ions\n HERE active\n    AND (Mner   'MBaH'\nGROUP BY account id:",
+      "blocks": [
+        {
+          "text": "SELECT",
+          "x": 0.025,
+          "y": 0.07142857142857145,
+          "width": 0.057,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "SUMI CASE l¥HEN catego ry",
+          "x": 0.063,
+          "y": 0.1473214285714286,
+          "width": 0.21000000000000002,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.21875,
+          "width": 0.21000000000000002,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.2901785714285714,
+          "width": 0.21000000000000002,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.36160714285714285,
+          "width": 0.21000000000000002,
+          "height": 0.050595238095238027
+        },
+        {
+          "text": "SUM I CASE l¥HEN catego ry",
+          "x": 0.063,
+          "y": 0.43303571428571425,
+          "width": 0.21000000000000002,
+          "height": 0.050595238095238027
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.5044642857142858,
+          "width": 0.21000000000000002,
+          "height": 0.050595238095238027
+        },
+        {
+          "text": "FROM t ransact ions",
+          "x": 0.025,
+          "y": 0.5699404761904763,
+          "width": 0.161,
+          "height": 0.038690476190476164
+        },
+        {
+          "text": "HERE active",
+          "x": 0.032,
+          "y": 0.6413690476190477,
+          "width": 0.10700000000000001,
+          "height": 0.038690476190476164
+        },
+        {
+          "text": "AND (Mner",
+          "x": 0.062,
+          "y": 0.7142857142857142,
+          "width": 0.086,
+          "height": 0.0357142857142857
+        },
+        {
+          "text": "'MBaH'",
+          "x": 0.182,
+          "y": 0.7127976190476191,
+          "width": 0.05000000000000002,
+          "height": 0.038690476190476164
+        },
+        {
+          "text": "GROUP BY account id:",
+          "x": 0.025,
+          "y": 0.7872023809523809,
+          "width": 0.188,
+          "height": 0.044642857142857206
+        },
+        {
+          "text": "'group_0' THEN amount ELSE 0 ENDI AS total_0,",
+          "x": 0.307,
+          "y": 0.1473214285714286,
+          "width": 0.425,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "'group_I' THEN amount ELSE O ENDI AS total_I,",
+          "x": 0.307,
+          "y": 0.21875,
+          "width": 0.425,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "'group_2' THEN amount ELSE O ENDI AS total_2,",
+          "x": 0.307,
+          "y": 0.2901785714285714,
+          "width": 0.425,
+          "height": 0.05059523809523814
+        },
+        {
+          "text": "'group_3' THEN amount ELSE O ENDI AS total_3,",
+          "x": 0.307,
+          "y": 0.36160714285714285,
+          "width": 0.425,
+          "height": 0.050595238095238027
+        },
+        {
+          "text": "'group_4' THEN amount ELSE 0 ENDI AS total_4,",
+          "x": 0.307,
+          "y": 0.43303571428571425,
+          "width": 0.425,
+          "height": 0.050595238095238027
+        },
+        {
+          "text": "'group_5' THEN amount ELSE 0 ENDI AS total_5",
+          "x": 0.307,
+          "y": 0.5044642857142858,
+          "width": 0.419,
+          "height": 0.050595238095238027
+        }
+      ]
+    },
+    {
+      "id": "json-medium-light-16",
+      "complexity": "medium",
+      "elapsed": 0.02225224999983766,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.4228694714131607,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"items\": {\n        \"item_0\": {\n            \"value\": 0,\n            \"active\": true\n        },\n        \"item_1\": {\n            \"value\": 1,\n            \"active\": false\n        },\n        \"item_2\": {\n            \"value\": 2,\n            \"active\": true\n        },\n        \"item_3\": {\n            \"value\": 3,\n            \"active\": false\n        },\n        \"item_4\": {\n            \"value\": 4,\n            \"active\": true\n        },\n        \"item_5\": {\n            \"value\": 5,\n            \"active\": false\n        }\n    }\n}\n",
+      "actual": "'name\": \"TecT\"\n'enabled\": t rue,\n'items\":\n    'item O\":\n        'value\":\n        'act ive t rue\n\n    'item I\":\n        'value\":\n        'active false\n\n    'item 2\":\n        'value\":\n        'act ive t rue\n\n    'item 3\":\n        'value\":\n        'active false\n\n    'item 4\":\n        'value\":\n        'act ive t rue\n\n    'item 5\":\n        'value\":\n        'active false",
+      "blocks": [
+        {
+          "text": "'name\": \"TecT\"",
+          "x": 0.067,
+          "y": 0.05997474747474746,
+          "width": 0.128,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'enabled\": t rue,",
+          "x": 0.067,
+          "y": 0.09217171717171718,
+          "width": 0.146,
+          "height": 0.02020202020202022
+        },
+        {
+          "text": "'items\":",
+          "x": 0.067,
+          "y": 0.12058080808080807,
+          "width": 0.069,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'item O\":",
+          "x": 0.106,
+          "y": 0.1508838383838384,
+          "width": 0.078,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.18118686868686873,
+          "width": 0.069,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.211489898989899,
+          "width": 0.12900000000000003,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'item I\":",
+          "x": 0.106,
+          "y": 0.27209595959595956,
+          "width": 0.078,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.30239898989898983,
+          "width": 0.069,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.33270202020202017,
+          "width": 0.13899999999999998,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'item 2\":",
+          "x": 0.106,
+          "y": 0.39330808080808083,
+          "width": 0.078,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.42361111111111116,
+          "width": 0.069,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.45391414141414144,
+          "width": 0.12900000000000003,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'item 3\":",
+          "x": 0.106,
+          "y": 0.514520202020202,
+          "width": 0.078,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.5448232323232323,
+          "width": 0.069,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.5751262626262627,
+          "width": 0.13899999999999998,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'item 4\":",
+          "x": 0.106,
+          "y": 0.6357323232323232,
+          "width": 0.078,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.6660353535353536,
+          "width": 0.069,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.6963383838383839,
+          "width": 0.12900000000000003,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'item 5\":",
+          "x": 0.106,
+          "y": 0.7569444444444444,
+          "width": 0.078,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.7872474747474747,
+          "width": 0.069,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.8175505050505051,
+          "width": 0.13899999999999998,
+          "height": 0.016414141414141437
+        }
+      ]
+    },
+    {
+      "id": "json-medium-dark-16",
+      "complexity": "medium",
+      "elapsed": 0.02168504099972779,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.4228694714131607,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"items\": {\n        \"item_0\": {\n            \"value\": 0,\n            \"active\": true\n        },\n        \"item_1\": {\n            \"value\": 1,\n            \"active\": false\n        },\n        \"item_2\": {\n            \"value\": 2,\n            \"active\": true\n        },\n        \"item_3\": {\n            \"value\": 3,\n            \"active\": false\n        },\n        \"item_4\": {\n            \"value\": 4,\n            \"active\": true\n        },\n        \"item_5\": {\n            \"value\": 5,\n            \"active\": false\n        }\n    }\n}\n",
+      "actual": "'name\": \"TecT\"\n'enabled\": t rue,\n'items\":\n    'item O\":\n        'value\":\n        'act ive t rue\n\n    'item I\":\n        'value\":\n        'active false\n\n    'item 2\":\n        'value\":\n        'act ive t rue\n\n    'item 3\":\n        'value\":\n        'active false\n\n    'item 4\":\n        'value\":\n        'act ive t rue\n\n    'item 5\":\n        'value\":\n        'active false",
+      "blocks": [
+        {
+          "text": "'name\": \"TecT\"",
+          "x": 0.067,
+          "y": 0.05997474747474746,
+          "width": 0.128,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'enabled\": t rue,",
+          "x": 0.067,
+          "y": 0.09217171717171718,
+          "width": 0.146,
+          "height": 0.02020202020202022
+        },
+        {
+          "text": "'items\":",
+          "x": 0.067,
+          "y": 0.12058080808080807,
+          "width": 0.069,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'item O\":",
+          "x": 0.106,
+          "y": 0.1508838383838384,
+          "width": 0.078,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.18118686868686873,
+          "width": 0.069,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.211489898989899,
+          "width": 0.12900000000000003,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'item I\":",
+          "x": 0.106,
+          "y": 0.27209595959595956,
+          "width": 0.078,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.30239898989898983,
+          "width": 0.069,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.33270202020202017,
+          "width": 0.13899999999999998,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'item 2\":",
+          "x": 0.106,
+          "y": 0.39330808080808083,
+          "width": 0.078,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.42361111111111116,
+          "width": 0.069,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.45391414141414144,
+          "width": 0.12900000000000003,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'item 3\":",
+          "x": 0.106,
+          "y": 0.514520202020202,
+          "width": 0.078,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.5448232323232323,
+          "width": 0.069,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.5751262626262627,
+          "width": 0.13899999999999998,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'item 4\":",
+          "x": 0.106,
+          "y": 0.6357323232323232,
+          "width": 0.078,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.6660353535353536,
+          "width": 0.069,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.6963383838383839,
+          "width": 0.12900000000000003,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'item 5\":",
+          "x": 0.106,
+          "y": 0.7569444444444444,
+          "width": 0.078,
+          "height": 0.016414141414141437
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.7872474747474747,
+          "width": 0.069,
+          "height": 0.016414141414141326
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.8175505050505051,
+          "width": 0.13899999999999998,
+          "height": 0.016414141414141437
+        }
+      ]
+    },
+    {
+      "id": "python-long-light-16",
+      "complexity": "long",
+      "elapsed": 0.048051249999844,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.7775034293552812,
+      "expected": "def collect(values):\n    result = []\n    # Проверка 1\n    if len(values) > 0:\n        result.append((\"item_0\", values[0]))\n    # Проверка 2\n    if len(values) > 1:\n        result.append((\"item_1\", values[1]))\n    # Проверка 3\n    if len(values) > 2:\n        result.append((\"item_2\", values[2]))\n    # Проверка 4\n    if len(values) > 3:\n        result.append((\"item_3\", values[3]))\n    # Проверка 5\n    if len(values) > 4:\n        result.append((\"item_4\", values[4]))\n    # Проверка 6\n    if len(values) > 5:\n        result.append((\"item_5\", values[5]))\n    # Проверка 7\n    if len(values) > 6:\n        result.append((\"item_6\", values[6]))\n    # Проверка 8\n    if len(values) > 7:\n        result.append((\"item_7\", values[7]))\n    # Проверка 9\n    if len(values) > 8:\n        result.append((\"item_8\", values[8]))\n    # Проверка 10\n    if len(values) > 9:\n        result.append((\"item_9\", values[9]))\n    # Проверка 11\n    if len(values) > 10:\n        result.append((\"item_10\", values[10]))\n    # Проверка 12\n    if len(values) > 11:\n        result.append((\"item_11\", values[11]))\n    # Проверка 13\n    if len(values) > 12:\n        result.append((\"item_12\", values[12]))\n    # Проверка 14\n    if len(values) > 13:\n        result.append((\"item_13\", values[13]))\n    # Проверка 15\n    if len(values) > 14:\n        result.append((\"item_14\", values[14]))\n    # Проверка 16\n    if len(values) > 15:\n        result.append((\"item_15\", values[15]))\n    # Проверка 17\n    if len(values) > 16:\n        result.append((\"item_16\", values[16]))\n    # Проверка 18\n    if len(values) > 17:\n        result.append((\"item_17\", values[17]))\n    # Проверка 19\n    if len(values) > 18:\n        result.append((\"item_18\", values[18]))\n    # Проверка 20\n    if len(values) > 19:\n        result.append((\"item_19\", values[19]))\n    return result\n",
+      "actual": "def collect I values I :\n    result\n    # npoBepKa I\n    if lenlvaluesl > O:\n        result.appendl I\"item 0 values10111\n    # npoBepKa 2\n    if lenlvaluesl > I:\n        result.appendll\"item I  values111 I I\n    # npoBepKa 3\n    if lenlvaluesl > 2:\n        result.appendll\"item 2  values12111\n    # npoBepKa 4\n    if lenlvaluesl > 3:\n        result.appendl I\"item 3 values13111\n    # npoBepKa 5\n    if lenlvaluesl > 4:\n        result.appendl I\"item 4 values14111\n    # npoBepKa 6\n    if lenlvaluesl > 5:\n        result.appendll\"item 5  values15111\n    # npoBepKa 7\n    if lenlvaluesl > 6:\n        result.appendll\"item 6  values16111\n    # npoBepKa 8\n    if lenlvaluesl > 7:\n        result.appendl I\"item 7 values17111\n    # npoBepKa 9\n    if lenlvaluesl > 8:\n        result.appendl I\"item 8 values18111\n    # npoBepKa 10\n    if lenlvaluesl > 9:\n        result.appendll\"item 9  values19111\n    # npoBepKa 11\n    if lenlvaluesl > 10:\n        result. append I I\" item lO\"values110111\n    # npoBepKa 12\n    if lenlvaluesl > 11:\n        result. append I I\" item Il\"values1111 I I\n    # npoBepKa 13\n    if lenlvaluesl > 12:\n        result. append I I\" item 12\"values112111\n    # npoBepKa 14\n    if lenlvaluesl > 13:\n        result. append I I\" item 13\"values113111\n    # npoBepKa 15\n    if lenlvaluesl > 14:\n        result. append I I\" item 14\"values114111\n    # npoBepKa 16\n    if lenlvaluesl > 15:\n        result. append I I\" item 15\"values115111\n    # npoBepKa 17\n    if lenlvaluesl > 16:\n        result. append I I\" item 16\"values116111\n    # npoBepKa 18\n    if lenlvaluesl > 17:\n        result. append I I\" item 17\"values117111\n    # npoBepKa 19\n    if lenlvaluesl > 18:\n        result. append I I\" item 18\"values118111\n    # npoBepKa 20\n    if lenlvaluesl > 1g:\n        result. append I I\" item Ig\"values119111\n    retu rn result",
+      "blocks": [
+        {
+          "text": "def collect I values I :",
+          "x": 0.025,
+          "y": 0.015467171717171713,
+          "width": 0.188,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result",
+          "x": 0.065,
+          "y": 0.0299873737373737,
+          "width": 0.05299999999999999,
+          "height": 0.008207070707070718
+        },
+        {
+          "text": "# npoBepKa I",
+          "x": 0.062,
+          "y": 0.04671717171717171,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > O:",
+          "x": 0.064,
+          "y": 0.06060606060606061,
+          "width": 0.178,
+          "height": 0.008838383838383757
+        },
+        {
+          "text": "result.appendl I\"item 0",
+          "x": 0.104,
+          "y": 0.07670454545454547,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 2",
+          "x": 0.062,
+          "y": 0.09217171717171718,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > I:",
+          "x": 0.064,
+          "y": 0.10637626262626265,
+          "width": 0.178,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result.appendll\"item I",
+          "x": 0.104,
+          "y": 0.12215909090909088,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 3",
+          "x": 0.062,
+          "y": 0.13762626262626265,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 2:",
+          "x": 0.064,
+          "y": 0.15183080808080807,
+          "width": 0.178,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result.appendll\"item 2",
+          "x": 0.104,
+          "y": 0.16761363636363635,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 4",
+          "x": 0.062,
+          "y": 0.18308080808080807,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 3:",
+          "x": 0.064,
+          "y": 0.19728535353535354,
+          "width": 0.178,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result.appendl I\"item 3",
+          "x": 0.104,
+          "y": 0.21306818181818182,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 5",
+          "x": 0.062,
+          "y": 0.22853535353535354,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 4:",
+          "x": 0.064,
+          "y": 0.24242424242424243,
+          "width": 0.178,
+          "height": 0.008838383838383868
+        },
+        {
+          "text": "result.appendl I\"item 4",
+          "x": 0.104,
+          "y": 0.25852272727272724,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 6",
+          "x": 0.062,
+          "y": 0.27398989898989895,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 5:",
+          "x": 0.064,
+          "y": 0.2881944444444445,
+          "width": 0.178,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result.appendll\"item 5",
+          "x": 0.104,
+          "y": 0.30397727272727276,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 7",
+          "x": 0.062,
+          "y": 0.3194444444444445,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 6:",
+          "x": 0.064,
+          "y": 0.33364898989898994,
+          "width": 0.178,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result.appendll\"item 6",
+          "x": 0.104,
+          "y": 0.3494318181818182,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 8",
+          "x": 0.062,
+          "y": 0.36489898989898994,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 7:",
+          "x": 0.064,
+          "y": 0.37910353535353536,
+          "width": 0.178,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result.appendl I\"item 7",
+          "x": 0.104,
+          "y": 0.39488636363636365,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 9",
+          "x": 0.062,
+          "y": 0.41035353535353536,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 8:",
+          "x": 0.064,
+          "y": 0.4242424242424242,
+          "width": 0.178,
+          "height": 0.008838383838383868
+        },
+        {
+          "text": "result.appendl I\"item 8",
+          "x": 0.104,
+          "y": 0.44034090909090906,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 10",
+          "x": 0.062,
+          "y": 0.4558080808080808,
+          "width": 0.125,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 9:",
+          "x": 0.064,
+          "y": 0.47001262626262624,
+          "width": 0.178,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result.appendll\"item 9",
+          "x": 0.104,
+          "y": 0.48579545454545453,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 11",
+          "x": 0.062,
+          "y": 0.5012626262626263,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 10:",
+          "x": 0.064,
+          "y": 0.5154671717171717,
+          "width": 0.187,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result. append I I\" item lO\"",
+          "x": 0.104,
+          "y": 0.53125,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 12",
+          "x": 0.062,
+          "y": 0.5467171717171717,
+          "width": 0.125,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 11:",
+          "x": 0.064,
+          "y": 0.5609217171717171,
+          "width": 0.187,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result. append I I\" item Il\"",
+          "x": 0.104,
+          "y": 0.5767045454545454,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 13",
+          "x": 0.062,
+          "y": 0.5921717171717171,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 12:",
+          "x": 0.064,
+          "y": 0.6060606060606061,
+          "width": 0.187,
+          "height": 0.008838383838383868
+        },
+        {
+          "text": "result. append I I\" item 12\"",
+          "x": 0.104,
+          "y": 0.6221590909090908,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 14",
+          "x": 0.062,
+          "y": 0.6376262626262625,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 13:",
+          "x": 0.064,
+          "y": 0.6518308080808081,
+          "width": 0.187,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result. append I I\" item 13\"",
+          "x": 0.104,
+          "y": 0.6676136363636364,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 15",
+          "x": 0.062,
+          "y": 0.6830808080808081,
+          "width": 0.125,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 14:",
+          "x": 0.064,
+          "y": 0.6972853535353536,
+          "width": 0.187,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result. append I I\" item 14\"",
+          "x": 0.104,
+          "y": 0.7130681818181819,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 16",
+          "x": 0.062,
+          "y": 0.7285353535353536,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 15:",
+          "x": 0.064,
+          "y": 0.742739898989899,
+          "width": 0.187,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result. append I I\" item 15\"",
+          "x": 0.104,
+          "y": 0.7585227272727273,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 17",
+          "x": 0.062,
+          "y": 0.773989898989899,
+          "width": 0.125,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 16:",
+          "x": 0.064,
+          "y": 0.7878787878787878,
+          "width": 0.187,
+          "height": 0.008838383838383868
+        },
+        {
+          "text": "result. append I I\" item 16\"",
+          "x": 0.104,
+          "y": 0.8039772727272727,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 18",
+          "x": 0.062,
+          "y": 0.8194444444444444,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 17:",
+          "x": 0.064,
+          "y": 0.8336489898989898,
+          "width": 0.187,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result. append I I\" item 17\"",
+          "x": 0.104,
+          "y": 0.8491161616161615,
+          "width": 0.22600000000000003,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "# npoBepKa 19",
+          "x": 0.062,
+          "y": 0.8648989898989898,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 18:",
+          "x": 0.064,
+          "y": 0.8791035353535354,
+          "width": 0.187,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result. append I I\" item 18\"",
+          "x": 0.104,
+          "y": 0.8948863636363636,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 20",
+          "x": 0.062,
+          "y": 0.9103535353535354,
+          "width": 0.125,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 1g:",
+          "x": 0.064,
+          "y": 0.9245580808080809,
+          "width": 0.187,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result. append I I\" item Ig\"",
+          "x": 0.104,
+          "y": 0.9403409090909092,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "retu rn result",
+          "x": 0.065,
+          "y": 0.954229797979798,
+          "width": 0.121,
+          "height": 0.008207070707070718
+        },
+        {
+          "text": "values10111",
+          "x": 0.342,
+          "y": 0.07607323232323232,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values111 I I",
+          "x": 0.342,
+          "y": 0.12152777777777779,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values12111",
+          "x": 0.342,
+          "y": 0.1669823232323232,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values13111",
+          "x": 0.342,
+          "y": 0.21243686868686867,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values14111",
+          "x": 0.342,
+          "y": 0.25789141414141414,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values15111",
+          "x": 0.342,
+          "y": 0.3033459595959596,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values16111",
+          "x": 0.342,
+          "y": 0.3488005050505051,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values17111",
+          "x": 0.342,
+          "y": 0.3942550505050505,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values18111",
+          "x": 0.342,
+          "y": 0.4397095959595959,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values19111",
+          "x": 0.342,
+          "y": 0.4851641414141414,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values110111",
+          "x": 0.352,
+          "y": 0.5306186868686869,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values1111 I I",
+          "x": 0.352,
+          "y": 0.5760732323232323,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values112111",
+          "x": 0.352,
+          "y": 0.6215277777777778,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values113111",
+          "x": 0.352,
+          "y": 0.6669823232323232,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values114111",
+          "x": 0.352,
+          "y": 0.7124368686868687,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values115111",
+          "x": 0.352,
+          "y": 0.7578914141414141,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values116111",
+          "x": 0.352,
+          "y": 0.8033459595959596,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values117111",
+          "x": 0.352,
+          "y": 0.848800505050505,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values118111",
+          "x": 0.352,
+          "y": 0.8942550505050505,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values119111",
+          "x": 0.352,
+          "y": 0.939709595959596,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969696906
+        }
+      ]
+    },
+    {
+      "id": "python-long-dark-16",
+      "complexity": "long",
+      "elapsed": 0.04968104100044002,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.7791495198902606,
+      "expected": "def collect(values):\n    result = []\n    # Проверка 1\n    if len(values) > 0:\n        result.append((\"item_0\", values[0]))\n    # Проверка 2\n    if len(values) > 1:\n        result.append((\"item_1\", values[1]))\n    # Проверка 3\n    if len(values) > 2:\n        result.append((\"item_2\", values[2]))\n    # Проверка 4\n    if len(values) > 3:\n        result.append((\"item_3\", values[3]))\n    # Проверка 5\n    if len(values) > 4:\n        result.append((\"item_4\", values[4]))\n    # Проверка 6\n    if len(values) > 5:\n        result.append((\"item_5\", values[5]))\n    # Проверка 7\n    if len(values) > 6:\n        result.append((\"item_6\", values[6]))\n    # Проверка 8\n    if len(values) > 7:\n        result.append((\"item_7\", values[7]))\n    # Проверка 9\n    if len(values) > 8:\n        result.append((\"item_8\", values[8]))\n    # Проверка 10\n    if len(values) > 9:\n        result.append((\"item_9\", values[9]))\n    # Проверка 11\n    if len(values) > 10:\n        result.append((\"item_10\", values[10]))\n    # Проверка 12\n    if len(values) > 11:\n        result.append((\"item_11\", values[11]))\n    # Проверка 13\n    if len(values) > 12:\n        result.append((\"item_12\", values[12]))\n    # Проверка 14\n    if len(values) > 13:\n        result.append((\"item_13\", values[13]))\n    # Проверка 15\n    if len(values) > 14:\n        result.append((\"item_14\", values[14]))\n    # Проверка 16\n    if len(values) > 15:\n        result.append((\"item_15\", values[15]))\n    # Проверка 17\n    if len(values) > 16:\n        result.append((\"item_16\", values[16]))\n    # Проверка 18\n    if len(values) > 17:\n        result.append((\"item_17\", values[17]))\n    # Проверка 19\n    if len(values) > 18:\n        result.append((\"item_18\", values[18]))\n    # Проверка 20\n    if len(values) > 19:\n        result.append((\"item_19\", values[19]))\n    return result\n",
+      "actual": "def collect I values I :\n    result\n    # npoBepKa I\n    if lenlvaluesl > 0:\n        result.appendl I\"item 0 values10111\n    # npoBepKa 2\n    if lenlvaluesl > I:\n        result.appendll\"item I  values111 I I\n    # npoBepKa 3\n    if lenlvaluesl > 2:\n        result.appendll\"item 2  values12111\n    # npoBepKa 4\n    if lenlvaluesl > 3:\n        result.appendl I\"item 3 values13111\n    # npoBepKa 5\n    if lenlvaluesl > 4:\n        result.appendl I\"item 4 values14111\n    # npoBepKa 6\n    if lenlvaluesl > 5:\n        result.appendll\"item 5  values15111\n    # npoBepKa 7\n    if lenlvaluesl > 6:\n        result.appendll\"item 6  values16111\n    # npoBepKa 8\n    if lenlvaluesl > 7:\n        result.appendll\"item 7  values17111\n    # npoBepKa 9\n    if lenlvaluesl > 8:\n        result.appendl I\"item 8 values18111\n    # npoBepKa 10\n    if lenlvaluesl > 9:\n        result.appendll\"item 9  values19111\n    # npoBepKa 11\n    if lenlvaluesl > 10:\n        result. append I I\" item lO\"values110111\n    # npoBepKa 12\n    if lenlvaluesl > 11:\n        result. append I I\" item Il\"values1111 I I\n    # npoBepKa 13\n    if lenlvaluesl > 12:\n        result. append I I\" item 12\"values112111\n    # npoBepKa 14\n    if lenlvaluesl > 13:\n        result. append I I\" item 13\"values113111\n    # npoBepKa 15\n    if lenlvaluesl > 14:\n        result. append I I\" item 14\"values114111\n    # npoBepKa 16\n    if lenlvaluesl > 15:\n        result. append I I\" item 15\"values115111\n    # npoBepKa 17\n    if lenlvaluesl > 16:\n        result. append I I\" item 16\"values116111\n    # npoBepKa 18\n    if lenlvaluesl > 17:\n        result. append I I\" item 17\"values117111\n    # npoBepKa 19\n    if lenlvaluesl > 18:\n        result. append I I\" item 18\"values118111\n    # npoBepKa 20\n    if lenlvaluesl > 1g:\n        result. append I I\" item 19\"values119111\n    retu rn result",
+      "blocks": [
+        {
+          "text": "def collect I values I :",
+          "x": 0.025,
+          "y": 0.015467171717171713,
+          "width": 0.188,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result",
+          "x": 0.065,
+          "y": 0.0299873737373737,
+          "width": 0.05299999999999999,
+          "height": 0.008207070707070718
+        },
+        {
+          "text": "# npoBepKa I",
+          "x": 0.062,
+          "y": 0.04671717171717171,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 0:",
+          "x": 0.064,
+          "y": 0.06060606060606061,
+          "width": 0.178,
+          "height": 0.008838383838383757
+        },
+        {
+          "text": "result.appendl I\"item 0",
+          "x": 0.104,
+          "y": 0.07670454545454547,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 2",
+          "x": 0.062,
+          "y": 0.09217171717171718,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > I:",
+          "x": 0.064,
+          "y": 0.10637626262626265,
+          "width": 0.178,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result.appendll\"item I",
+          "x": 0.104,
+          "y": 0.12215909090909088,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 3",
+          "x": 0.062,
+          "y": 0.13762626262626265,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 2:",
+          "x": 0.064,
+          "y": 0.15183080808080807,
+          "width": 0.178,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result.appendll\"item 2",
+          "x": 0.104,
+          "y": 0.16761363636363635,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 4",
+          "x": 0.062,
+          "y": 0.18308080808080807,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 3:",
+          "x": 0.064,
+          "y": 0.19728535353535354,
+          "width": 0.178,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result.appendl I\"item 3",
+          "x": 0.104,
+          "y": 0.21306818181818182,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 5",
+          "x": 0.062,
+          "y": 0.22853535353535354,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 4:",
+          "x": 0.064,
+          "y": 0.24242424242424243,
+          "width": 0.178,
+          "height": 0.008838383838383868
+        },
+        {
+          "text": "result.appendl I\"item 4",
+          "x": 0.104,
+          "y": 0.25852272727272724,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 6",
+          "x": 0.062,
+          "y": 0.27398989898989895,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 5:",
+          "x": 0.064,
+          "y": 0.2881944444444445,
+          "width": 0.178,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result.appendll\"item 5",
+          "x": 0.104,
+          "y": 0.30397727272727276,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 7",
+          "x": 0.062,
+          "y": 0.3194444444444445,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 6:",
+          "x": 0.064,
+          "y": 0.33364898989898994,
+          "width": 0.178,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result.appendll\"item 6",
+          "x": 0.104,
+          "y": 0.3494318181818182,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 8",
+          "x": 0.062,
+          "y": 0.36489898989898994,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 7:",
+          "x": 0.064,
+          "y": 0.37910353535353536,
+          "width": 0.178,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result.appendll\"item 7",
+          "x": 0.104,
+          "y": 0.39488636363636365,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 9",
+          "x": 0.062,
+          "y": 0.41035353535353536,
+          "width": 0.11499999999999999,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 8:",
+          "x": 0.064,
+          "y": 0.4242424242424242,
+          "width": 0.178,
+          "height": 0.008838383838383868
+        },
+        {
+          "text": "result.appendl I\"item 8",
+          "x": 0.104,
+          "y": 0.44034090909090906,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 10",
+          "x": 0.062,
+          "y": 0.4558080808080808,
+          "width": 0.125,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 9:",
+          "x": 0.064,
+          "y": 0.47001262626262624,
+          "width": 0.178,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result.appendll\"item 9",
+          "x": 0.104,
+          "y": 0.48579545454545453,
+          "width": 0.20800000000000002,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 11",
+          "x": 0.062,
+          "y": 0.5012626262626263,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 10:",
+          "x": 0.064,
+          "y": 0.5154671717171717,
+          "width": 0.187,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result. append I I\" item lO\"",
+          "x": 0.104,
+          "y": 0.53125,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 12",
+          "x": 0.062,
+          "y": 0.5467171717171717,
+          "width": 0.125,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 11:",
+          "x": 0.064,
+          "y": 0.5609217171717171,
+          "width": 0.187,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result. append I I\" item Il\"",
+          "x": 0.104,
+          "y": 0.5767045454545454,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 13",
+          "x": 0.062,
+          "y": 0.5921717171717171,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 12:",
+          "x": 0.064,
+          "y": 0.6060606060606061,
+          "width": 0.187,
+          "height": 0.008838383838383868
+        },
+        {
+          "text": "result. append I I\" item 12\"",
+          "x": 0.104,
+          "y": 0.6221590909090908,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 14",
+          "x": 0.062,
+          "y": 0.6376262626262625,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 13:",
+          "x": 0.064,
+          "y": 0.6518308080808081,
+          "width": 0.187,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result. append I I\" item 13\"",
+          "x": 0.104,
+          "y": 0.6676136363636364,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 15",
+          "x": 0.062,
+          "y": 0.6830808080808081,
+          "width": 0.125,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 14:",
+          "x": 0.064,
+          "y": 0.6972853535353536,
+          "width": 0.187,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result. append I I\" item 14\"",
+          "x": 0.104,
+          "y": 0.7130681818181819,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 16",
+          "x": 0.062,
+          "y": 0.7285353535353536,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 15:",
+          "x": 0.064,
+          "y": 0.742739898989899,
+          "width": 0.187,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result. append I I\" item 15\"",
+          "x": 0.104,
+          "y": 0.7585227272727273,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 17",
+          "x": 0.062,
+          "y": 0.773989898989899,
+          "width": 0.125,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 16:",
+          "x": 0.064,
+          "y": 0.7878787878787878,
+          "width": 0.187,
+          "height": 0.008838383838383868
+        },
+        {
+          "text": "result. append I I\" item 16\"",
+          "x": 0.104,
+          "y": 0.8039772727272727,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 18",
+          "x": 0.062,
+          "y": 0.8194444444444444,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 17:",
+          "x": 0.064,
+          "y": 0.8336489898989898,
+          "width": 0.187,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result. append I I\" item 17\"",
+          "x": 0.104,
+          "y": 0.8494318181818181,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "# npoBepKa 19",
+          "x": 0.062,
+          "y": 0.8648989898989898,
+          "width": 0.125,
+          "height": 0.010101010101010055
+        },
+        {
+          "text": "if lenlvaluesl > 18:",
+          "x": 0.064,
+          "y": 0.8791035353535354,
+          "width": 0.187,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "result. append I I\" item 18\"",
+          "x": 0.104,
+          "y": 0.8948863636363636,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323315
+        },
+        {
+          "text": "# npoBepKa 20",
+          "x": 0.062,
+          "y": 0.9103535353535354,
+          "width": 0.125,
+          "height": 0.010101010101010166
+        },
+        {
+          "text": "if lenlvaluesl > 1g:",
+          "x": 0.064,
+          "y": 0.9245580808080809,
+          "width": 0.187,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "result. append I I\" item 19\"",
+          "x": 0.104,
+          "y": 0.9403409090909092,
+          "width": 0.22600000000000003,
+          "height": 0.010732323232323204
+        },
+        {
+          "text": "retu rn result",
+          "x": 0.065,
+          "y": 0.954229797979798,
+          "width": 0.121,
+          "height": 0.008207070707070718
+        },
+        {
+          "text": "values10111",
+          "x": 0.342,
+          "y": 0.07607323232323232,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values111 I I",
+          "x": 0.342,
+          "y": 0.12152777777777779,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values12111",
+          "x": 0.342,
+          "y": 0.1669823232323232,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values13111",
+          "x": 0.342,
+          "y": 0.21243686868686867,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values14111",
+          "x": 0.342,
+          "y": 0.25789141414141414,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values15111",
+          "x": 0.342,
+          "y": 0.3033459595959596,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values16111",
+          "x": 0.342,
+          "y": 0.3488005050505051,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values17111",
+          "x": 0.342,
+          "y": 0.3942550505050505,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values18111",
+          "x": 0.342,
+          "y": 0.4397095959595959,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values19111",
+          "x": 0.342,
+          "y": 0.4851641414141414,
+          "width": 0.10199999999999998,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values110111",
+          "x": 0.352,
+          "y": 0.5306186868686869,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values1111 I I",
+          "x": 0.352,
+          "y": 0.5760732323232323,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values112111",
+          "x": 0.352,
+          "y": 0.6215277777777778,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values113111",
+          "x": 0.352,
+          "y": 0.6669823232323232,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values114111",
+          "x": 0.352,
+          "y": 0.7124368686868687,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values115111",
+          "x": 0.352,
+          "y": 0.7578914141414141,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values116111",
+          "x": 0.352,
+          "y": 0.8033459595959596,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values117111",
+          "x": 0.352,
+          "y": 0.848800505050505,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969696906
+        },
+        {
+          "text": "values118111",
+          "x": 0.352,
+          "y": 0.8942550505050505,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969697017
+        },
+        {
+          "text": "values119111",
+          "x": 0.352,
+          "y": 0.939709595959596,
+          "width": 0.11200000000000004,
+          "height": 0.009469696969696906
+        }
+      ]
+    },
+    {
+      "id": "sql-long-light-16",
+      "complexity": "long",
+      "elapsed": 0.042470958000194514,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8828996282527881,
+      "expected": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_0,\n    SUM(CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,\n    SUM(CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,\n    SUM(CASE WHEN category = 'group_3' THEN amount ELSE 0 END) AS total_3,\n    SUM(CASE WHEN category = 'group_4' THEN amount ELSE 0 END) AS total_4,\n    SUM(CASE WHEN category = 'group_5' THEN amount ELSE 0 END) AS total_5,\n    SUM(CASE WHEN category = 'group_6' THEN amount ELSE 0 END) AS total_6,\n    SUM(CASE WHEN category = 'group_7' THEN amount ELSE 0 END) AS total_7,\n    SUM(CASE WHEN category = 'group_8' THEN amount ELSE 0 END) AS total_8,\n    SUM(CASE WHEN category = 'group_9' THEN amount ELSE 0 END) AS total_9,\n    SUM(CASE WHEN category = 'group_10' THEN amount ELSE 0 END) AS total_10,\n    SUM(CASE WHEN category = 'group_11' THEN amount ELSE 0 END) AS total_11,\n    SUM(CASE WHEN category = 'group_12' THEN amount ELSE 0 END) AS total_12,\n    SUM(CASE WHEN category = 'group_13' THEN amount ELSE 0 END) AS total_13,\n    SUM(CASE WHEN category = 'group_14' THEN amount ELSE 0 END) AS total_14,\n    SUM(CASE WHEN category = 'group_15' THEN amount ELSE 0 END) AS total_15,\n    SUM(CASE WHEN category = 'group_16' THEN amount ELSE 0 END) AS total_16,\n    SUM(CASE WHEN category = 'group_17' THEN amount ELSE 0 END) AS total_17,\n    SUM(CASE WHEN category = 'group_18' THEN amount ELSE 0 END) AS total_18,\n    SUM(CASE WHEN category = 'group_19' THEN amount ELSE 0 END) AS total_19\nFROM transactions\nWHERE active = 1\n    AND owner = 'Иван'\nGROUP BY account_id;\n",
+      "actual": "SELECT\n    SUM I CASE l¥HEN catego ry'group_0' THEN amount ELSE 0 ENDI AS total_0,\n    SUM I CASE l¥NEN catego ry'group_I' THEN amount ELSE O ENDI AS total_I,\n    SUM I CASE l¥NEN catego ry'group_2' THEN amount ELSE O ENDI AS total_2,\n    SUM I CASE l¥NEN catego ry'group_3' THEN amount ELSE O ENDI AS total_3,\n    SUM I CASE l¥NEN catego ry'group_4' THEN amount ELSE O ENDI AS total_4,\n    SUM I CASE l¥NEN catego ry'group_5' THEN amount ELSE O ENDI AS total_5,\n    SUM I CASE l¥NEN catego ry'group_6' THEN amount ELSE O ENDI AS total_6,\n    SUM I CASE l¥NEN catego ry'group_7' THEN amount ELSE O ENDI AS total_7,\n    SUM I CASE l¥NEN catego ry'group_8' THEN amount ELSE O ENDI AS total_8,\n    SUM I CASE l¥NEN catego ry'group_9' THEN amount ELSE O ENDI AS total_9,\n    SUM I CASE l¥NEN catego ry'group_1O' THEN amount ELSE O ENDI AS total_10,\n    SUM I CASE l¥NEN catego ry'group_Il' THEN amount ELSE O ENDI AS total_Il,\n    SUM I CASE l¥NEN catego ry'group_12' THEN amount ELSE O ENDI AS total_12,\n    SUM I CASE l¥NEN catego ry'group_13' THEN amount ELSE O ENDI AS total_13,\n    SUM I CASE l¥NEN catego ry'group_14' THEN amount ELSE O ENDI AS total_14,\n    SUM I CASE l¥NEN catego ry'group_15' THEN amount ELSE O ENDI AS total_15,\n    SUM I CASE l¥NEN catego ry'group_16' THEN amount ELSE O ENDI AS total_16,\n    SUM I CASE l¥NEN catego ry'group_17' THEN amount ELSE O ENDI AS total_17,\n    SUM I CASE l¥NEN catego ry'group_18' THEN amount ELSE O ENDI AS total_18,\n    SUM I CASE l¥NEN catego ry'group_19' THEN amount ELSE O ENDI AS total_19\nFROM t ransact ions\nl¥HERE active\n    AND (Mner   'MBaH'\nGROUP BY account id:",
+      "blocks": [
+        {
+          "text": "SELECT",
+          "x": 0.025,
+          "y": 0.0357142857142857,
+          "width": 0.057,
+          "height": 0.017857142857142794
+        },
+        {
+          "text": "SUM I CASE l¥HEN catego ry",
+          "x": 0.063,
+          "y": 0.0736607142857143,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.109375,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.1450892857142857,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.1808035714285714,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.21651785714285715,
+          "width": 0.21000000000000002,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.25223214285714285,
+          "width": 0.21000000000000002,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.2879464285714286,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.3236607142857143,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.359375,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.3950892857142857,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.4308035714285714,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.4665178571428572,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.5022321428571428,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.5379464285714286,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.5736607142857143,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.609375,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.6450892857142857,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.6808035714285714,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.7165178571428572,
+          "width": 0.21000000000000002,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.7522321428571428,
+          "width": 0.21000000000000002,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "FROM t ransact ions",
+          "x": 0.026,
+          "y": 0.7849702380952381,
+          "width": 0.16,
+          "height": 0.019345238095238027
+        },
+        {
+          "text": "l¥HERE active",
+          "x": 0.024,
+          "y": 0.8206845238095238,
+          "width": 0.11500000000000002,
+          "height": 0.019345238095238138
+        },
+        {
+          "text": "AND (Mner",
+          "x": 0.062,
+          "y": 0.8571428571428572,
+          "width": 0.086,
+          "height": 0.017857142857142905
+        },
+        {
+          "text": "'MBaH'",
+          "x": 0.182,
+          "y": 0.8563988095238095,
+          "width": 0.05000000000000002,
+          "height": 0.019345238095238138
+        },
+        {
+          "text": "GROUP BY account id:",
+          "x": 0.025,
+          "y": 0.8936011904761905,
+          "width": 0.188,
+          "height": 0.022321428571428603
+        },
+        {
+          "text": "'group_0' THEN amount ELSE 0 ENDI AS total_0,",
+          "x": 0.307,
+          "y": 0.0736607142857143,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_I' THEN amount ELSE O ENDI AS total_I,",
+          "x": 0.307,
+          "y": 0.109375,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_2' THEN amount ELSE O ENDI AS total_2,",
+          "x": 0.307,
+          "y": 0.1450892857142857,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_3' THEN amount ELSE O ENDI AS total_3,",
+          "x": 0.307,
+          "y": 0.1808035714285714,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_4' THEN amount ELSE O ENDI AS total_4,",
+          "x": 0.307,
+          "y": 0.21651785714285715,
+          "width": 0.425,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "'group_5' THEN amount ELSE O ENDI AS total_5,",
+          "x": 0.307,
+          "y": 0.25223214285714285,
+          "width": 0.425,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "'group_6' THEN amount ELSE O ENDI AS total_6,",
+          "x": 0.307,
+          "y": 0.2879464285714286,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_7' THEN amount ELSE O ENDI AS total_7,",
+          "x": 0.307,
+          "y": 0.3236607142857143,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_8' THEN amount ELSE O ENDI AS total_8,",
+          "x": 0.307,
+          "y": 0.359375,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_9' THEN amount ELSE O ENDI AS total_9,",
+          "x": 0.307,
+          "y": 0.3950892857142857,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_1O' THEN amount ELSE O ENDI AS total_10,",
+          "x": 0.307,
+          "y": 0.4308035714285714,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_Il' THEN amount ELSE O ENDI AS total_Il,",
+          "x": 0.307,
+          "y": 0.4665178571428572,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_12' THEN amount ELSE O ENDI AS total_12,",
+          "x": 0.307,
+          "y": 0.5022321428571428,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_13' THEN amount ELSE O ENDI AS total_13,",
+          "x": 0.307,
+          "y": 0.5379464285714286,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_14' THEN amount ELSE O ENDI AS total_14,",
+          "x": 0.307,
+          "y": 0.5736607142857143,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_15' THEN amount ELSE O ENDI AS total_15,",
+          "x": 0.307,
+          "y": 0.609375,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_16' THEN amount ELSE O ENDI AS total_16,",
+          "x": 0.307,
+          "y": 0.6450892857142857,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_17' THEN amount ELSE O ENDI AS total_17,",
+          "x": 0.307,
+          "y": 0.6808035714285714,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_18' THEN amount ELSE O ENDI AS total_18,",
+          "x": 0.307,
+          "y": 0.7165178571428572,
+          "width": 0.445,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "'group_19' THEN amount ELSE O ENDI AS total_19",
+          "x": 0.307,
+          "y": 0.7522321428571428,
+          "width": 0.438,
+          "height": 0.025297619047618958
+        }
+      ]
+    },
+    {
+      "id": "sql-long-dark-16",
+      "complexity": "long",
+      "elapsed": 0.04315137499997945,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.8868918500154943,
+      "expected": "SELECT\n    SUM(CASE WHEN category = 'group_0' THEN amount ELSE 0 END) AS total_0,\n    SUM(CASE WHEN category = 'group_1' THEN amount ELSE 0 END) AS total_1,\n    SUM(CASE WHEN category = 'group_2' THEN amount ELSE 0 END) AS total_2,\n    SUM(CASE WHEN category = 'group_3' THEN amount ELSE 0 END) AS total_3,\n    SUM(CASE WHEN category = 'group_4' THEN amount ELSE 0 END) AS total_4,\n    SUM(CASE WHEN category = 'group_5' THEN amount ELSE 0 END) AS total_5,\n    SUM(CASE WHEN category = 'group_6' THEN amount ELSE 0 END) AS total_6,\n    SUM(CASE WHEN category = 'group_7' THEN amount ELSE 0 END) AS total_7,\n    SUM(CASE WHEN category = 'group_8' THEN amount ELSE 0 END) AS total_8,\n    SUM(CASE WHEN category = 'group_9' THEN amount ELSE 0 END) AS total_9,\n    SUM(CASE WHEN category = 'group_10' THEN amount ELSE 0 END) AS total_10,\n    SUM(CASE WHEN category = 'group_11' THEN amount ELSE 0 END) AS total_11,\n    SUM(CASE WHEN category = 'group_12' THEN amount ELSE 0 END) AS total_12,\n    SUM(CASE WHEN category = 'group_13' THEN amount ELSE 0 END) AS total_13,\n    SUM(CASE WHEN category = 'group_14' THEN amount ELSE 0 END) AS total_14,\n    SUM(CASE WHEN category = 'group_15' THEN amount ELSE 0 END) AS total_15,\n    SUM(CASE WHEN category = 'group_16' THEN amount ELSE 0 END) AS total_16,\n    SUM(CASE WHEN category = 'group_17' THEN amount ELSE 0 END) AS total_17,\n    SUM(CASE WHEN category = 'group_18' THEN amount ELSE 0 END) AS total_18,\n    SUM(CASE WHEN category = 'group_19' THEN amount ELSE 0 END) AS total_19\nFROM transactions\nWHERE active = 1\n    AND owner = 'Иван'\nGROUP BY account_id;\n",
+      "actual": "SELECT\n    SUMI CASE l¥HEN catego ry'group_0' THEN amount ELSE 0 ENDI AS total_0,\n    SUM I CASE l¥NEN catego ry'group_I' THEN amount ELSE O ENDI AS total_I,\n    SUM I CASE l¥NEN catego ry'group_2' THEN amount ELSE O ENDI AS total_2,\n    SUM I CASE l¥NEN catego ry'group_3' THEN amount ELSE O ENDI AS total_3,\n    SUM I CASE l¥HEN catego ry'group_4' THEN amount ELSE 0 ENDI AS total_4,\n    SUM I CASE l¥NEN catego ry'group_5' THEN amount ELSE O ENDI AS total_5,\n    SUM I CASE l¥NEN catego ry'group_6' THEN amount ELSE O ENDI AS total_6,\n    SUM I CASE l¥NEN catego ry'group_7' THEN amount ELSE O ENDI AS total_7,\n    SUM I CASE l¥HEN catego ry'group_8' THEN amount ELSE 0 ENDI AS total_8,\n    SUM I CASE l¥NEN catego ry'group_9' THEN amount ELSE O ENDI AS total_9,\n    SUM I CASE l¥NEN catego ry'group_1O' THEN amount ELSE O ENDI AS total_10,\n    SUM I CASE l¥NEN catego ry'group_Il' THEN amount ELSE O ENDI AS total_Il,\n    SUM I CASE l¥HEN catego ry'group_12' THEN amount ELSE O ENDI AS total_12,\n    SUM I CASE l¥NEN catego ry'group_13' THEN amount ELSE O ENDI AS total_13,\n    SUM I CASE l¥NEN catego ry'group_14' THEN amount ELSE O ENDI AS total_14,\n    SUM I CASE l¥NEN catego ry'group_15' THEN amount ELSE O ENDI AS total_15,\n    SUM I CASE l¥HEN catego ry'group_16' THEN amount ELSE O ENDI AS total_16,\n    SUM I CASE l¥NEN catego ry'group_17' THEN amount ELSE O ENDI AS total_17,\n    SUM I CASE l¥NEN catego ry'group_18' THEN amount ELSE O ENDI AS total_18,\n    SUM I CASE l¥NEN catego ry'group_19' THEN amount ELSE O ENDI AS total_19\nFROM t ransact ions\nl¥HERE active\n    AND (Mner   'MBaH'\nGROUP BY account id:",
+      "blocks": [
+        {
+          "text": "SELECT",
+          "x": 0.025,
+          "y": 0.0357142857142857,
+          "width": 0.057,
+          "height": 0.017857142857142794
+        },
+        {
+          "text": "SUMI CASE l¥HEN catego ry",
+          "x": 0.063,
+          "y": 0.0736607142857143,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.109375,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.1450892857142857,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.1808035714285714,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥HEN catego ry",
+          "x": 0.063,
+          "y": 0.21651785714285715,
+          "width": 0.21000000000000002,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.25223214285714285,
+          "width": 0.21000000000000002,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.2879464285714286,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.3236607142857143,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥HEN catego ry",
+          "x": 0.063,
+          "y": 0.359375,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.3950892857142857,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.4308035714285714,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.4665178571428572,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥HEN catego ry",
+          "x": 0.063,
+          "y": 0.5022321428571428,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.5379464285714286,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.5736607142857143,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.609375,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥HEN catego ry",
+          "x": 0.063,
+          "y": 0.6450892857142857,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.6808035714285714,
+          "width": 0.21000000000000002,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.7165178571428572,
+          "width": 0.21000000000000002,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "SUM I CASE l¥NEN catego ry",
+          "x": 0.063,
+          "y": 0.7522321428571428,
+          "width": 0.21000000000000002,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "FROM t ransact ions",
+          "x": 0.025,
+          "y": 0.7849702380952381,
+          "width": 0.161,
+          "height": 0.019345238095238027
+        },
+        {
+          "text": "l¥HERE active",
+          "x": 0.024,
+          "y": 0.8206845238095238,
+          "width": 0.11500000000000002,
+          "height": 0.019345238095238138
+        },
+        {
+          "text": "AND (Mner",
+          "x": 0.062,
+          "y": 0.8571428571428572,
+          "width": 0.086,
+          "height": 0.017857142857142905
+        },
+        {
+          "text": "'MBaH'",
+          "x": 0.182,
+          "y": 0.8563988095238095,
+          "width": 0.05000000000000002,
+          "height": 0.019345238095238138
+        },
+        {
+          "text": "GROUP BY account id:",
+          "x": 0.025,
+          "y": 0.8936011904761905,
+          "width": 0.188,
+          "height": 0.022321428571428603
+        },
+        {
+          "text": "'group_0' THEN amount ELSE 0 ENDI AS total_0,",
+          "x": 0.307,
+          "y": 0.0736607142857143,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_I' THEN amount ELSE O ENDI AS total_I,",
+          "x": 0.307,
+          "y": 0.109375,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_2' THEN amount ELSE O ENDI AS total_2,",
+          "x": 0.307,
+          "y": 0.1450892857142857,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_3' THEN amount ELSE O ENDI AS total_3,",
+          "x": 0.307,
+          "y": 0.1808035714285714,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_4' THEN amount ELSE 0 ENDI AS total_4,",
+          "x": 0.307,
+          "y": 0.21651785714285715,
+          "width": 0.425,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "'group_5' THEN amount ELSE O ENDI AS total_5,",
+          "x": 0.307,
+          "y": 0.25223214285714285,
+          "width": 0.425,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "'group_6' THEN amount ELSE O ENDI AS total_6,",
+          "x": 0.307,
+          "y": 0.2879464285714286,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_7' THEN amount ELSE O ENDI AS total_7,",
+          "x": 0.307,
+          "y": 0.3236607142857143,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_8' THEN amount ELSE 0 ENDI AS total_8,",
+          "x": 0.307,
+          "y": 0.359375,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_9' THEN amount ELSE O ENDI AS total_9,",
+          "x": 0.307,
+          "y": 0.3950892857142857,
+          "width": 0.425,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_1O' THEN amount ELSE O ENDI AS total_10,",
+          "x": 0.307,
+          "y": 0.4308035714285714,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_Il' THEN amount ELSE O ENDI AS total_Il,",
+          "x": 0.307,
+          "y": 0.4665178571428572,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_12' THEN amount ELSE O ENDI AS total_12,",
+          "x": 0.307,
+          "y": 0.5022321428571428,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_13' THEN amount ELSE O ENDI AS total_13,",
+          "x": 0.307,
+          "y": 0.5379464285714286,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_14' THEN amount ELSE O ENDI AS total_14,",
+          "x": 0.307,
+          "y": 0.5736607142857143,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_15' THEN amount ELSE O ENDI AS total_15,",
+          "x": 0.307,
+          "y": 0.609375,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_16' THEN amount ELSE O ENDI AS total_16,",
+          "x": 0.307,
+          "y": 0.6450892857142857,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_17' THEN amount ELSE O ENDI AS total_17,",
+          "x": 0.307,
+          "y": 0.6808035714285714,
+          "width": 0.445,
+          "height": 0.02529761904761907
+        },
+        {
+          "text": "'group_18' THEN amount ELSE O ENDI AS total_18,",
+          "x": 0.307,
+          "y": 0.7165178571428572,
+          "width": 0.445,
+          "height": 0.025297619047618958
+        },
+        {
+          "text": "'group_19' THEN amount ELSE O ENDI AS total_19",
+          "x": 0.307,
+          "y": 0.7522321428571428,
+          "width": 0.438,
+          "height": 0.025297619047618958
+        }
+      ]
+    },
+    {
+      "id": "json-long-light-16",
+      "complexity": "long",
+      "elapsed": 0.04312320900044142,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.45557461406518013,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"items\": {\n        \"item_0\": {\n            \"value\": 0,\n            \"active\": true\n        },\n        \"item_1\": {\n            \"value\": 1,\n            \"active\": false\n        },\n        \"item_2\": {\n            \"value\": 2,\n            \"active\": true\n        },\n        \"item_3\": {\n            \"value\": 3,\n            \"active\": false\n        },\n        \"item_4\": {\n            \"value\": 4,\n            \"active\": true\n        },\n        \"item_5\": {\n            \"value\": 5,\n            \"active\": false\n        },\n        \"item_6\": {\n            \"value\": 6,\n            \"active\": true\n        },\n        \"item_7\": {\n            \"value\": 7,\n            \"active\": false\n        },\n        \"item_8\": {\n            \"value\": 8,\n            \"active\": true\n        },\n        \"item_9\": {\n            \"value\": 9,\n            \"active\": false\n        },\n        \"item_10\": {\n            \"value\": 10,\n            \"active\": true\n        },\n        \"item_11\": {\n            \"value\": 11,\n            \"active\": false\n        },\n        \"item_12\": {\n            \"value\": 12,\n            \"active\": true\n        },\n        \"item_13\": {\n            \"value\": 13,\n            \"active\": false\n        },\n        \"item_14\": {\n            \"value\": 14,\n            \"active\": true\n        },\n        \"item_15\": {\n            \"value\": 15,\n            \"active\": false\n        },\n        \"item_16\": {\n            \"value\": 16,\n            \"active\": true\n        },\n        \"item_17\": {\n            \"value\": 17,\n            \"active\": false\n        },\n        \"item_18\": {\n            \"value\": 18,\n            \"active\": true\n        },\n        \"item_19\": {\n            \"value\": 19,\n            \"active\": false\n        }\n    }\n}\n",
+      "actual": "'name\": \"TecT\"\n'enabled\": t rue,\n'items\":\n    'item O\":\n        'value\":\n        'act ive t rue\n\n    'item I\":\n        'value\":\n        'active false\n\n    'item 2\":\n        'value\":\n        'act ive t rue\n\n    'item 3\":\n        'value\":\n        'active false\n\n    'item 4\":\n        'value\":\n        'act ive t rue\n\n    'item 5\":\n        'value\":\n        'active false\n\n    'item 6\":\n        'value\":\n        'act ive t rue\n\n    'item 7\":\n        'value\":\n        'active false\n\n    'item 8\":\n        'value\":\n        'act ive t rue\n\n    'item g\":\n        'value\":\n        'active false\n\n    'item 10\":\n        'value\": 10,\n        'act ive t rue\n\n    'item Il\":\n        'value\": 11,\n        'active false\n\n    'item 12\":\n        'value\": 12,\n        'act ive t rue\n\n    'item 13\":\n        'value\": 13,\n        'active false\n\n    'item 14\":\n        'value\": 14,\n        'act ive t rue\n\n    'item 15\":\n        'value\": 15,\n        'active false\n\n    'item 16\":\n        'value\": 16,\n        'act ive t rue\n\n    'item 17\":\n        'value\": 17,\n        'active false\n\n    'item 18\":\n        'value\": 18,\n        'act ive t rue\n\n    'item 19\":\n        'value\": Ig,\n        'active false",
+      "blocks": [
+        {
+          "text": "'name\": \"TecT\"",
+          "x": 0.067,
+          "y": 0.022237827715355818,
+          "width": 0.128,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'enabled\": t rue,",
+          "x": 0.067,
+          "y": 0.03417602996254682,
+          "width": 0.146,
+          "height": 0.0074906367041197575
+        },
+        {
+          "text": "'items\":",
+          "x": 0.067,
+          "y": 0.04470973782771531,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item O\":",
+          "x": 0.106,
+          "y": 0.055945692883895115,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.06718164794007492,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.07841760299625472,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item I\":",
+          "x": 0.106,
+          "y": 0.10088951310861421,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.11212546816479402,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.12336142322097382,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 2\":",
+          "x": 0.106,
+          "y": 0.14583333333333331,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.15706928838951312,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.16830524344569286,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'item 3\":",
+          "x": 0.106,
+          "y": 0.19077715355805241,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.20201310861423222,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.21324906367041202,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 4\":",
+          "x": 0.106,
+          "y": 0.23572097378277151,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.24695692883895132,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.25819288389513106,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'item 5\":",
+          "x": 0.106,
+          "y": 0.28066479400749067,
+          "width": 0.078,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.2919007490636704,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.3031367041198502,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 6\":",
+          "x": 0.106,
+          "y": 0.3256086142322097,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.3368445692883895,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.34808052434456926,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'item 7\":",
+          "x": 0.106,
+          "y": 0.37055243445692887,
+          "width": 0.078,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.3817883895131086,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.3930243445692884,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 8\":",
+          "x": 0.106,
+          "y": 0.4154962546816479,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.4267322097378277,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.43796816479400746,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'item g\":",
+          "x": 0.106,
+          "y": 0.46044007490636707,
+          "width": 0.078,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.4716760299625468,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.4829119850187266,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 10\":",
+          "x": 0.106,
+          "y": 0.5053838951310861,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 10,",
+          "x": 0.144,
+          "y": 0.5173220973782772,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.5278558052434457,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item Il\":",
+          "x": 0.106,
+          "y": 0.5503277153558053,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 11,",
+          "x": 0.144,
+          "y": 0.5622659176029963,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.5727996254681649,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 12\":",
+          "x": 0.106,
+          "y": 0.5952715355805243,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 12,",
+          "x": 0.144,
+          "y": 0.6072097378277154,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.6177434456928839,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 13\":",
+          "x": 0.106,
+          "y": 0.6402153558052435,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 13,",
+          "x": 0.144,
+          "y": 0.6521535580524345,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.6626872659176031,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 14\":",
+          "x": 0.106,
+          "y": 0.6851591760299625,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 14,",
+          "x": 0.144,
+          "y": 0.6970973782771536,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.7076310861423221,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 15\":",
+          "x": 0.106,
+          "y": 0.7301029962546817,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 15,",
+          "x": 0.144,
+          "y": 0.7420411985018727,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.7525749063670413,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 16\":",
+          "x": 0.106,
+          "y": 0.7750468164794007,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 16,",
+          "x": 0.144,
+          "y": 0.7869850187265918,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.7975187265917603,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 17\":",
+          "x": 0.106,
+          "y": 0.8199906367041199,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 17,",
+          "x": 0.144,
+          "y": 0.8319288389513109,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.8424625468164795,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 18\":",
+          "x": 0.106,
+          "y": 0.8649344569288389,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 18,",
+          "x": 0.144,
+          "y": 0.87687265917603,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.8874063670411985,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 19\":",
+          "x": 0.106,
+          "y": 0.9098782771535581,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": Ig,",
+          "x": 0.144,
+          "y": 0.9218164794007491,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.9323501872659177,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        }
+      ]
+    },
+    {
+      "id": "json-long-dark-16",
+      "complexity": "long",
+      "elapsed": 0.04381999999986874,
+      "passed_4s": true,
+      "exact_ignoring_final_newline": false,
+      "similarity": 0.45557461406518013,
+      "expected": "{\n    \"name\": \"Тест\",\n    \"enabled\": true,\n    \"items\": {\n        \"item_0\": {\n            \"value\": 0,\n            \"active\": true\n        },\n        \"item_1\": {\n            \"value\": 1,\n            \"active\": false\n        },\n        \"item_2\": {\n            \"value\": 2,\n            \"active\": true\n        },\n        \"item_3\": {\n            \"value\": 3,\n            \"active\": false\n        },\n        \"item_4\": {\n            \"value\": 4,\n            \"active\": true\n        },\n        \"item_5\": {\n            \"value\": 5,\n            \"active\": false\n        },\n        \"item_6\": {\n            \"value\": 6,\n            \"active\": true\n        },\n        \"item_7\": {\n            \"value\": 7,\n            \"active\": false\n        },\n        \"item_8\": {\n            \"value\": 8,\n            \"active\": true\n        },\n        \"item_9\": {\n            \"value\": 9,\n            \"active\": false\n        },\n        \"item_10\": {\n            \"value\": 10,\n            \"active\": true\n        },\n        \"item_11\": {\n            \"value\": 11,\n            \"active\": false\n        },\n        \"item_12\": {\n            \"value\": 12,\n            \"active\": true\n        },\n        \"item_13\": {\n            \"value\": 13,\n            \"active\": false\n        },\n        \"item_14\": {\n            \"value\": 14,\n            \"active\": true\n        },\n        \"item_15\": {\n            \"value\": 15,\n            \"active\": false\n        },\n        \"item_16\": {\n            \"value\": 16,\n            \"active\": true\n        },\n        \"item_17\": {\n            \"value\": 17,\n            \"active\": false\n        },\n        \"item_18\": {\n            \"value\": 18,\n            \"active\": true\n        },\n        \"item_19\": {\n            \"value\": 19,\n            \"active\": false\n        }\n    }\n}\n",
+      "actual": "'name\": \"TecT\"\n'enabled\": t rue,\n'items\":\n    'item O\":\n        'value\":\n        'act ive t rue\n\n    'item I\":\n        'value\":\n        'active false\n\n    'item 2\":\n        'value\":\n        'act ive t rue\n\n    'item 3\":\n        'value\":\n        'active false\n\n    'item 4\":\n        'value\":\n        'act ive t rue\n\n    'item 5\":\n        'value\":\n        'active false\n\n    'item 6\":\n        'value\":\n        'act ive t rue\n\n    'item 7\":\n        'value\":\n        'active false\n\n    'item 8\":\n        'value\":\n        'act ive t rue\n\n    'item 9\":\n        'value\":\n        'active false\n\n    'item 10\":\n        'value\": 10,\n        'act ive t rue\n\n    'item Il\":\n        'value\": 11,\n        'active false\n\n    'item 12\":\n        'value\": 12,\n        'act ive t rue\n\n    'item 13\":\n        'value\": 13,\n        'active false\n\n    'item 14\":\n        'value\": 14,\n        'act ive t rue\n\n    'item 15\":\n        'value\": 15,\n        'active false\n\n    'item 16\":\n        'value\": 16,\n        'act ive t rue\n\n    'item 17\":\n        'value\": 17,\n        'active false\n\n    'item 18\":\n        'value\": 18,\n        'act ive t rue\n\n    'item 19\":\n        'value\": Ig,\n        'active false",
+      "blocks": [
+        {
+          "text": "'name\": \"TecT\"",
+          "x": 0.067,
+          "y": 0.022237827715355818,
+          "width": 0.128,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'enabled\": t rue,",
+          "x": 0.067,
+          "y": 0.03417602996254682,
+          "width": 0.146,
+          "height": 0.0074906367041197575
+        },
+        {
+          "text": "'items\":",
+          "x": 0.067,
+          "y": 0.04470973782771531,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item O\":",
+          "x": 0.106,
+          "y": 0.055945692883895115,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.06718164794007492,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.07841760299625472,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item I\":",
+          "x": 0.106,
+          "y": 0.10088951310861421,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.11212546816479402,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.12336142322097382,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 2\":",
+          "x": 0.106,
+          "y": 0.14583333333333331,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.15706928838951312,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.16830524344569286,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'item 3\":",
+          "x": 0.106,
+          "y": 0.19077715355805241,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.20201310861423222,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.21324906367041202,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 4\":",
+          "x": 0.106,
+          "y": 0.23572097378277151,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.24695692883895132,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.25819288389513106,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'item 5\":",
+          "x": 0.106,
+          "y": 0.28066479400749067,
+          "width": 0.078,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.2919007490636704,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.3031367041198502,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 6\":",
+          "x": 0.106,
+          "y": 0.3256086142322097,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.3368445692883895,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.34808052434456926,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'item 7\":",
+          "x": 0.106,
+          "y": 0.37055243445692887,
+          "width": 0.078,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.3817883895131086,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.3930243445692884,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 8\":",
+          "x": 0.106,
+          "y": 0.4154962546816479,
+          "width": 0.078,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.4267322097378277,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.43796816479400746,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'item 9\":",
+          "x": 0.106,
+          "y": 0.46044007490636707,
+          "width": 0.078,
+          "height": 0.006086142322097476
+        },
+        {
+          "text": "'value\":",
+          "x": 0.144,
+          "y": 0.4716760299625468,
+          "width": 0.069,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.4829119850187266,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 10\":",
+          "x": 0.106,
+          "y": 0.5053838951310861,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 10,",
+          "x": 0.144,
+          "y": 0.5173220973782772,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.5278558052434457,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item Il\":",
+          "x": 0.106,
+          "y": 0.5503277153558053,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 11,",
+          "x": 0.144,
+          "y": 0.5622659176029963,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.5727996254681649,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 12\":",
+          "x": 0.106,
+          "y": 0.5952715355805243,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 12,",
+          "x": 0.144,
+          "y": 0.6072097378277154,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.6177434456928839,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 13\":",
+          "x": 0.106,
+          "y": 0.6402153558052435,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 13,",
+          "x": 0.144,
+          "y": 0.6521535580524345,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.6626872659176031,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 14\":",
+          "x": 0.106,
+          "y": 0.6851591760299625,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 14,",
+          "x": 0.144,
+          "y": 0.6970973782771536,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.7076310861423221,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 15\":",
+          "x": 0.106,
+          "y": 0.7301029962546817,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 15,",
+          "x": 0.144,
+          "y": 0.7420411985018727,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.7525749063670413,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 16\":",
+          "x": 0.106,
+          "y": 0.7750468164794007,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 16,",
+          "x": 0.144,
+          "y": 0.7869850187265918,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.7975187265917603,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 17\":",
+          "x": 0.106,
+          "y": 0.8199906367041199,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 17,",
+          "x": 0.144,
+          "y": 0.8319288389513109,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.8424625468164795,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 18\":",
+          "x": 0.106,
+          "y": 0.8649344569288389,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": 18,",
+          "x": 0.144,
+          "y": 0.87687265917603,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'act ive t rue",
+          "x": 0.144,
+          "y": 0.8874063670411985,
+          "width": 0.12900000000000003,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'item 19\":",
+          "x": 0.106,
+          "y": 0.9098782771535581,
+          "width": 0.08700000000000001,
+          "height": 0.006086142322097365
+        },
+        {
+          "text": "'value\": Ig,",
+          "x": 0.144,
+          "y": 0.9218164794007491,
+          "width": 0.10700000000000001,
+          "height": 0.0074906367041198685
+        },
+        {
+          "text": "'active false",
+          "x": 0.144,
+          "y": 0.9323501872659177,
+          "width": 0.13899999999999998,
+          "height": 0.006086142322097365
+        }
+      ]
+    }
+  ]
+}
