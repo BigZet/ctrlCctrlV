@@ -32,6 +32,17 @@ def test_gui_smoke_checks_parser_and_diagnostics_then_exits_cleanly(tmp_path):
     assert "OCR transport and cancellation checks passed" in result.stdout
 
 
+def test_loopback_ocr_smoke_does_not_depend_on_reverse_dns(monkeypatch):
+    import socket
+    from ctrlcctrlv.smoke import check_ocr_transport
+
+    def unavailable_reverse_dns(*args, **kwargs):
+        raise AssertionError("A numeric loopback smoke server must not need reverse DNS")
+
+    monkeypatch.setattr(socket, "getfqdn", unavailable_reverse_dns)
+    assert check_ocr_transport() is True
+
+
 @pytest.mark.skipif(sys.platform != "win32", reason="Windows credential vault")
 def test_opt_in_gui_smoke_checks_disposable_credentials(tmp_path):
     result = run_smoke("--smoke", "--smoke-credentials", "--data-dir", str(tmp_path),

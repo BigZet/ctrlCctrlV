@@ -1,6 +1,7 @@
 """Explicit smoke checks use synthetic data and a loopback-only HTTP server."""
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+from socketserver import TCPServer
 import threading
 import time
 
@@ -55,6 +56,13 @@ def check_ocr_transport():
     entered, disconnected = threading.Event(), threading.Event()
     failures = []
 
+    class LoopbackHTTPServer(ThreadingHTTPServer):
+        def server_bind(self):
+            # HTTPServer resolves a name here, which can block on macOS CI even
+            # for 127.0.0.1. This synthetic server only needs its numeric address.
+            TCPServer.server_bind(self)
+            self.server_name, self.server_port = self.server_address[:2]
+
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_):
             pass
@@ -74,7 +82,7 @@ def check_ocr_transport():
             self.end_headers()
             self.wfile.write(body)
 
-    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    server = LoopbackHTTPServer(("127.0.0.1", 0), Handler)
     serving = threading.Thread(target=server.serve_forever, daemon=True)
     serving.start()
     operation = Operation()
