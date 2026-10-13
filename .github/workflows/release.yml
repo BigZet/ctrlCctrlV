@@ -1,0 +1,136 @@
+name: Publish verified desktop release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag, for example v0.1.1
+        required: true
+        type: string
+      build_run_id:
+        description: Successful Desktop checks and builds run for this tag's commit
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ inputs.tag }}
+      BUILD_RUN_ID: ${{ inputs.build_run_id }}
+    steps:
+      - name: Validate release inputs
+        shell: bash
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$BUILD_RUN_ID" =~ ^[0-9]+$ ]]
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+          path: source
+          persist-credentials: false
+      - name: Verify successful build belongs to the tagged source
+        shell: bash
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID" > build-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID/jobs?per_page=100" > build-jobs.json
+          python - <<'PY'
+          import json, os, subprocess, tomllib
+          from pathlib import Path
+          tag = os.environ['RELEASE_TAG']
+          version = tomllib.loads(Path('source/pyproject.toml').read_text())['project']['version']
+          sha = subprocess.check_output(['git', '-C', 'source', 'rev-parse', 'HEAD'], text=True).strip()
+          run = json.loads(Path('build-run.json').read_text())
+          assert tag == 'v' + version, 'Tag does not match package version'
+          assert run['head_sha'] == sha, 'Artifacts were built from another commit'
+          assert run['path'] == '.github/workflows/desktop.yml', 'Unexpected build workflow'
+          assert run['event'] in ('push', 'workflow_dispatch'), 'Unexpected build trigger'
+          assert run['head_repository']['full_name'] == os.environ['GITHUB_REPOSITORY']
+          assert run['status'] == 'completed' and run['conclusion'] == 'success'
+          jobs = {job['name']: job['conclusion'] for job in json.loads(Path('build-jobs.json').read_text())['jobs']}
+          assert all(jobs.get(name) == 'success' for name in ('desktop (windows-2022)', 'desktop (macos-15)'))
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              env.write(f'RELEASE_SHA={sha}\n')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.build_run_id }}
+          pattern: ctrlCctrlV-*
+          path: downloaded
+      - name: Verify checksums and prepare release assets
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, os, shutil
+          from pathlib import Path
+          version = os.environ['RELEASE_TAG'][1:]
+          pairs = {
+              f'ctrlCctrlV-{version}-windows-x64-setup.exe': f'ctrlCctrlV-{version}-windows-x64-setup.sha256',
+              'ctrlCctrlV-windows-x64.zip': 'ctrlCctrlV-windows-x64.sha256',
+              f'ctrlCctrlV-{version}-macos-arm64.dmg': f'ctrlCctrlV-{version}-macos-arm64.dmg.sha256',
+          }
+          files = [p for p in Path('downloaded').rglob('*') if p.is_file()]
+          assert len(files) == len(pairs) * 2, 'Missing or unexpected release assets'
+          by_name = {p.name: p for p in files}
+          assert set(by_name) == set(pairs) | set(pairs.values()), 'Asset names differ from the requested version'
+          target = Path('release-assets')
+          target.mkdir()
+          sums = []
+          for binary, checksum in pairs.items():
+              with by_name[binary].open('rb') as stream:
+                  digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+              expected = f'{digest}  {binary}'
+              assert by_name[checksum].read_text().strip() == expected, f'Checksum mismatch: {binary}'
+              sums.append(expected)
+          for path in files:
+              shutil.copy2(path, target / path.name)
+          (target / 'SHA256SUMS.txt').write_text('\n'.join(sums) + '\n')
+          notes = Path(f"source/docs/releases/{os.environ['RELEASE_TAG']}.md").read_text()
+          notes += f"\n## Проверка сборки\n\n[Windows и macOS: тесты и проверка установщиков](https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['BUILD_RUN_ID']}) прошли для коммита `{os.environ['RELEASE_SHA']}`. SHA256 проверены перед публикацией.\n"
+          Path('release-notes.md').write_text(notes)
+          PY
+      - name: Upload draft and publish only when all assets match
+        shell: bash
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,targetCommitish > existing-release.json 2>/dev/null; then
+            python - <<'PY'
+          import json, os
+          from pathlib import Path
+          release = json.loads(Path('existing-release.json').read_text())
+          assert release['isDraft'], 'Refusing to modify an already published release'
+          assert release['targetCommitish'] == os.environ['RELEASE_SHA'], 'Draft targets a different commit'
+          PY
+            gh release upload "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --notes-file release-notes.md
+          else
+            gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --verify-tag --target "$RELEASE_SHA" --draft --title "ctrlCctrlV $RELEASE_TAG" --notes-file release-notes.md
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > uploaded-release.json
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          release = json.loads(Path('uploaded-release.json').read_text())
+          assert release['draft'], 'Release must remain a draft until verification finishes'
+          expected = {}
+          for path in Path('release-assets').iterdir():
+              with path.open('rb') as stream:
+                  expected[path.name] = (path.stat().st_size, 'sha256:' + hashlib.file_digest(stream, 'sha256').hexdigest())
+          assert len(release['assets']) == len(expected) and all(asset['state'] == 'uploaded' for asset in release['assets']), 'Incomplete or extra remote assets'
+          actual = {asset['name']: (asset['size'], asset['digest']) for asset in release['assets']}
+          assert actual == expected, 'Uploaded asset names, sizes or SHA256 digests differ'
+          PY
+          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json url,isDraft,tagName
