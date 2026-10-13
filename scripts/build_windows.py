@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 import uuid
 
@@ -77,14 +78,36 @@ def existing_installation():
         return False
 
 
+def wait_for_uninstall(application, log, timeout=30):
+    """Wait for Inno's temporary child and its open log, not just its launcher."""
+    deadline = time.monotonic() + timeout
+    last_error = None
+    while True:
+        if not application.exists() and not existing_installation():
+            try:
+                # Windows denies deletion while Inno's child still owns the log.
+                # Removing this generated log is also proof that cleanup is safe.
+                log.unlink(missing_ok=True)
+            except PermissionError as error:
+                last_error = error
+            else:
+                return
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError(
+                f"Uninstaller did not finish within {timeout}s; inspect {log.parent}"
+            ) from last_error
+        time.sleep(min(0.1, remaining))
+
+
 def verify_installer(installer):
     """Exercise install, repair/upgrade, frozen smoke and uninstall on a clean runner."""
     if existing_installation():
         raise RuntimeError("Installer verification refuses to replace an existing installation")
     environment = os.environ.copy()
     environment["QT_QPA_PLATFORM"] = "offscreen"
-    with tempfile.TemporaryDirectory(prefix="ctrlcctrlv-installer-check-") as staging:
-        root = Path(staging)
+    root = Path(tempfile.mkdtemp(prefix="ctrlcctrlv-installer-check-"))
+    try:
         application = root / "installed"
         data = root / "profile"
         data.mkdir()
@@ -107,10 +130,17 @@ def verify_installer(installer):
                     str(uninstall), "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART",
                     f"/LOG={root / 'uninstall.log'}",
                 ], check=True, timeout=180)
-        if (application / "ctrlCctrlV.exe").exists() or existing_installation():
+                wait_for_uninstall(application, root / "uninstall.log")
+        if application.exists() or existing_installation():
             raise RuntimeError("The installer verification left application files or registration behind")
         if sentinel.read_text(encoding="utf-8") != "Installer verification data":
             raise RuntimeError("Uninstall did not preserve the application's separate data directory")
+    except Exception:
+        # Preserve evidence, and avoid a cleanup error masking the actual failure.
+        print(f"Installer verification failed; diagnostic files retained in {root}")
+        raise
+    else:
+        shutil.rmtree(root)
     print("Installer install, repair, smoke, uninstall and data preservation verified")
 
 

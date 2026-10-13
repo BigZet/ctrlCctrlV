@@ -90,3 +90,55 @@ def test_compiler_lookup_supports_standard_windows_install(tmp_path, monkeypatch
     monkeypatch.setenv("ProgramFiles(x86)", str(program_files))
     monkeypatch.delenv("ProgramFiles", raising=False)
     assert build_windows.find_inno_compiler() == compiler
+
+
+def test_uninstall_waits_for_child_to_release_log_before_cleanup(tmp_path, monkeypatch):
+    application = tmp_path / "installed"
+    application.mkdir()
+    log = tmp_path / "uninstall.log"
+    log.write_text("Uninstalling", encoding="utf-8")
+    state = {"registered": True, "locked": True, "waits": 0}
+    monkeypatch.setattr(build_windows, "existing_installation", lambda: state["registered"])
+    unlink = Path.unlink
+
+    def sharing_violation(path, *args, **kwargs):
+        if path == log and state["locked"]:
+            raise PermissionError("The uninstaller child still holds this log")
+        return unlink(path, *args, **kwargs)
+
+    def child_progress(_):
+        state["waits"] += 1
+        if state["waits"] == 1:
+            application.rmdir()
+            state["registered"] = False
+        else:
+            state["locked"] = False
+
+    monkeypatch.setattr(Path, "unlink", sharing_violation)
+    monkeypatch.setattr(build_windows.time, "sleep", child_progress)
+    build_windows.wait_for_uninstall(application, log)
+    assert state["waits"] == 2
+    assert not application.exists()
+    assert not log.exists()
+    tmp_path.rmdir()  # The verified scratch tree really is removable now.
+
+
+@pytest.mark.parametrize("unfinished", ["application", "registration", "locked_log"])
+def test_uninstall_timeout_does_not_turn_incomplete_removal_into_success(tmp_path, monkeypatch, unfinished):
+    application = tmp_path / "installed"
+    log = tmp_path / "uninstall.log"
+    log.write_text("Uninstalling", encoding="utf-8")
+    if unfinished == "application":
+        application.mkdir()
+    monkeypatch.setattr(build_windows, "existing_installation", lambda: unfinished == "registration")
+    unlink = Path.unlink
+
+    def sharing_violation(path, *args, **kwargs):
+        if path == log and unfinished == "locked_log":
+            raise PermissionError("The uninstaller child never closed the log")
+        return unlink(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "unlink", sharing_violation)
+    with pytest.raises(TimeoutError, match="Uninstaller did not finish"):
+        build_windows.wait_for_uninstall(application, log, timeout=0)
+    assert log.exists()
