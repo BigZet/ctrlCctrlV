@@ -23,7 +23,7 @@ def settings_window():
 
 
 @pytest.mark.parametrize('index',[0,1,2])
-def test_tab_space_records_each_hotkey_and_escape_restores_binding(settings_window,index):
+def test_tab_space_records_each_hotkey_and_escape_restores_binding(settings_window,index,physical_control_modifier):
     field = (settings_window.capture_hotkey,settings_window.typing_hotkey,settings_window.cancel_hotkey)[index]
     record = settings_window.hotkey_record_buttons[index]
     original = field.text()
@@ -39,7 +39,7 @@ def test_tab_space_records_each_hotkey_and_escape_restores_binding(settings_wind
     field.setFocus()
     QTest.keyClick(field,Qt.Key.Key_Tab)
     QTest.keyClick(record,Qt.Key.Key_Space)
-    QTest.keyClick(field,Qt.Key.Key_K,Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier)
+    QTest.keyClick(field,Qt.Key.Key_K,physical_control_modifier | Qt.KeyboardModifier.AltModifier)
     assert field.text() == 'ctrl+alt+k'
     assert not field.recording
 

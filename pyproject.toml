@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ctrlcctrlv"
-version = "0.1.0"
+version = "0.1.1"
 description = "Local and OpenRouter screen OCR and controlled keyboard transfer for macOS and Windows"
 requires-python = ">=3.11"
 dependencies = [

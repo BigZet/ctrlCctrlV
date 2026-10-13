@@ -1,8 +1,16 @@
 import os
+import sys
 import pytest
 
 # GUI tests must never capture the user's screen or change the real clipboard.
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
+
+
+@pytest.fixture
+def physical_control_modifier():
+    """Qt represents the physical Control key as Meta on macOS."""
+    from PySide6.QtCore import Qt
+    return Qt.KeyboardModifier.MetaModifier if sys.platform == "darwin" else Qt.KeyboardModifier.ControlModifier
 
 
 @pytest.fixture(scope="session", autouse=True)

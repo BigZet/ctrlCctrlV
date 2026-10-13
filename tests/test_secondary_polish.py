@@ -1,6 +1,6 @@
 """User-visible summaries, compact onboarding, and screen bounds."""
 import json
-import sys
+from types import SimpleNamespace
 
 import pytest
 from PySide6.QtCore import QRect
@@ -52,7 +52,10 @@ def test_diagnostics_summary_names_known_model_and_denied_permission(app):
 
 @pytest.mark.parametrize('platform,shown,absent', [('win32', 'CUDA', 'Metal'), ('darwin', 'Metal', 'CUDA')])
 def test_setup_acceleration_is_platform_specific_and_disclosed(app, monkeypatch, platform, shown, absent):
-    monkeypatch.setattr(sys, 'platform', platform)
+    from ctrlcctrlv import ui
+    # Select UI labels without changing the host platform used by native APIs.
+    monkeypatch.setattr(ui, 'sys', SimpleNamespace(platform=platform))
+    monkeypatch.setattr('ctrlcctrlv.hardware.memory_capacity', lambda: (16 * 1024**3, 8 * 1024**3))
     wizard = SetupWizard()
     try:
         wizard.show()

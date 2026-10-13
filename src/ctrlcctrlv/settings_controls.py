@@ -4,7 +4,7 @@ import sys
 from PySide6.QtCore import Qt, Signal, QTimer
 from PySide6.QtWidgets import QComboBox, QLineEdit, QDoubleSpinBox
 
-from .hotkeys import parse_hotkey
+from .hotkeys import KEY_CODES, parse_hotkey
 
 CAPTURE_ACTION_LABEL = 'Распознать область'
 
@@ -84,6 +84,10 @@ class HotkeyEdit(QLineEdit):
             return
         if event.isAutoRepeat():
             return
+        if event.key() in (Qt.Key.Key_Shift, Qt.Key.Key_Control, Qt.Key.Key_Meta, Qt.Key.Key_Alt,
+                           Qt.Key.Key_AltGr, Qt.Key.Key_CapsLock, Qt.Key.Key_NumLock, Qt.Key.Key_ScrollLock):
+            # Cocoa flagsChanged may use native keyCode 0; it is not the A key.
+            return
         # Qt swaps Control and Meta to follow native macOS menu conventions.
         control = Qt.KeyboardModifier.MetaModifier if sys.platform == "darwin" else Qt.KeyboardModifier.ControlModifier
         meta = Qt.KeyboardModifier.ControlModifier if sys.platform == "darwin" else Qt.KeyboardModifier.MetaModifier
@@ -95,6 +99,12 @@ class HotkeyEdit(QLineEdit):
         if sys.platform == "win32" and 0x30 <= event.nativeVirtualKey() <= 0x39:
             key = event.nativeVirtualKey()
         name = "esc" if key == Qt.Key.Key_Escape else chr(key).lower() if 0x30 <= key <= 0x5a else ""
+        if sys.platform == "darwin" and event.nativeModifiers():
+            # Cocoa's key is layout/Shift dependent; registration uses physical
+            # keyCodes. Native modifiers distinguish A (code 0) from synthetic
+            # Qt events with no native metadata, which must keep the Qt key.
+            name = next((name for name, code in KEY_CODES.items()
+                         if code == event.nativeVirtualKey()), "")
         value = "+".join(parts + [name])
         try:
             parse_hotkey(value)

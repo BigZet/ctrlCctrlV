@@ -69,11 +69,11 @@ def test_preview_sync_save_visibility_and_permissions(window):
     assert window.permissions_toggle.isChecked()
 
 
-def test_hotkey_capture_keeps_portable_validator_compatible_text(window):
+def test_hotkey_capture_keeps_portable_validator_compatible_text(window, physical_control_modifier):
     from ctrlcctrlv.hotkeys import parse_hotkey
     field = window.capture_hotkey
     field.start_recording()
-    QTest.keyClick(field, Qt.Key.Key_K, Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier)
+    QTest.keyClick(field, Qt.Key.Key_K, physical_control_modifier | Qt.KeyboardModifier.AltModifier)
     assert parse_hotkey(field.text()) == (frozenset({'ctrl', 'alt'}), 'k')
     field.start_recording()
     QTest.keyClick(field, Qt.Key.Key_Escape)
@@ -138,7 +138,9 @@ def test_quick_preview_fits_next_to_format_at_minimum_window_size(window):
     window.resize(820, 620)
     window.show()
     QApplication.processEvents()
-    assert abs(window.quick_preview.geometry().center().y() - window.capture_format.geometry().center().y()) < 4
+    preview_center = window.quick_preview.mapTo(window, window.quick_preview.rect().center())
+    format_center = window.capture_format.mapTo(window, window.capture_format.rect().center())
+    assert abs(preview_center.y() - format_center.y()) < 4
     assert window.quick_preview.width() >= window.quick_preview.sizeHint().width()
     window.close()
 

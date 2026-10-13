@@ -17,6 +17,7 @@ from .catalog import MODELS
 from .theme import fit_window_to_screen
 from .workspace_painting import HistoryItemDelegate, navigation_icon
 from .workspace_layouts import AdaptiveRow
+from . import __version__
 
 
 from .model_picker import DETAIL_ROLE, ModelPicker
@@ -580,7 +581,7 @@ class SettingsWindow(BaseSettingsWindow):
         for widget in (self.action_hint, self.typing_hint, self.tray_hint):
             widget.setParent(self)
             widget.hide()
-        rail_layout.addWidget(label("v0.1", "muted"))
+        rail_layout.addWidget(label(f"v{__version__}", "muted"))
         root.addWidget(rail)
         main = QVBoxLayout()
         main.setContentsMargins(24, 24, 24, 20)
@@ -625,7 +626,7 @@ class SettingsWindow(BaseSettingsWindow):
         self.capture_format.setMaximumWidth(180)
         self.quick_preview = QCheckBox("Показывать результат")
         self.quick_preview.setChecked(settings.show_preview)
-        self.work_format_row = AdaptiveRow(workspace_row(label("Результат"), self.capture_format), self.quick_preview, spacing=12)
+        self.work_format_row = AdaptiveRow(workspace_row(label("Результат"), self.capture_format), workspace_row(self.quick_preview), spacing=12)
         capture_layout.addWidget(self.work_format_row)
         self.capture_button = button(CAPTURE_ACTION_LABEL, self.capture_requested, True)
         self.capture_button.setProperty("workAction", True)

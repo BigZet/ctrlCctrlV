@@ -1,8 +1,11 @@
 # Build on the target OS; no cross compilation.
 import os
 import sys
+import tomllib
+from pathlib import Path
 from PyInstaller.utils.hooks import collect_submodules, collect_all
 
+version = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
 signing_identity = os.environ.get("CTRLC_CODESIGN_IDENTITY") or None
 
 hidden = []
@@ -41,7 +44,7 @@ if sys.platform == "darwin":
         coll, name="ctrlCctrlV.app", bundle_identifier="local.ctrlcctrlv.desktop",
         icon="src/ctrlcctrlv/assets/app.icns",
         info_plist={
-            "CFBundleShortVersionString": "0.1.0", "CFBundleVersion": "1",
+            "CFBundleShortVersionString": version, "CFBundleVersion": version,
             "LSMinimumSystemVersion": "14.0", "LSUIElement": False,
             "NSHighResolutionCapable": True,
             "NSScreenCaptureUsageDescription": "Выделение области экрана для распознавания текста.",

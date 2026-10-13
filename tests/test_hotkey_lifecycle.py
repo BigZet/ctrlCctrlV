@@ -13,7 +13,8 @@ from ctrlcctrlv.ui_state import UiState
 
 
 class ShortcutPlatform:
-    def __init__(self):
+    def __init__(self, control_modifier):
+        self.control_modifier = control_modifier
         self.registrations = []
         self.active_bindings = {}
         self.callback = None
@@ -39,15 +40,15 @@ class ShortcutPlatform:
             self.callback("capture")
         else:
             QTest.keyClick(widget, Qt.Key.Key_4,
-                           Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier)
+                           self.control_modifier | Qt.KeyboardModifier.AltModifier)
 
 
 @pytest.fixture
-def controller(tmp_path):
+def controller(tmp_path, physical_control_modifier):
     app = QApplication.instance() or QApplication([])
     Settings(capture_hotkey="ctrl+alt+4", typing_hotkey="ctrl+alt+v",
              cancel_hotkey="ctrl+alt+esc").save(tmp_path)
-    adapter = ShortcutPlatform()
+    adapter = ShortcutPlatform(physical_control_modifier)
     c = Controller(app, tmp_path, platform_adapter=adapter, native=False)
     yield c
     c.shutting_down = True
@@ -146,12 +147,12 @@ def test_resume_waits_until_every_recorder_has_finished(controller):
     assert len(c.platform.registrations) == 2
 
 
-def test_new_chord_is_registered_only_after_settings_are_saved(controller):
+def test_new_chord_is_registered_only_after_settings_are_saved(controller, physical_control_modifier):
     c = controller
     field = c.window.capture_hotkey
     field.start_recording()
     QTest.keyClick(field, Qt.Key.Key_9,
-                   Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier)
+                   physical_control_modifier | Qt.KeyboardModifier.AltModifier)
     c.app.processEvents()
     assert field.text() == "ctrl+alt+9"
     assert c.platform.active_bindings["capture"] == "ctrl+alt+4"
