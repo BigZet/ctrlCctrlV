@@ -118,12 +118,13 @@ jobs:
           else
             gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --verify-tag --target "$RELEASE_SHA" --draft --title "ctrlCctrlV $RELEASE_TAG" --notes-file release-notes.md
           fi
-          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > uploaded-release.json
+          # The REST tag endpoint excludes drafts; gh resolves the draft by tag.
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,assets > uploaded-release.json
           python - <<'PY'
           import hashlib, json
           from pathlib import Path
           release = json.loads(Path('uploaded-release.json').read_text())
-          assert release['draft'], 'Release must remain a draft until verification finishes'
+          assert release['isDraft'], 'Release must remain a draft until verification finishes'
           expected = {}
           for path in Path('release-assets').iterdir():
               with path.open('rb') as stream:
