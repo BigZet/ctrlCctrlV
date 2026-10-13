@@ -1,0 +1,205 @@
+{
+  "date": "2026-10-12",
+  "goal": "Полностью просмотри весь интерфейс приложения и предложи улучшения по интерфейсу",
+  "restart": {
+    "exe": "artifacts/builds/windows-save-file/dist/ctrlCctrlV/ctrlCctrlV.exe",
+    "pid": 51260,
+    "responding": true,
+    "profile": "Default, matching previous live command line"
+  },
+  "method": "Native Windows app observation, fresh Qt renders from current working tree, source inspection of controls and conditional states. No product code changes.",
+  "scope": [
+    {
+      "area": "Работа",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-work.png",
+        "artifacts/ui-audit-current/light-work.png"
+      ],
+      "proposal": "Сократить высоту карточек; добавить быстрый переключатель предпросмотра рядом с форматом результата; подписи горячих клавиш привести к Ctrl + Alt + 4."
+    },
+    {
+      "area": "Модели",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-models.png",
+        "artifacts/ui-audit-current/light-models.png",
+        "artifacts/ui-audit-current/extra-download-busy.png"
+      ],
+      "proposal": "Сохранить таблицу и групповые кнопки. Удаление недоступных моделей скрыть или явно приглушить; переносить прогресс скачивания в строку; показывать количество выбранных моделей и сумму загрузки в действии/подсказке."
+    },
+    {
+      "area": "Вычисления",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-hardware.png",
+        "artifacts/ui-audit-current/extra-hardware-bottom.png"
+      ],
+      "proposal": "При раскрытии показывать настройки без ручного поиска ниже прокрутки; убрать повтор заголовка; не показывать кнопку сохранения без изменений."
+    },
+    {
+      "area": "Настройки OCR",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-configuration.png",
+        "artifacts/ui-audit-current/light-configuration.png",
+        "artifacts/ui-audit-current/dark-cloud.png",
+        "artifacts/ui-audit-current/extra-cloud-bottom.png",
+        "artifacts/ui-audit-current/extra-no-preview.png"
+      ],
+      "proposal": "При выборе OpenRouter показывать подключение/API-ключ до выбора модели; сохранять скрытие уточнения при выключенном предпросмотре. Сократить повторяющиеся карточки и общие статусы."
+    },
+    {
+      "area": "Ввод текста",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-typing.png"
+      ],
+      "proposal": "Базовый выбор скорости с расширенными задержками; целые миллисекунды без .00; сохранение ручной настройки и автоотступов."
+    },
+    {
+      "area": "Система",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-system.png",
+        "artifacts/ui-audit-current/light-system.png",
+        "artifacts/ui-audit-current/extra-permissions-needed.png"
+      ],
+      "proposal": "Запись сочетания нажатием клавиш вместо строки; сведения о доступах свернуть при отсутствии проблем."
+    },
+    {
+      "area": "Предпросмотр текста",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-preview.png",
+        "artifacts/ui-audit-current/dark-edited.png",
+        "artifacts/ui-audit-current/dark-context.png",
+        "artifacts/ui-audit-current/dark-checking.png",
+        "artifacts/ui-audit-current/dark-syntax-warning.png",
+        "artifacts/ui-audit-current/light-preview.png"
+      ],
+      "proposal": "Убрать повтор состояния правок, не уменьшать редактор при появлении статуса; возврат исходного текста убрать в меню. Добавить масштаб снимка и возможность скрыть его. Синтаксическую ошибку привязать к строке."
+    },
+    {
+      "area": "Вид редактора",
+      "evidence": [
+        "artifacts/ui-audit-current/extra-editor-view.png"
+      ],
+      "proposal": "Оставить компактное меню; показывать флажки у переключателей, а не только цвет активного текста."
+    },
+    {
+      "area": "Исправления",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-review.png",
+        "artifacts/ui-audit-current/light-review.png"
+      ],
+      "proposal": "Заменить технический unified diff на Было/Стало с выделением изменённых символов, сохранить выбор отдельных изменений и технический вид как опцию."
+    },
+    {
+      "area": "Таблицы",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-csv-preview.png",
+        "artifacts/ui-audit-current/dark-csv-edited.png",
+        "artifacts/ui-audit-current/light-csv-preview.png"
+      ],
+      "proposal": "Сохранить отдельные CSV/XLSX кнопки; сделать первую строку заголовком только по явному переключателю, добавить копирование/вставку диапазонов и заметную активную ячейку, не менять исходные значения."
+    },
+    {
+      "area": "Сохранение файлов",
+      "evidence": [],
+      "proposal": "Сохранить системный Save As и угаданное расширение. Добавить Ctrl/Cmd+S, запоминание последнего каталога и отличимые имена файлов. Проверено по choose_text_path/choose_export_path и текущим тестам; системный диалог отдельно не фотографировался."
+    },
+    {
+      "area": "Выбор модели",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-model-chooser.png",
+        "artifacts/ui-audit-current/dark-model-chooser-empty.png"
+      ],
+      "proposal": "Сохранить поиск и таблицу; добавить фильтр Скачанные/избранные; в цене явно указывать токены; у нескачанной локальной модели показать действие перехода к установке."
+    },
+    {
+      "area": "Импорт модели",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-add-model.png",
+        "artifacts/ui-audit-current/extra-add-found.png",
+        "artifacts/ui-audit-current/extra-add-error.png",
+        "artifacts/ui-audit-current/light-add-model.png"
+      ],
+      "proposal": "Начинать со ссылки; технические файлы и протокол показывать после поиска под Дополнительно, сохраняя ручной выбор."
+    },
+    {
+      "area": "История",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-history.png",
+        "artifacts/ui-audit-current/dark-history-populated.png",
+        "artifacts/ui-audit-current/extra-history-no-matches.png"
+      ],
+      "proposal": "У пустого поиска заголовок Ничего не найдено; скрыть недоступные действия; добавить открытие в полноценном редакторе/сохранение и группы Сегодня/Вчера."
+    },
+    {
+      "area": "Первый запуск",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-setup.png",
+        "artifacts/ui-audit-current/dark-setup-local.png",
+        "artifacts/ui-audit-current/dark-setup-cloud.png"
+      ],
+      "proposal": "Заменить пустую вторую страницу с инструкцией непосредственным действием Скачать модель/Подключить OpenRouter; показывать актуальное для ОС обозначение ускорения."
+    },
+    {
+      "area": "Захват и индикатор",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-selection.png",
+        "artifacts/ui-audit-current/dark-indicator.png"
+      ],
+      "proposal": "Сохранить компактный индикатор полоса+время и рамку выделения. Убрать постоянную инструкцию выделения после знакомства; предлагать коррекцию рамки перед подтверждением как необязательный режим."
+    },
+    {
+      "area": "Ошибки и длительные операции",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-ocr-retry.png",
+        "artifacts/ui-audit-current/dark-ocr-slow.png",
+        "artifacts/ui-audit-current/extra-download-busy.png"
+      ],
+      "proposal": "Ошибка у соответствующего действия и Повторить; технические подробности по раскрытию. В индикаторе не возвращать большие текстовые плашки; не выводить внутреннюю цель времени."
+    },
+    {
+      "area": "Диагностика",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-diagnostics.png"
+      ],
+      "proposal": "Сохранить подробный отчёт вне рабочего экрана; добавить краткое состояние и сохранение отчёта в файл."
+    },
+    {
+      "area": "Трей",
+      "evidence": [],
+      "proposal": "Сверено по Controller._create_tray: унифицировать Распознать область, показать горячие клавиши и включать Остановить только при операции; отделить Выход разделителем."
+    },
+    {
+      "area": "Визуальная система",
+      "evidence": [
+        "artifacts/ui-audit-current/dark-models.png",
+        "artifacts/ui-audit-current/light-models.png",
+        "artifacts/ui-audit-current/light-preview.png",
+        "artifacts/ui-audit-current/light-system.png"
+      ],
+      "proposal": "Унифицировать поля/кнопки/отступы, уменьшить вложенность рамок, поправить disabled danger styling; сохранить обе темы, одну основную кнопку и клавиатурный фокус."
+    }
+  ],
+  "scale_150_inspected": [
+    "dark-preview",
+    "dark-models",
+    "light-configuration",
+    "dark-setup",
+    "dark-model-chooser"
+  ],
+  "scale_150_directory": "artifacts/ui-audit-150",
+  "priorities": [
+    "Preview space and readable refinement comparison",
+    "Model action states and progress",
+    "Cloud setup and onboarding",
+    "History and keyboard ergonomics",
+    "Styling consistency"
+  ],
+  "limitations": [
+    "Native macOS not inspected",
+    "OS Save As and tray menus inspected in source; OS-rendered menus were not visually exercised",
+    "Model/download/error states use synthetic data, not paid API calls"
+  ],
+  "paid_api_calls": 0,
+  "user_settings_modified": false,
+  "implementation_requested": false,
+  "completion_audit": "All application-defined screens, dialogs, menus and major conditional states mapped to observations or source. Concrete proposals recorded for each area. Review complete; implementation is a separate step."
+}

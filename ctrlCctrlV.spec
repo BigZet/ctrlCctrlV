@@ -1,17 +1,21 @@
 # Build on the target OS; no cross compilation.
 import os
 import sys
-from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import collect_submodules, collect_all
 
 signing_identity = os.environ.get("CTRLC_CODESIGN_IDENTITY") or None
 
 hidden = []
+format_datas, format_binaries, format_hidden = collect_all("clang_format")
+hidden += format_hidden
+hidden += collect_submodules("black")
+hidden += collect_submodules("pygments.lexers")
 for package in (("Quartz", "ApplicationServices", "keyring.backends") if sys.platform == "darwin" else ("keyring.backends",)):
     hidden += collect_submodules(package)
 
 a = Analysis(
     ["scripts/launch.py"], pathex=["src"],
-    binaries=[], datas=[("THIRD_PARTY.md", "."), ("src/ctrlcctrlv/assets", "ctrlcctrlv/assets")],
+    binaries=format_binaries, datas=format_datas + [("THIRD_PARTY.md", "."), ("src/ctrlcctrlv/assets", "ctrlcctrlv/assets")],
     hiddenimports=hidden,
     excludes=["pytest", "tkinter", "PySide6.QtNetwork", "PySide6.QtSql", "PySide6.QtTest"],
 )

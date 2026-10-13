@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-12",
+  "scope": "Full accepted UI implementation plan",
+  "tests": {
+    "command": ".venv/Scripts/python.exe -m pytest -q",
+    "passed": 433,
+    "seconds": 19.13,
+    "exit_code": 0
+  },
+  "build": {
+    "command": ".venv/Scripts/python.exe -m scripts.build_windows --output artifacts/builds/windows-ui-complete",
+    "exit_code": 0,
+    "package": "artifacts\\builds\\windows-ui-complete\\ctrlCctrlV-windows-x64.zip",
+    "bytes": 47242496,
+    "sha256": "8a56ad1feb39a24f9e574c8488126d854d42bde6c8d898bdb8f156769ec67bab",
+    "frozen_smoke": {
+      "passed": true,
+      "includes": [
+        "GUI",
+        "syntax",
+        "diagnostics",
+        "loopback OCR",
+        "transport cancellation",
+        "formatters",
+        "text CSV XLSX exports",
+        "disposable Windows credential"
+      ]
+    }
+  },
+  "visual": {
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "scales": [
+      100,
+      150,
+      200
+    ],
+    "sizes": [
+      "normal",
+      "minimum"
+    ],
+    "path": "artifacts/ui-complete",
+    "additional_import_states": "artifacts/ui-workspace-polish/100/import-*.png",
+    "review": "Independent review completed; three material issues fixed and rechecked"
+  },
+  "restart": {
+    "old_pid": 51260,
+    "new_pid": 49232,
+    "profile": "C:\\Users\\bigze\\AppData\\Local\\ctrlCctrlV",
+    "same_profile": true,
+    "settings_and_history_unchanged": {
+      "history.sqlite3": true,
+      "settings.json": true
+    },
+    "pre_restart_open_windows": [
+      "SettingsWindow, Models page, Save disabled"
+    ],
+    "unsaved_result_window_open": false,
+    "new_window": "ctrlCctrlV, work page visible and responding"
+  },
+  "paid_model_calls": 0,
+  "macos_native_verification": "not performed; requires Mac",
+  "regressions": [
+    "Direct OCR calls only primary model, copies result, no refinement without manual preview action",
+    "Review selection and cancelled/stale results",
+    "TSV rectangles and one-step undo",
+    "Literal exports and last successful directory",
+    "Immutable history and no image/refinement in history editor",
+    "Model filters and cancelled/stale queues",
+    "Recorded shortcuts temporarily unregister global bindings and reject stale events",
+    "Old settings and separate corrupt UI-state recovery"
+  ]
+}

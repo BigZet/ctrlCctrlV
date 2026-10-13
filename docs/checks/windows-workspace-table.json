@@ -1,0 +1,10 @@
+{
+  "model": "lightonocr-3-0.8b",
+  "fixture": "synthetic table only, font visually verified",
+  "acceleration": "gpu",
+  "elapsed_seconds": 0.609,
+  "csv_exact": true,
+  "rows": 4,
+  "raw_format": "LightOn wrapped Markdown with structural annotations",
+  "invalid_fixture_attempts_excluded": true
+}

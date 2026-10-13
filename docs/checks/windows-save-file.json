@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-12",
+  "platform": "Windows x64",
+  "tests": {
+    "passed": 335,
+    "seconds": 13.7,
+    "exit_code": 0,
+    "log": "artifacts/save-file-pytest.log"
+  },
+  "package": "artifacts/builds/windows-save-file/ctrlCctrlV-windows-x64.zip",
+  "sha256": "1c78109d70715b8ae0217168bd97735a800063dc3fcce7a07644c77f63e90d78",
+  "build_exit_code": 0,
+  "frozen_smoke": "passed, including UTF-8 text, CSV and XLSX saves",
+  "renders": [
+    "artifacts/ui-save-file"
+  ],
+  "visual_review": "Compact dark/light preview inspected; save button fits in result header.",
+  "independent_review": "Read-only review found no substantial issues.",
+  "scenarios": [
+    "Non-table preview shows Save As; table preview keeps only CSV/XLSX exports",
+    "Native QFileDialog defaults to content-derived extension; explicit editor language takes priority",
+    "Python, SQL, Java, JSON, JavaScript, HTML, XML, TOML and Markdown detection; unknown text defaults to txt",
+    "Default py suffix added when filename has no extension; custom extension remains unchanged",
+    "Current edits saved literally as UTF-8; indentation, whitespace and newlines preserved",
+    "Cancel/error preserve preview and clipboard; failed replacement preserves previous file",
+    "Empty text disables save"
+  ],
+  "paid_api_calls": 0,
+  "native_macos_verified": false,
+  "running_session": "Existing user session was not restarted; new build saved separately."
+}

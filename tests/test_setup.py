@@ -24,20 +24,27 @@ def controller(tmp_path):
 
 
 @pytest.mark.parametrize("provider,acceleration", [("local", "cpu"), ("openrouter", "gpu")])
-def test_first_run_persists_explicit_mode_without_install_or_credentials(controller, provider, acceleration):
+def test_first_run_downloads_or_connects_only_after_explicit_finish(controller, provider, acceleration):
     c = controller
-    c.run_job = lambda *args, **kwargs: pytest.fail("Setup must not download or run OCR")
-    c.credentials.write = lambda *args: pytest.fail("Setup must not write an API key")
+    calls = []
+    c.run_job = lambda *args, **kwargs: pytest.fail("No OCR or implicit jobs during setup")
+    c.install = lambda: calls.append("download")
+    c.refresh_catalog = lambda: calls.append("catalog")
+    c.credentials.write = lambda value: calls.append(("key", value))
     c.show_startup()
     wizard = c.setup_wizard
     wizard.provider.setCurrentIndex(wizard.provider.findData(provider))
     wizard.acceleration.setCurrentIndex(wizard.acceleration.findData(acceleration))
     wizard.next()
+    assert calls == []
+    if provider == "openrouter":
+        wizard.key.setText("synthetic-onboarding-key")
     wizard.accept()
     saved = Settings.load(c.directory)
     assert saved.provider == provider and saved.acceleration == acceleration
     assert not c.first_run and c.window.isVisible()
     assert not c.runtime.ready
+    assert calls == (["download"] if provider == "local" else [("key", "synthetic-onboarding-key"), "catalog"])
 
 
 def test_deferred_setup_does_not_write_preferences(controller):

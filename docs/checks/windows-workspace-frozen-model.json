@@ -1,0 +1,9 @@
+{
+  "exe_sha256": "a40b70f7c79809de359206d3916c99370d059c97ae1377a689899797abc6d9ad",
+  "model": "lightonocr-3-0.8b",
+  "acceleration": "gpu",
+  "elapsed_seconds": 4.0,
+  "exit_code": 0,
+  "passed": true,
+  "scope": "frozen model preparation, not OCR latency"
+}

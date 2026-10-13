@@ -1,0 +1,122 @@
+{
+  "date": "2026-10-12",
+  "kind": "screenshot-based visual critique; no product implementation",
+  "report": "docs/PROJECT_AUDIT_2026-10-12.md",
+  "finding_ids": [
+    "VIS-01",
+    "VIS-02",
+    "VIS-03",
+    "VIS-04",
+    "VIS-05",
+    "VIS-06",
+    "VIS-07",
+    "VIS-08",
+    "VIS-09",
+    "VIS-10",
+    "VIS-11",
+    "VIS-12",
+    "VIS-13",
+    "VIS-14",
+    "VIS-15",
+    "VIS-16",
+    "VIS-17",
+    "VIS-18",
+    "VIS-19",
+    "VIS-20",
+    "VIS-21",
+    "VIS-22",
+    "VIS-23",
+    "VIS-24",
+    "VIS-25"
+  ],
+  "native_windows_states": [
+    "Work",
+    "Models",
+    "Compute expanded",
+    "OCR settings",
+    "Model chooser",
+    "Typing",
+    "Typing expanded",
+    "System",
+    "Diagnostics"
+  ],
+  "native_screenshots": [
+    {
+      "path": "artifacts/ui-visual-review/native/01-work.jpg",
+      "sha256": "37d332e644d48c46b03289526dbca8fa2895d3f9854c9fd4c668f171c71bf301"
+    },
+    {
+      "path": "artifacts/ui-visual-review/native/02-models.jpg",
+      "sha256": "dd1acaa59acce284f78bc8a564452f2052e522660b523aef2a30801893a1c61e"
+    },
+    {
+      "path": "artifacts/ui-visual-review/native/03-compute-expanded.jpg",
+      "sha256": "1b17e545e92fc8abaa7f0854223452e85fed9b9c6529473e9e70aaf3fbb7b175"
+    },
+    {
+      "path": "artifacts/ui-visual-review/native/04-settings.jpg",
+      "sha256": "41ed61229fd2dc198ca69d70a3040973084a4e89f388575e1a833c0ec7ba3e81"
+    },
+    {
+      "path": "artifacts/ui-visual-review/native/05-model-picker-1.jpg",
+      "sha256": "97540e3ae13b6f348ed69d2ced10c84851a8bdcfdbe9fbec50f7502d0527e1ad"
+    },
+    {
+      "path": "artifacts/ui-visual-review/native/05-model-picker.jpg",
+      "sha256": "f9afe7644aef5eed2934401c0873e3e18cea0321182a5951625d9d07a8b72dc1"
+    },
+    {
+      "path": "artifacts/ui-visual-review/native/06-typing.jpg",
+      "sha256": "eb7c3e9faf1ff36d69043d51785fe688448990e6021886510a542c26c6c6eb0d"
+    },
+    {
+      "path": "artifacts/ui-visual-review/native/07-typing-expanded.jpg",
+      "sha256": "6d6822c6df5bf907c540c43d8fe9e64c7ce62bf2c9309c92b477e9e023656f52"
+    },
+    {
+      "path": "artifacts/ui-visual-review/native/08-system.jpg",
+      "sha256": "badf95ae145570074c9a8cc6bec471ba61c7cd4c469864ff2bff09f73b9d161e"
+    },
+    {
+      "path": "artifacts/ui-visual-review/native/09-diagnostics-1.jpg",
+      "sha256": "745288253d9d5710ae063268a752044a4b11a051c233bdf6f904e7300240aed9"
+    },
+    {
+      "path": "artifacts/ui-visual-review/native/09-diagnostics.jpg",
+      "sha256": "f35adb0a13fcf4a0e2ad631285bcf54721eed67a3f3aafa5eec93f8592c8c3d0"
+    }
+  ],
+  "synthetic_fresh_render_folders": [
+    "artifacts\\ui-visual-review\\normal",
+    "artifacts\\ui-visual-review\\compact",
+    "artifacts\\ui-visual-review\\150",
+    "artifacts\\ui-visual-review\\200",
+    "artifacts\\ui-visual-review\\workspace-extra"
+  ],
+  "review_method": "Direct visual inspection of selected current Windows app captures and Qt widget PNGs by root and two independent agents; layout/source inspection only after viewing.",
+  "evidence_limits": [
+    "Synthetic data for preview/review/history/first-run/error/download states",
+    "Cursor glow and certain scripted status strings excluded from product findings",
+    "Images generated are not all claimed individually inspected",
+    "Native macOS not inspected"
+  ],
+  "native_state_count": 9,
+  "native_image_count": 11,
+  "visual_findings": 25,
+  "geometry_probe": "artifacts\\ui-visual-review\\history-geometry.json",
+  "geometry_probe_exit_code": 0,
+  "independent_notes": [
+    "artifacts\\ui-visual-review\\preview-findings.md",
+    "artifacts\\ui-visual-review\\workspace-findings.md"
+  ],
+  "paid_model_calls": 0,
+  "product_code_changed": false,
+  "user_settings_values_edited": false,
+  "high_priority_next": [
+    "Recover editor area",
+    "Adapt comparison",
+    "Fix clipped history action",
+    "Keep Models actions visible when settings expand",
+    "Unify alignment and control geometry"
+  ]
+}

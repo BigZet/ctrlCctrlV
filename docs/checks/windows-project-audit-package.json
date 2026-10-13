@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-12",
+  "scope": "Independent verification of the extracted final Windows ZIP",
+  "package": "artifacts/builds/windows-project-audit/ctrlCctrlV-windows-x64.zip",
+  "bytes": 47246636,
+  "sha256": "d67e9209be00dbd5cd3ec5f8eba9cf270409fe8567d12ee7a0d80d2433d21089",
+  "sidecar_sha256": "d67e9209be00dbd5cd3ec5f8eba9cf270409fe8567d12ee7a0d80d2433d21089",
+  "sidecar_matches": true,
+  "zip_crc_valid": true,
+  "smoke": {
+    "arguments": ["--smoke", "--data-dir", "<unique temporary profile>"],
+    "exit_code": 0,
+    "non_repository_cwd": true,
+    "path_only_system32": true,
+    "unicode_space_paths": true,
+    "python_qt_venv_settings_removed": true,
+    "qt_platform": "offscreen",
+    "credentials_check_requested": false,
+    "stdout": "GUI, background syntax and diagnostics checks passed\nOCR transport and cancellation checks passed\nPython, SQL, Java and JSON formatter checks passed\nText, CSV and XLSX export checks passed\n",
+    "stderr": ""
+  },
+  "external_ocr_calls": 0,
+  "macos_native_verification": "not performed"
+}

@@ -167,11 +167,24 @@ class ReviewProvider:
         if self.provider.mode != "json":
             raise ValueError("Проверка требует vision-модель с текстовыми инструкциями")
 
-    def inspect(self, png, original, operation=None, transport=None):
+    def inspect(self, png, original, operation=None, transport=None, *, details="", format_mode="text"):
         operation = operation or Operation(budget=30)
         started = time.monotonic()
-        proposed = self.provider.recognize(png, operation, transport,
-                                          prompt=REVIEW_PROMPT, context={"transcription": original})
+        if not isinstance(details, str) or len(details) > 8192:
+            raise ValueError("Контекст проверки должен быть не длиннее 8192 символов")
+        context = {"transcription": original}
+        if details.strip():
+            context["user_context"] = details.strip()
+        prompt = REVIEW_PROMPT
+        if format_mode == "csv":
+            prompt += (" The transcription is CSV. Return the corrected table as comma-delimited RFC 4180 CSV "
+                       "inside the text field. Preserve row order, column order and empty cells. "
+                       "Quote cells containing commas, double quotes or line breaks; escape embedded double quotes. "
+                       "Do not output a Markdown or HTML table or calculate totals.")
+        proposed = self.provider.recognize(png, operation, transport, prompt=prompt, context=context)
+        if format_mode == "csv":
+            from .table_ocr import table_result
+            proposed = table_result(proposed)
         operation.check()
         if original.strip() and not proposed.strip():
             raise OperationError("Модель проверки вернула пустой текст. Исходный текст сохранён.")

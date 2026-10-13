@@ -8,6 +8,36 @@ from .core import Cancelled, Operation
 from .ocr import OCRProvider
 
 
+def check_formatters():
+    from .formatting import format_text
+    cases = {"python": "x=1\n", "sql": "select a,b from t;", "java": "class X{int x=1;}", "json": '{"x":1,"x":2}'}
+    return all(format_text(text, language) != text for language, text in cases.items())
+
+
+def check_table_exports():
+    import csv
+    from pathlib import Path
+    import tempfile
+    from zipfile import ZipFile
+    from .table_export import export_table
+    from .text_export import save_text, suggest_extension
+    with tempfile.TemporaryDirectory(prefix="ctrlc-export-smoke-") as directory:
+        code = '    print("Привет")  \n'
+        if suggest_extension(code) != "py":
+            return False
+        text_file = save_text(Path(directory) / "code.py", code)
+        if text_file.read_bytes() != code.encode("utf-8"):
+            return False
+        source = 'Товар,Код\n"Папка, А4",00123\n'
+        csv_file = export_table(Path(directory) / "table.csv", source, "csv")
+        with csv_file.open(encoding="utf-8-sig", newline="") as stream:
+            if list(csv.reader(stream)) != [["Товар", "Код"], ["Папка, А4", "00123"]]:
+                return False
+        xlsx_file = export_table(Path(directory) / "table.xlsx", source, "xlsx")
+        with ZipFile(xlsx_file) as package:
+            return package.testzip() is None and b"00123" in package.read("xl/sharedStrings.xml")
+
+
 def check_credentials():
     """Opt-in check against a disposable service; never reads the app's key."""
     import uuid

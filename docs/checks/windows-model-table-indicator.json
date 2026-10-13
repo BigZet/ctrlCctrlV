@@ -1,0 +1,12 @@
+{
+  "foreground_preserved": true,
+  "visible": true,
+  "size": [
+    208,
+    36
+  ],
+  "progress": 35,
+  "elapsed": "00:01",
+  "native_platform": "windows",
+  "timer_stopped_when_hidden": true
+}

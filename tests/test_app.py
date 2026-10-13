@@ -55,21 +55,25 @@ def wait(app, condition, timeout=2):
 
 
 class Provider:
+    local = True
     model = "test"
 
-    def recognize(self, png, operation):
+    def recognize(self, png, operation, **kwargs):
         assert png.startswith(b"\x89PNG")
         return '    print("Ж")\n\n'
 
 
 @pytest.mark.parametrize("preview_enabled", [True, False])
-def test_full_ui_flow_publishes_literal_result_on_main_thread(app, tmp_path, preview_enabled):
+def test_full_ui_flow_publishes_literal_result_on_main_thread(app, tmp_path, preview_enabled, monkeypatch):
+    from ctrlcctrlv.review import ReviewProvider
+    monkeypatch.setattr(ReviewProvider, "inspect", lambda *a, **k: pytest.fail("Refinement must only run on explicit request"))
     c = Controller(app, tmp_path, native=False)
     c.window.show_preview.setChecked(preview_enabled)
     if not preview_enabled:
         assert Settings.load(tmp_path).show_preview is False
         c.preview.show()  # A previously open result must not linger in direct-copy mode.
     c.provider = lambda: Provider()
+    c.review_runtime.start = lambda *a, **k: pytest.fail("First OCR must not prepare a refinement model")
     original_complete = c.ocr_complete
     def complete(*args):
         assert QThread.currentThread() == app.thread()
@@ -99,7 +103,7 @@ def test_cancel_ignores_late_success_and_error(app, tmp_path):
     release = threading.Event()
 
     class SlowProvider(Provider):
-        def recognize(self, png, operation):
+        def recognize(self, png, operation, **kwargs):
             release.wait(1)
             return "late result"
 
@@ -156,7 +160,10 @@ def test_expired_result_does_not_overwrite_clipboard(app, tmp_path):
     app.clipboard().setText("keep this")
     c.ocr_complete(op, QImage(), Provider(), "late")
     assert app.clipboard().text() == "keep this"
-    assert "4 секунды" in c.window.status.text()
+    assert c.window.operation_error.isVisibleTo(c.window)
+    c.window.operation_error_toggle.click()
+    assert c.window.operation_error_details.isVisibleTo(c.window)
+    assert "4 секунды" in c.window.operation_error_details.toPlainText()
     c.tray.hide()
     c.watchdog.stop()
     c.idle_timer.stop()
@@ -293,9 +300,9 @@ def test_gui_typing_keeps_original_text_and_countdown_can_be_cancelled(app, tmp_
     typed = []
     c.start_typing = typed.append
     try:
-        c.window.navigation.setCurrentRow(1)
+        c.window.navigation.setCurrentRow(0)
         assert not c.window.typing_button.isHidden()
-        assert c.window.capture_button.isHidden()
+        assert not c.window.capture_button.isHidden()
         app.clipboard().setText("original")
         c.schedule_typing()
         assert c.typing_pending
@@ -419,7 +426,7 @@ def test_deadline_retry_waits_for_original_worker_to_release(app, tmp_path):
     calls = []
 
     class HeldProvider(Provider):
-        def recognize(self, png, operation):
+        def recognize(self, png, operation, **kwargs):
             calls.append(operation)
             entered.set()
             release.wait(2)
@@ -459,7 +466,7 @@ def test_slow_ocr_continues_after_target_and_copies_complete_result(app, tmp_pat
     entered, release = threading.Event(), threading.Event()
 
     class HeldProvider(Provider):
-        def recognize(self, png, operation):
+        def recognize(self, png, operation, **kwargs):
             entered.set()
             release.wait(2)
             operation.check()
@@ -479,18 +486,20 @@ def test_slow_ocr_continues_after_target_and_copies_complete_result(app, tmp_pat
         assert c.operation is operation
         assert not operation.cancelled.is_set()
         assert c.busy()
-        assert "цель 4 с" in c.window.status.text()
+        assert "5 с" in c.window.status.text()
+        assert "цель" not in c.window.status.text()
         assert c.window.cancel_button.isVisibleTo(c.window)
         assert app.clipboard().text() == "previous"
         assert c.window.retry_button.isHidden()
         release.set()
         wait(app, lambda: not c.busy() and c.pool.activeThreadCount() == 0)
         assert app.clipboard().text() == '    полный результат\n\n'
-        assert "дольше цели 4 с" in c.window.status.text()
+        assert c.window.status.text().startswith("Скопировано")
+        assert "цели" not in c.window.status.text()
         assert c.preview.isVisible() is show_preview
         if show_preview:
             assert c.preview.text.toPlainText() == app.clipboard().text()
-            assert "дольше цели 4 с" in c.preview.status.text()
+            assert " с" in c.preview.status.text()
     finally:
         release.set()
         dispose(c, app)
@@ -511,8 +520,8 @@ def test_cancel_network_wait_releases_ui_and_allows_next_capture(app, tmp_path):
             closed.set()
 
     class WaitingProvider(OCRProvider):
-        def recognize(self, png, operation):
-            return super().recognize(png, operation, httpx.MockTransport(request))
+        def recognize(self, png, operation, **kwargs):
+            return super().recognize(png, operation, httpx.MockTransport(request), **kwargs)
 
     c = Controller(app, tmp_path, native=False)
     c.provider = lambda: WaitingProvider("http://127.0.0.1/ocr", "test", "key", local=True)

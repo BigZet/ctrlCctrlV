@@ -47,5 +47,6 @@ jobs:
           name: ctrlCctrlV-${{ runner.os }}
           path: |
             artifacts/builds/windows/ctrlCctrlV-windows-x64.zip
+            artifacts/builds/windows/ctrlCctrlV-windows-x64.sha256
             artifacts/builds/ctrlCctrlV-macos-arm64.tar.gz
           if-no-files-found: error

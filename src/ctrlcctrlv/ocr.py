@@ -1,6 +1,10 @@
 import asyncio
 import base64
 import json
+import ast
+import re
+import textwrap
+import tomllib
 from dataclasses import dataclass
 
 import httpx
@@ -14,6 +18,39 @@ PROMPT = (
     'Return only one JSON object {"text": "the exact transcription"}. '
     'Return {"text": ""} if there is no text. Do not include Markdown wrappers.'
 )
+
+
+def clean_lighton_code(text):
+    """Remove LightOn's Python presentation wrapper, preserving the code bytes."""
+    fenced = re.fullmatch(r"```(?:python|python3|py)[ \t]*\r?\n([\s\S]*?)^```[ \t]*(?:\r?\n)?", text,
+                          re.MULTILINE | re.IGNORECASE)
+    if fenced and not re.search(r"^```", fenced[1], re.MULTILINE):
+        return fenced[1]
+    label = re.match(r"(?:python|python3|py)[ \t]*(?:\r?\n|\\n)", text, re.IGNORECASE)
+    if not label:
+        return text
+    code = text[label.end():]
+    # Line numbers are ignored only for detection; the returned body stays literal.
+    candidate = re.sub(r"(?m)^[ \t]*\d+[ \t]", "", code)
+    # Incomplete snippets also count as code. Do not strip a language name from prose.
+    if re.match(r"\s*(?:(?:async\s+)?def\s+\w+\s*\(|class\s+\w+\s*[:(]|from\s+[\w.]+\s+import\s|(?:[A-Za-z_]\w*\.)*[A-Za-z_]\w*\s*\()", candidate):
+        return code
+    try:
+        statements = ast.parse(textwrap.dedent(candidate)).body
+    except (SyntaxError, ValueError, RecursionError):
+        statements = []
+    if any(not isinstance(node, ast.Expr) or
+           isinstance(node, ast.Expr) and isinstance(node.value, ast.Call) for node in statements):
+        return code
+    # Recognize a TOML opening even when later OCR contains syntax errors.
+    try:
+        opening = [line for line in code.splitlines() if line.strip()][:2]
+        configuration = tomllib.loads("\n".join(opening))
+        if any(isinstance(value, dict) and value for value in configuration.values()):
+            return code
+    except (tomllib.TOMLDecodeError, RecursionError):
+        pass
+    return text
 
 
 def parse_completion(payload: dict, mode="json") -> str:
@@ -37,6 +74,12 @@ def parse_completion(payload: dict, mode="json") -> str:
 
 
 @dataclass(frozen=True)
+class OCRResult:
+    text: str
+    raw_text: str | None = None
+
+
+@dataclass(frozen=True)
 class OCRProvider:
     endpoint: str
     model: str
@@ -44,8 +87,13 @@ class OCRProvider:
     max_tokens: int = 4096
     local: bool = False
     mode: str = "json"
+    response_format: bool = True
+    temperature: float | None = 0
 
     def recognize(self, png: bytes, operation: Operation, transport=None, *, prompt=None, context=None) -> str:
+        return self.recognize_result(png, operation, transport, prompt=prompt, context=context).text
+
+    def recognize_result(self, png: bytes, operation: Operation, transport=None, *, prompt=None, context=None) -> OCRResult:
         operation.check()
         encoded = base64.b64encode(png).decode("ascii")
         content = [{"type": "image_url", "image_url": {"url": "data:image/png;base64," + encoded}}]
@@ -56,18 +104,25 @@ class OCRProvider:
         payload = {
             "model": self.model,
             "messages": [{"role": "user", "content": content}],
-            "temperature": 0,
             "max_tokens": self.max_tokens,
             "stream": False,
         }
-        if self.mode == "json":
+        if self.temperature is not None:
+            payload["temperature"] = self.temperature
+        if not self.local:
+            payload["modalities"] = ["text"]
+        if self.mode == "json" and self.response_format:
             payload["response_format"] = {"type": "json_object"}
         if self.local:
             payload["chat_template_kwargs"] = {"enable_thinking": False}
         try:
             body = asyncio.run(self._request(payload, operation, transport))
             operation.check()
-            return parse_completion(json.loads(body), self.mode)
+            raw_text = parse_completion(json.loads(body), self.mode)
+            text = raw_text
+            if self.mode == "transcription" and "lighton" in self.model.casefold():
+                text = clean_lighton_code(text)
+            return OCRResult(text, raw_text)
         except httpx.TimeoutException:
             if operation.budget is None:
                 raise OperationError("Сервис OCR долго не отвечает. Повторите запрос. Буфер не изменён.") from None
@@ -87,8 +142,14 @@ class OCRProvider:
                         connect=10, read=120, write=30, pool=10),
                 ) as response:
                     if response.status_code != 200:
-                        # Do not display/log provider bodies: they may contain user text.
-                        raise OperationError(f"OCR HTTP {response.status_code}. Проверьте модель, ключ и соединение.")
+                        # Classify bounded error bodies, never echo provider/user content.
+                        error_body = bytearray()
+                        async for chunk in response.aiter_bytes():
+                            operation.check()
+                            error_body.extend(chunk)
+                            if len(error_body) > 64_000:
+                                break
+                        raise OperationError(http_error(response.status_code, error_body))
                     body = bytearray()
                     async for chunk in response.aiter_bytes():
                         operation.check()
@@ -110,3 +171,32 @@ class OCRProvider:
                 if not request.done():
                     request.cancel()
                 await asyncio.gather(request, return_exceptions=True)
+
+
+def http_error(status, body):
+    if status == 400:
+        try:
+            error = json.loads(body).get("error", {})
+            message = str(error.get("message", "")).lower() if isinstance(error, dict) else ""
+            metadata = error.get("metadata") if isinstance(error, dict) else None
+            if isinstance(metadata, dict):
+                raw = metadata.get("raw", "")
+                if isinstance(raw, str):
+                    message += " " + raw.lower()
+        except (ValueError, AttributeError):
+            message = ""
+        if "response_format" in message or "json_object" in message or "json_schema" in message:
+            reason = "Провайдер не поддерживает выбранный JSON-формат. Выберите другую vision-модель."
+        elif "temperature" in message:
+            reason = "Провайдер отклонил параметр temperature. Обновите каталог моделей."
+        elif any(word in message for word in ("max_tokens", "max_completion_tokens", "context length", "context_length", "context window")):
+            reason = "Превышен лимит модели. Уменьшите лимит ответа или область снимка."
+        elif any(word in message for word in ("image", "vision", "multimodal", "modality", "modalities")):
+            reason = "Модель или её провайдер не принимает изображения. Выберите другую vision-модель."
+        else:
+            reason = "Провайдер отклонил запрос. Обновите каталог или выберите другую vision-модель."
+        return f"OCR HTTP 400. {reason} Буфер не изменён."
+    reason = {401: "Проверьте API-ключ.", 402: "Недостаточно средств OpenRouter.",
+              403: "Провайдер запретил запрос.", 404: "Модель недоступна. Обновите каталог.",
+              429: "Лимит запросов. Повторите позже."}.get(status, "Сервис недоступен. Повторите позже.")
+    return f"OCR HTTP {status}. {reason} Буфер не изменён."

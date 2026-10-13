@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-12",
+  "platform": "Windows x64",
+  "tests": {"passed": 280, "seconds": 12.08, "exit_code": 0, "remaining_qt_windows": 0},
+  "package": "artifacts/builds/windows-interface-rework/ctrlCctrlV-windows-x64.zip",
+  "sha256": "f573fc81261005c52257ec0129b7ca2e9d2bae90d45b2deafe93e2a978d30fdb",
+  "build_exit_code": 0,
+  "frozen_smoke": "passed: UI, worker, syntax, four formatters, loopback OCR/cancellation and disposable credential roundtrip",
+  "renders": ["artifacts/ui-rework-final", "artifacts/ui-rework-final-compact", "artifacts/ui-rework-final-150"],
+  "themes": ["light", "dark"],
+  "visual_audit": ["work", "model library", "recognition settings", "typing settings", "system settings", "history empty and populated", "preview and context", "model chooser and empty search", "review dialog", "model import", "setup", "diagnostics", "indicator"],
+  "native_indicator_report": "docs/checks/windows-interface-rework-indicator.json",
+  "review_fixes": ["discard late review after close", "inline repeat preparation and cancellation", "minimize preserves pending work"],
+  "paid_api_calls": 0,
+  "macos_native_verified": false,
+  "cross_platform": "Shared Qt implementation; no new platform-specific production dependencies. Native macOS verification requires a Mac."
+}

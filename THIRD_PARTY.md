@@ -7,6 +7,11 @@ This is a local development/pilot application. It is not notarized for public di
 - PyObjC: MIT — https://github.com/ronaldoussoren/pyobjc
 - HTTPX: BSD-3-Clause — https://github.com/encode/httpx
 - keyring: MIT — https://github.com/jaraco/keyring
+- Black: MIT — https://github.com/psf/black
+- sqlparse: BSD-3-Clause — https://github.com/andialbrecht/sqlparse
+- Pygments: BSD-2-Clause — https://github.com/pygments/pygments
+- XlsxWriter: BSD-2-Clause — https://github.com/jmcnamara/XlsxWriter
+- clang-format / LLVM: Apache-2.0 with LLVM exceptions — https://llvm.org/LICENSE.txt
 - llama.cpp: MIT — https://github.com/ggml-org/llama.cpp
 - NVIDIA CUDA runtime / cuBLAS on Windows: downloaded separately with the pinned llama.cpp CUDA release, not included in the application ZIP — https://docs.nvidia.com/cuda/eula/index.html
 - Qwen3-VL weights: Apache-2.0 — https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct

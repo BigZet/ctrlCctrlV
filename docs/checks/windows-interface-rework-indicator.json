@@ -1,0 +1,19 @@
+{
+  "platform": "windows",
+  "hidden_states": {
+    "typing_pending": true,
+    "typing_cancel": true,
+    "model_cancel": true,
+    "review_cancel": true,
+    "diagnostics_cancel": true
+  },
+  "ocr_visible": true,
+  "size": [
+    208,
+    36
+  ],
+  "elapsed": "00:01",
+  "foreground_preserved": true,
+  "cancel_hides": true,
+  "timer_stopped": true
+}

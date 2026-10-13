@@ -39,6 +39,7 @@ def file_hash(path: Path, cancel: threading.Event) -> str:
 
 
 def download(artifact: Artifact, destination: Path, cancel: threading.Event, progress, transport=None):
+    check_cancel(cancel)
     destination.parent.mkdir(parents=True, exist_ok=True)
     part = destination.with_suffix(destination.suffix + ".part")
     if destination.exists() and destination.stat().st_size == artifact.size:
@@ -73,6 +74,9 @@ def download(artifact: Artifact, destination: Path, cancel: threading.Event, pro
                 retry_delay = min(0.5 * 2 ** attempt, 4)
                 try:
                     with client.stream("GET", artifact.url, headers=headers) as response:
+                        # A cancellation while waiting for headers must not discard
+                        # resumable bytes when the server ignores Range.
+                        check_cancel(cancel)
                         if response.status_code in {408, 425, 429, 500, 502, 503, 504}:
                             retry_after = response.headers.get("Retry-After", "")
                             if retry_after.isdecimal():
@@ -158,7 +162,8 @@ def extract_engine(archive, destination, cancel):
 
 
 class LocalRuntime:
-    def __init__(self, directory: Path, session="ocr", *, slots=1, acceleration="gpu"):
+    def __init__(self, directory: Path, session="ocr", *, slots=1, acceleration="gpu", models=None):
+        self.models = models if models is not None else MODELS
         if session not in {"ocr", "review"}:
             raise ValueError("Unknown runtime session")
         if not isinstance(slots, int) or isinstance(slots, bool) or not 1 <= slots <= 8:
@@ -209,7 +214,7 @@ class LocalRuntime:
         return candidates[0] if candidates else None
 
     def installed(self, model_id):
-        model = MODELS[model_id]
+        model = self.models[model_id]
         directory = self.directory / "models" / model_id
         try:
             receipt = json.loads((directory / "verified.json").read_text())
@@ -223,7 +228,7 @@ class LocalRuntime:
             return False
 
     def install(self, model_id, cancel, progress):
-        if model_id not in MODELS:
+        if model_id not in self.models:
             raise OperationError("Неизвестная модель")
         try:
             artifacts = engine_artifacts(platform.system(), platform.machine(), self.acceleration)
@@ -253,7 +258,7 @@ class LocalRuntime:
                 raise OperationError("В пакете движка нет llama-server")
             if platform.system() != "Windows":
                 self.binary.chmod(self.binary.stat().st_mode | 0o100)
-        model = MODELS[model_id]
+        model = self.models[model_id]
         directory = self.directory / "models" / model_id
         for artifact in model.files:
             download(artifact, directory / artifact.filename, cancel, progress)
@@ -267,7 +272,7 @@ class LocalRuntime:
     def preflight(self, model_id, cancel):
         from .hardware import inspect_hardware, require_capacity
         self.hardware = inspect_hardware(self.binary, self.acceleration, cancel)
-        require_capacity(self.hardware, MODELS[model_id], self.slots)
+        require_capacity(self.hardware, self.models[model_id], self.slots)
         return self.hardware
 
     def start(self, model_id, cancel, progress):
@@ -277,7 +282,7 @@ class LocalRuntime:
             raise OperationError("Сначала установите выбранную модель через настройки")
         progress("Проверка оборудования и доступной памяти…", 0, 1)
         self.preflight(model_id, cancel)
-        model = MODELS[model_id]
+        model = self.models[model_id]
         directory = self.directory / "models" / model_id
         with socket.socket() as sock:
             sock.bind(("127.0.0.1", 0))
@@ -376,7 +381,7 @@ class LocalRuntime:
                         pass
 
     def delete(self, model_id):
-        if model_id not in MODELS:
+        if model_id not in self.models:
             raise OperationError("Неизвестная модель")
         if self.model_id == model_id:
             self.stop()

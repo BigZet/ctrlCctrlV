@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "checks": {
+    "local_cpu_choice_saved": true,
+    "no_download_before_install_command": true,
+    "no_ocr_before_prepare_command": true,
+    "owned_application_stopped": true
+  },
+  "passed": true
+}

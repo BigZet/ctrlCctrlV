@@ -1,0 +1,255 @@
+{
+  "date": "2026-10-12",
+  "objective": "Полная ревизия проекта несколькими независимыми агентами, тестирование и предложения по улучшению интерфейса",
+  "conclusion": "Ревизия завершена; воспроизведённые существенные дефекты исправлены. Внешняя приёмка Mac, Cisco VDI и реальных OCR-эталонов остаётся явно непроверенной.",
+  "human_readable_findings": "docs/PROJECT_AUDIT_2026-10-12.md",
+  "agents": [
+    {
+      "name": "audit_product",
+      "scope": "UI, draft preservation, model picker, history, typing dispatch",
+      "related_passed": 152,
+      "new_tests": 25
+    },
+    {
+      "name": "audit_runtime",
+      "scope": "macOS target-window identity and hotkey lifecycle",
+      "related_passed": 49,
+      "deselected_native_probes": 2,
+      "new_tests": 12
+    },
+    {
+      "name": "audit_tests",
+      "scope": "test coverage, download space/cancel, CI checksums, package validation and independent Mac code review",
+      "related_passed": 60,
+      "new_tests": 11,
+      "independent_macos_review_passed": 32
+    },
+    {
+      "name": "root",
+      "scope": "Unicode history search, integration, renders, docs, final tests/build/restart",
+      "new_tests": 4
+    }
+  ],
+  "verification": {
+    "full_suite": {
+      "command": ".venv/Scripts/python.exe -m pytest -q",
+      "passed": 485,
+      "seconds": 20.87,
+      "exit_code": 0,
+      "log": "artifacts/tests-project-audit.log"
+    },
+    "source_smoke": {
+      "command": ".venv/Scripts/python.exe -m ctrlcctrlv --smoke --data-dir artifacts/source-smoke-project-audit",
+      "exit_code": 0,
+      "log": "artifacts/source-smoke-project-audit.log"
+    },
+    "build": {
+      "command": ".venv/Scripts/python.exe -m scripts.build_windows --output artifacts/builds/windows-project-audit",
+      "exit_code": 0,
+      "log": "artifacts/build-windows-project-audit.log",
+      "frozen_smoke_including_disposable_credentials": true
+    },
+    "independent_extracted_package": "docs/checks/windows-project-audit-package.json",
+    "visual": {
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "scales": [
+        100,
+        150,
+        200
+      ],
+      "current_minimum_renders": "artifacts/ui-project-audit",
+      "previous_full_plan_renders": "artifacts/ui-complete",
+      "chooser_minimum": "640x420; two complete rows, wrapped names, visible actions and price header",
+      "review_minimum": "680x420; separate panes, scrolling and actions visible"
+    },
+    "diff_check": "passed; line-ending advisories only"
+  },
+  "package": {
+    "path": "artifacts/builds/windows-project-audit/ctrlCctrlV-windows-x64.zip",
+    "bytes": 47246636,
+    "sha256": "d67e9209be00dbd5cd3ec5f8eba9cf270409fe8567d12ee7a0d80d2433d21089"
+  },
+  "restart": {
+    "executable": "C:\\Users\\bigze\\Documents\\GH\\ctrlCctrlV\\artifacts\\builds\\windows-project-audit\\dist\\ctrlCctrlV\\ctrlCctrlV.exe",
+    "same_profile": true,
+    "new_pid": 50548,
+    "profile": "C:\\Users\\bigze\\AppData\\Local\\ctrlCctrlV",
+    "native_pre_restart": "Settings only, no Save button and no result window",
+    "child_processes": 0,
+    "old_pid": 49232,
+    "profile_files_unchanged": {
+      "history.sqlite3": true,
+      "ui-state.json": true,
+      "settings.json": true
+    },
+    "running": true,
+    "new_window": "Native Windows UI: work page visible and responding"
+  },
+  "accepted_plan_coverage": [
+    {
+      "requirement": "Single lightweight OCR and clipboard; heavy refinement manual only",
+      "evidence": [
+        "tests/test_app.py",
+        "tests/test_ui.py",
+        "src/ctrlcctrlv/app.py"
+      ]
+    },
+    {
+      "requirement": "Stable preview status, zoom/persistence, syntax row, separate selectable comparison",
+      "evidence": [
+        "tests/test_preview_polish.py",
+        "tests/test_review.py",
+        "artifacts/ui-project-audit"
+      ]
+    },
+    {
+      "requirement": "TSV rectangles, active cell shortcuts, one-step Undo, heading display and literal atomic saves",
+      "evidence": [
+        "tests/test_preview_polish.py",
+        "tests/test_table_export.py",
+        "tests/test_text_export.py"
+      ]
+    },
+    {
+      "requirement": "Model row progress, queue cancellation and stale callbacks, filters/favorites/availability",
+      "evidence": [
+        "tests/test_workspace_polish.py",
+        "tests/test_full_ui_integration.py",
+        "tests/test_audit_ui_safety.py"
+      ]
+    },
+    {
+      "requirement": "Work/settings, speed presets, old settings, recorded hotkeys, conditional permissions, first run",
+      "evidence": [
+        "tests/test_workspace_polish.py",
+        "tests/test_hotkey_lifecycle.py",
+        "tests/test_setup.py",
+        "tests/test_settings.py",
+        "tests/test_setup_capture_diagnostics_ui.py"
+      ]
+    },
+    {
+      "requirement": "Immutable history editor without image/refinement, grouping/open/save/search/errors",
+      "evidence": [
+        "tests/test_full_ui_integration.py",
+        "tests/test_workspace_polish.py",
+        "tests/test_audit_ui_safety.py",
+        "tests/test_history_search.py"
+      ]
+    },
+    {
+      "requirement": "Diagnostics JSON, tray, optional capture adjustment",
+      "evidence": [
+        "tests/test_setup_capture_diagnostics_ui.py",
+        "tests/test_capture_adjust.py",
+        "tests/test_full_ui_integration.py"
+      ]
+    },
+    {
+      "requirement": "UI state isolated from OCR settings; corruption fallback",
+      "evidence": [
+        "tests/test_ui_state.py"
+      ]
+    },
+    {
+      "requirement": "No draft loss on capture/retry/quit; unavailable target cannot initiate typing",
+      "evidence": [
+        "tests/test_audit_ui_safety.py"
+      ]
+    },
+    {
+      "requirement": "Mac same-process window changes and cancelled/replaced hotkey sessions",
+      "evidence": [
+        "tests/test_macos_lifecycle.py"
+      ],
+      "limitation": "Mocked API contracts only; native Mac unavailable"
+    },
+    {
+      "requirement": "Full tests, separate Windows ZIP, frozen checks, same profile restart",
+      "evidence": [
+        "artifacts/tests-project-audit.log",
+        "artifacts/build-windows-project-audit.log",
+        "docs/checks/windows-project-audit-package.json",
+        "artifacts/project-audit-restart.json"
+      ]
+    }
+  ],
+  "prioritized_followups_not_implemented": [
+    {
+      "priority": "P2",
+      "idea": "Text/Table override in preview",
+      "reason": "Comma-delimited prose can be misclassified; correct without new OCR"
+    },
+    {
+      "priority": "P2",
+      "idea": "Find in result and next/previous correction",
+      "reason": "Navigate long results and scroll both comparison panes to selection"
+    },
+    {
+      "priority": "P3",
+      "idea": "Undoable insert/delete table rows and columns",
+      "reason": "Repair recognized structure without raw CSV editing"
+    },
+    {
+      "priority": "P3",
+      "idea": "Pinned history and undo deletion",
+      "reason": "Reuse important fragments; define recovery/privacy semantics first"
+    },
+    {
+      "priority": "P3",
+      "idea": "Explicit repeat last capture region",
+      "reason": "Recurring same-region workflow without automatic paid calls"
+    },
+    {
+      "priority": "P3",
+      "idea": "In-memory raw OCR response",
+      "reason": "Inspect cleanup heuristics while keeping requested technical Python prefix removal"
+    },
+    {
+      "priority": "P3",
+      "idea": "Trim delay-field trailing zero display",
+      "reason": "Reduce visual noise without rounding stored manual values"
+    },
+    {
+      "priority": "P3",
+      "idea": "Unify capture action wording in tray and Work",
+      "reason": "Current labels differ despite referring to the same action"
+    }
+  ],
+  "limits": [
+    "No fresh native macOS run or package",
+    "No real Cisco VDI acceptance",
+    "No fresh live paid OCR/model calls; real-document accuracy not accepted",
+    "Extracted smoke is not a clean-machine installation test",
+    "Public signing/notarization not performed",
+    "Remote CI was not triggered"
+  ],
+  "paid_model_calls": 0,
+  "user_changes_preserved": true,
+  "commits_created": 0,
+  "open_findings": [
+    {
+      "id": "OPEN-01",
+      "priority": "P2",
+      "status": "confirmed; not fixed",
+      "description": "Auto mode may treat comma-delimited prose as CSV; no in-place Text/Table override"
+    },
+    {
+      "id": "OPEN-02",
+      "priority": "P3",
+      "status": "observed; not fixed",
+      "description": "Delay spinboxes show unnecessary trailing zeroes"
+    },
+    {
+      "id": "OPEN-03",
+      "priority": "P3",
+      "status": "confirmed in source; not fixed",
+      "description": "Tray capture label differs from Work capture label"
+    }
+  ],
+  "visual_followup": "docs/checks/ui-visual-review-2026-10-12.json",
+  "visual_findings_pending": 25
+}

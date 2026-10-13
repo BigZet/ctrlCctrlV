@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-12",
+  "platform": "Windows x64",
+  "tests": {"passed": 292, "seconds": 13.34, "exit_code": 0},
+  "independent_review": "Initial findings fixed: commit active cell before copy/refine; exclude characteristic code from automatic CSV detection. Follow-up: 78 focused tests passed, no new findings.",
+  "package": "artifacts/builds/windows-refine-table/ctrlCctrlV-windows-x64.zip",
+  "sha256": "2d0ebf47bf7e2283f9a09d4299a7b0f1845ec58fed16f25c0c7fd597d2ed4cbe",
+  "build_exit_code": 0,
+  "frozen_smoke": "passed",
+  "renders": ["artifacts/ui-refine-table", "artifacts/ui-refine-table-150"],
+  "scenarios": [
+    "First OCR never prepares or invokes refinement model; preview on and off",
+    "One refinement action uses selected model, source image, edited transcription and optional prompt",
+    "Refinement selection does not change saved OCR/default refinement models",
+    "CSV renders as editable cells with embedded commas, quotes, line breaks and empty cells",
+    "Cell edits serialize to CSV and are undoable",
+    "Copy shortcut and refinement commit active editor before reading canonical text",
+    "CSV parse or rendering failure preserves editable original text",
+    "Characteristic Python and SQL fragments stay text in auto mode",
+    "CSV refinement requests CSV output"
+  ],
+  "paid_api_calls": 0,
+  "native_macos_verified": false,
+  "running_previous_instance": "Existing user session and its loaded local model were preserved; this package is ready to launch after closing that session."
+}

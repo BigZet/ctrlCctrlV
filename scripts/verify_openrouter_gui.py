@@ -185,7 +185,7 @@ def main():
             report["clipboard_restored"] = False
         fixture_window.close()
         if controller:
-            controller.quit()
+            controller.quit(force=True)
             controller.pool.waitForDone(5000)
             app.processEvents()
             controller.finish_shutdown()

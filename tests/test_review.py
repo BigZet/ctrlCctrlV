@@ -48,6 +48,19 @@ def test_empty_proposal_and_image_only_model_are_rejected():
         ReviewProvider(OCRProvider("https://example.invalid", "ocr", "key", mode="transcription"))
 
 
+def test_csv_refinement_requests_csv_and_preserves_cell_quoting():
+    original = 'Товар,Цена\n"Папка, картонная","89,00"\n'
+    def request(req):
+        payload = json.loads(req.content)
+        content = payload["messages"][0]["content"]
+        assert "RFC 4180 CSV" in content[0]["text"]
+        assert json.loads(content[2]["text"]) == {"transcription": original, "user_context": "Сверь цену"}
+        return response(original)
+    result = ReviewProvider(OCRProvider("https://example.invalid", "checker", "key")).inspect(
+        b"png", original, transport=httpx.MockTransport(request), details="Сверь цену", format_mode="csv")
+    assert result.proposed == original
+
+
 def test_checker_has_separate_budget_and_checks_cancellation_after_response():
     provider = ReviewProvider(OCRProvider("https://example.invalid", "checker", "key"))
     transport = httpx.MockTransport(lambda req: response("checked"))
@@ -191,7 +204,7 @@ def test_background_review_keeps_clipboard_and_discards_stale_results(controller
         # A later capture can fail while an older preview remains available.
         # Its checker must receive that preview's image, not the failed capture.
         c.last_image.fill(0xff000000)
-    def inspect(self, png, original, operation):
+    def inspect(self, png, original, operation, **kwargs):
         assert png.startswith(b"\x89PNG")
         assert QImage.fromData(png).pixel(0, 0) == 0xffffffff
         entered.set()
@@ -253,7 +266,7 @@ def test_review_presentation_is_prepared_in_worker_and_discards_edits(controller
     entered, release = threading.Event(), threading.Event()
     c.review_runtime = SimpleNamespace(installed=lambda model: True, start=lambda *args: None,
         endpoint="http://127.0.0.1:1", key="test", stop=lambda: None)
-    monkeypatch.setattr(ReviewProvider, "inspect", lambda *args: ReviewResult("value = O\n", "value = 0\n", "m", 1))
+    monkeypatch.setattr(ReviewProvider, "inspect", lambda *args, **kwargs: ReviewResult("value = O\n", "value = 0\n", "m", 1))
     main_thread = threading.get_ident()
     prepare = ReviewResult.prepare
     def held(result):

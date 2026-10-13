@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "date": "2026-10-12",
+  "platform": "Windows x64",
+  "archive": "artifacts/builds/windows-workspace/ctrlCctrlV-windows-x64.zip",
+  "archive_sha256": "909d7798d1098e9320c58978a6cc2cfaa35e0b8cd2101ba0c4f52b9c9bb09120",
+  "exe_sha256": "a40b70f7c79809de359206d3916c99370d059c97ae1377a689899797abc6d9ad",
+  "tests": {
+    "passed": 259,
+    "failed": 0
+  },
+  "frozen_checks": {
+    "gui": true,
+    "background_syntax": true,
+    "loopback_ocr_and_cancel": true,
+    "disposable_credential": true,
+    "python_sql_java_json_formatters": true,
+    "native_onboarding": "windows-workspace-onboarding.json",
+    "prepared_model": "windows-workspace-frozen-model.json"
+  },
+  "native_indicator": "windows-workspace-indicator.json",
+  "table_ocr": "windows-workspace-table.json",
+  "macos": "shared code and ARM64 clang-format wheel checked; native execution not performed",
+  "openrouter": "public catalog verified; one small paid synthetic request (512-token cap) used an invalid font fixture and is excluded from OCR quality evidence"
+}

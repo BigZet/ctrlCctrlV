@@ -63,7 +63,7 @@ def test_ui_detects_new_access_and_does_not_request_granted_rights(tmp_path):
     try:
         assert adapter.registrations == 0
         assert c.window.permission_buttons["input_monitoring"].isEnabled()
-        assert "Предоставлено" in c.window.permission_labels["screen"].text()
+        assert "доступен" in c.window.permission_labels["screen"].text()
         assert not c.window.permission_buttons["screen"].isEnabled()
         c.window.permission_buttons["accessibility"].click()
         assert adapter.opened == ["accessibility"]

@@ -51,7 +51,7 @@ def inspect_hardware(binary, acceleration, cancel):
               "acceleration": acceleration, "devices": []}
     if acceleration == "gpu":
         if binary is None:
-            raise OperationError("Сначала установите движок через кнопку «Установить»")
+            raise OperationError("Сначала загрузите модель в разделе «Модели»")
         options = {"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt" else {}
         try:
             result = subprocess.run([str(binary), "--list-devices"], cwd=binary.parent,

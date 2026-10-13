@@ -5,6 +5,22 @@ import pytest
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 
 
+@pytest.fixture(scope="session", autouse=True)
+def qt_application_lifetime():
+    # Keep Qt alive until every test-owned top-level window has been destroyed.
+    # Python shutdown otherwise destroys surviving dialogs/documents in an
+    # undefined order, which can crash the Windows Qt runtime after pytest exits.
+    from PySide6.QtCore import QEvent, QThreadPool
+    from PySide6.QtWidgets import QApplication
+    app = QApplication.instance() or QApplication([])
+    yield app
+    QThreadPool.globalInstance().waitForDone()
+    for window in app.topLevelWidgets():
+        window.close()
+        window.deleteLater()
+    app.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+
+
 @pytest.fixture(autouse=True)
 def dispose_queued_qt_objects():
     yield

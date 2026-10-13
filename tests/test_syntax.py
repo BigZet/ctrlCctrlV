@@ -33,7 +33,7 @@ def test_indented_fragments_json_and_disabled_checks():
 def test_auto_detection_is_optional_and_unknown_text_has_no_hint():
     assert guess_language('def collect():\n    pass') == "python"
     assert guess_language(' {"value": 1}') == "json"
-    assert guess_language("SELECT * FROM items;") == "none"
+    assert guess_language("SELECT * FROM items;") == "sql"
     assert syntax_hint("Перенос текста из редактора.") is None
 
 
@@ -111,9 +111,11 @@ def test_edits_are_debounced_and_disabling_check_removes_hint(controller, monkey
     monkeypatch.setattr("ctrlcctrlv.syntax.syntax_hint", checker)
     for text in ("d", "de", "def", "def broken("):
         c.preview.text.setPlainText(text)
-    wait(c, lambda: not c.preview.syntax_message.isHidden())
+    wait(c, lambda: c.preview.text.syntax_hint is not None)
     assert calls == [("def broken(", "auto")]
     c.preview.syntax_language.setCurrentIndex(c.preview.syntax_language.findData("none"))
+    assert c.preview.text.syntax_hint is None
     assert c.preview.syntax_message.isHidden()
     wait(c, lambda: len(calls) == 2 and c.pool.activeThreadCount() == 0)
+    assert c.preview.text.syntax_hint is None
     assert c.preview.syntax_message.isHidden()

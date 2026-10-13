@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-12",
+  "platform": "Windows x64",
+  "tests": {
+    "passed": 314,
+    "seconds": 13.15,
+    "exit_code": 0,
+    "log": "artifacts/table-export-pytest.log"
+  },
+  "final_ocr_tests": {
+    "passed": 34,
+    "exit_code": 0
+  },
+  "independent_review": "Export reviewed; overbroad LightOn prose recognition corrected. Final review: no substantial findings, 14 LightOn tests passed.",
+  "package": "artifacts/builds/windows-table-export/ctrlCctrlV-windows-x64.zip",
+  "sha256": "a9fe114aa450c9041e2e7b86b215c90b7f6f88214aa1e44a786695539a2edf82",
+  "build_exit_code": 0,
+  "frozen_smoke": "passed, including actual CSV and XLSX export",
+  "renders": [
+    "artifacts/ui-table-export"
+  ],
+  "scenarios": [
+    "CSV and XLSX buttons visible only for tables; active cell edit committed before export",
+    "Native save dialog; cancellation preserves preview and clipboard",
+    "UTF-8 BOM CSV round-trip: Cyrillic, commas, quotes, embedded newlines, empty cells",
+    "XLSX stores literal strings: leading zeros, decimal commas, formula-like text",
+    "Atomic replacement; errors preserve existing destination; oversized XLSX cells rejected",
+    "LightOn Python marker and whole Python fence removed before publication",
+    "Code indentation, blank lines and literal strings preserved; ordinary prose retained",
+    "Six local historical LightOn examples: exact body preserved after marker removal; history read-only"
+  ],
+  "paid_api_calls": 0,
+  "native_macos_verified": false,
+  "running_previous_instance": "PID 19044 runs windows-refine-table; existing user session left running. New package built separately."
+}

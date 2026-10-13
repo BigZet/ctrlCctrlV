@@ -53,8 +53,48 @@ def test_specialized_ocr_gets_image_only_and_literal_markdown():
         assert [item["type"] for item in payload["messages"][0]["content"]] == ["image_url"]
         return httpx.Response(200, json=completion(text, raw=True))
 
-    provider = OCRProvider("http://127.0.0.1/ocr", "lighton", "test", local=True, mode="transcription")
+    provider = OCRProvider("http://127.0.0.1/ocr", "other-transcriber", "test", local=True, mode="transcription")
     assert provider.recognize(b"png", Operation(), httpx.MockTransport(request)) == text
+
+
+@pytest.mark.parametrize('prefix', ['python\n', 'python\r\n', r'python\n'])
+def test_lighton_language_label_is_removed_before_publication(prefix):
+    expected = '    def greet(name):\n\n\tprint("python\\n", name)  \n'
+    transport = httpx.MockTransport(lambda req: httpx.Response(200, json=completion(prefix + expected, raw=True)))
+    provider = OCRProvider('http://localhost/ocr', 'lightonocr-3-0.8b', 'key', local=True, mode='transcription')
+    operation = Operation()
+    published = []
+    operation.publish(provider.recognize(b'png', operation, transport), published.append)
+    assert published == [expected]
+
+
+@pytest.mark.parametrize('text', ['python\nThis is a language name.\n', 'python = 3\nprint(python)\n',
+                                 'python\nfrom the documentation, choose the correct version.\n',
+                                 'python\nif you need help, read the documentation.\n',
+                                 'def f():\n    python = "python"\n', 'python\n'])
+def test_lighton_cleanup_preserves_literal_text_and_identifiers(text):
+    transport = httpx.MockTransport(lambda req: httpx.Response(200, json=completion(text, raw=True)))
+    provider = OCRProvider('http://localhost/ocr', 'lightonocr-3-0.8b', 'key', local=True, mode='transcription')
+    assert provider.recognize(b'png', Operation(), transport) == text
+
+
+def test_lighton_python_fence_is_unwrapped_without_stripping_code_whitespace():
+    expected = '\n    x = 1  \n\n'
+    transport = httpx.MockTransport(lambda req: httpx.Response(200, json=completion('```python\n' + expected + '```\n', raw=True)))
+    provider = OCRProvider('http://localhost/ocr', 'lightonocr-3-0.8b', 'key', local=True, mode='transcription')
+    assert provider.recognize(b'png', Operation(), transport) == expected
+
+
+@pytest.mark.parametrize('expected', [
+    '27  def main():\n28      parser = argparse.ArgumentParser()\n29      parser.parse_args()\n',
+    '[build-system]\nrequires = ["setuptools>=68"]\nbuild-backend = "setuptools.build_meta"\n',
+    '[build-system]\nrequires = ["setuptools>=68"]\n\n[project]\ninvalid OCR fragment\n',
+    'import argparse\n\ndef main():\n    pass\n',
+])
+def test_lighton_label_cleanup_preserves_numbered_code_and_configuration(expected):
+    transport = httpx.MockTransport(lambda req: httpx.Response(200, json=completion('python\n' + expected, raw=True)))
+    provider = OCRProvider('http://localhost/ocr', 'lightonocr-3-0.8b', 'key', local=True, mode='transcription')
+    assert provider.recognize(b'png', Operation(), transport) == expected
 
 
 def test_deadline_before_publication_preserves_old_clipboard():

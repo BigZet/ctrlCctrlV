@@ -14,6 +14,8 @@ def data_directory() -> Path:
 @dataclass
 class Settings:
     provider: str = "local"
+    review_provider: str = "local"
+    capture_format: str = "auto"
     acceleration: str = "gpu"
     local_model: str = "lightonocr-3-0.8b"
     remote_model: str = "qwen/qwen3-vl-8b-instruct"
@@ -32,7 +34,7 @@ class Settings:
     max_tokens: int = 4096
 
     @classmethod
-    def load(cls, directory: Path):
+    def load(cls, directory: Path, models=None):
         try:
             with (directory / "settings.json").open("rb") as stream:
                 data = stream.read(65537)
@@ -42,17 +44,18 @@ class Settings:
             if not isinstance(values, dict):
                 return cls()
             fields = cls.__dataclass_fields__
+            values.setdefault("review_provider", values.get("provider", "local"))
             result = cls(**{k: v for k, v in values.items() if k in fields})
-            result.validate()
+            result.validate(models)
             return result
         except (OSError, ValueError, TypeError, RecursionError):
             return cls()
 
-    def validate(self):
+    def validate(self, models=None):
         for name in ("show_preview", "autoindent"):
             if type(getattr(self, name)) is not bool:
                 raise ValueError("Некорректная настройка: " + name)
-        for name in ("provider", "acceleration", "local_model", "remote_model", "remote_mode", "review_local_model",
+        for name in ("provider", "review_provider", "capture_format", "acceleration", "local_model", "remote_model", "remote_mode", "review_local_model",
                      "review_remote_model", "capture_hotkey", "typing_hotkey", "cancel_hotkey"):
             if not isinstance(getattr(self, name), str):
                 raise ValueError("Некорректная настройка: " + name)
@@ -63,12 +66,13 @@ class Settings:
             if type(getattr(self, name)) not in (int, float):
                 raise ValueError("Некорректная настройка: " + name)
         from .catalog import MODELS
+        MODELS = models if models is not None else MODELS
         if self.local_model not in MODELS:
             raise ValueError("Неизвестная локальная модель OCR")
         if not self.remote_model.strip():
             raise ValueError("Укажите облачную модель OCR")
         if self.review_local_model not in MODELS or MODELS[self.review_local_model].mode != "json":
-            raise ValueError("Для проверки выберите vision-модель Qwen")
+            raise ValueError("Для проверки выберите vision-модель с текстовыми инструкциями")
         if not isinstance(self.review_remote_model, str) or not self.review_remote_model.strip():
             raise ValueError("Укажите облачную модель проверки")
         from .hotkeys import parse_hotkey
@@ -77,6 +81,10 @@ class Settings:
             raise ValueError("Горячие клавиши должны различаться")
         if self.provider not in {"local", "openrouter"}:
             raise ValueError("Неизвестный OCR-провайдер")
+        if self.review_provider not in {"local", "openrouter"}:
+            raise ValueError("Неизвестный провайдер проверки")
+        if self.capture_format not in {"auto", "text", "csv"}:
+            raise ValueError("Неизвестный формат распознавания")
         if self.acceleration not in {"gpu", "cpu"}:
             raise ValueError("Выберите GPU или CPU для локальной модели")
         if self.remote_mode not in {"json", "transcription"}:
@@ -88,8 +96,8 @@ class Settings:
         if not 128 <= self.max_tokens <= 8192:
             raise ValueError("Некорректный предел ответа")
 
-    def save(self, directory: Path):
-        self.validate()
+    def save(self, directory: Path, models=None):
+        self.validate(models)
         encoded = json.dumps(asdict(self), ensure_ascii=False, indent=2).encode("utf-8")
         if len(encoded) > 65536:
             raise ValueError("Настройки слишком большие")

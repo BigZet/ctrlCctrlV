@@ -45,6 +45,10 @@ def guess_language(text):
     stripped = text.lstrip()
     if stripped.startswith(("{", "[")):
         return "json"
+    if re.search(r"(?im)^\s*(?:SELECT|WITH\s+\w+\s+AS|INSERT\s+INTO|UPDATE\s+\w+\s+SET|CREATE\s+TABLE|DELETE\s+FROM)\b", text):
+        return "sql"
+    if re.search(r"\b(?:public|private|protected)\s+(?:static\s+)?(?:class|void|int|String)\b|\bSystem\.out\.", text):
+        return "java"
     if re.search(r"(?m)^\s*(?:async\s+def|def|class|import|from|if|elif|for|while|try|with)\b", text):
         return "python"
     return "none"

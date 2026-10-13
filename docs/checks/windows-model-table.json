@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-12",
+  "changes": [
+    "model table with row and bulk actions",
+    "208x36 progress and elapsed time indicator",
+    "per-image retry model selection",
+    "OpenRouter vision and parameter validation",
+    "safe HTTP400 classification"
+  ],
+  "tests": {
+    "passed": 270,
+    "seconds": 12.98
+  },
+  "build": {
+    "path": "artifacts/builds/windows-model-table/ctrlCctrlV-windows-x64.zip",
+    "sha256": "32d32d25e5287922c7a1321b8977f6620b4f912869becb4ad62af9fff945144d",
+    "frozen_smoke": true
+  },
+  "native_indicator": {
+    "foreground_preserved": true,
+    "visible": true,
+    "size": [
+      208,
+      36
+    ],
+    "progress": 35,
+    "elapsed": "00:01",
+    "native_platform": "windows",
+    "timer_stopped_when_hidden": true
+  },
+  "native_model_table": {
+    "rows_visible": 4,
+    "selection_enables_bulk_buttons": true,
+    "computer_use_stopped_by_user_escape": true
+  },
+  "public_catalog": {
+    "vision_models": 296,
+    "without_temperature": 105,
+    "without_response_format": 31,
+    "paid_requests": 0
+  },
+  "macos_native_test": false
+}
