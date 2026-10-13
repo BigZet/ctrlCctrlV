@@ -28,8 +28,10 @@
 
 ## Tasks
 
-- [ ] Windows: extend `scripts/build_windows.py`, add Inno Setup definition and focused packaging tests. Verify silent install, upgrade, frozen smoke and uninstall on Windows Actions runner.
-- [ ] macOS: extend `scripts/build_macos.py` and focused tests for DMG staging, checksum and validation. Verify a temporary installed copy; preserve existing app.
-- [ ] Metadata/docs: update `pyproject.toml`, `__init__.py`, `.spec`, sidebar version, README and release notes.
-- [ ] CI: extend `.github/workflows/desktop.yml` to build and verify both installers, upload exact packages and checksums.
-- [ ] Verify and publish: run local suite/source smoke, review changes, commit/push, wait for both CI jobs, download and checksum artifacts, tag tested commit and publish a fully populated GitHub release.
+- [x] Windows: extend `scripts/build_windows.py`, add Inno Setup definition and focused packaging tests. Verify silent install, repeated installation, frozen smoke and uninstall on Windows Actions runner.
+- [x] macOS: extend `scripts/build_macos.py` and focused tests for DMG staging, checksum and validation. Verify a temporary installed copy; preserve existing app.
+- [x] Metadata/docs: update `pyproject.toml`, `__init__.py`, `.spec`, sidebar version, README and release notes.
+- [x] CI: extend `.github/workflows/desktop.yml` to build and verify both installers, upload exact packages and checksums.
+- [x] Verify and publish: run local suite/source smoke, review changes, commit/push, wait for both CI jobs, download and checksum artifacts on a GitHub runner, tag tested commit and publish a fully populated GitHub release.
+
+Completed: [v0.1.1](https://github.com/BigZet/ctrlCctrlV/releases/tag/v0.1.1). Build run `38380193396`, publication run `38382157565`; see `docs/STATUS.md`. GitHub publication was used because large downloads to the local Mac were interrupted by connection failures. The published packages retain the exact tested commit `fc87c96e27e0b96bb2a836caef37969a9e4caff3`.
