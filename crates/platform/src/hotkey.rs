@@ -33,10 +33,7 @@ pub fn parse_shortcut(value: &str) -> Result<Shortcut> {
     let mut parts: Vec<&str> = value.split('+').collect();
     let key = match parts.pop().unwrap_or_default() {
         "esc" => Key::Escape,
-        k if k.len() == 1
-            && k.chars()
-                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit()) =>
-        {
+        k if k.len() == 1 && k.chars().all(|c| c.is_ascii_lowercase() || c.is_ascii_digit()) => {
             Key::Char(k.chars().next().unwrap())
         }
         _ => return Err(Error::Operation(EXAMPLE.into())),
@@ -51,20 +48,14 @@ pub fn parse_shortcut(value: &str) -> Result<Shortcut> {
             "alt" => &mut modifiers.alt,
             "shift" => &mut modifiers.shift,
             "cmd" => &mut modifiers.cmd,
-            _ => {
-                return Err(Error::Operation(
-                    "Модификаторы: ctrl, alt, cmd (или win), shift".into(),
-                ))
-            }
+            _ => return Err(Error::Operation("Модификаторы: ctrl, alt, cmd (или win), shift".into())),
         };
         if std::mem::replace(slot, true) {
             return Err(Error::Operation(EXAMPLE.into()));
         }
     }
     if !(modifiers.ctrl || modifiers.alt || modifiers.cmd) {
-        return Err(Error::Operation(
-            "Добавьте ctrl, alt или cmd к сочетанию".into(),
-        ));
+        return Err(Error::Operation("Добавьте ctrl, alt или cmd к сочетанию".into()));
     }
     Ok(Shortcut { modifiers, key })
 }
@@ -74,7 +65,7 @@ pub use native::Hotkeys;
 
 #[cfg(any(windows, target_os = "macos"))]
 mod native {
-    use super::{parse_shortcut, Key, Shortcut};
+    use super::{Key, Shortcut, parse_shortcut};
     use crate::{Error, Result};
     use global_hotkey::hotkey::{Code, HotKey, Modifiers as Mods};
     use global_hotkey::{GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState};
@@ -93,8 +84,8 @@ mod native {
 
     impl<A: Clone> Hotkeys<A> {
         pub fn new() -> Result<Self> {
-            let manager = GlobalHotKeyManager::new()
-                .map_err(|e| Error::Operation(format!("Горячие клавиши недоступны: {e}")))?;
+            let manager =
+                GlobalHotKeyManager::new().map_err(|e| Error::Operation(format!("Горячие клавиши недоступны: {e}")))?;
             Ok(Self {
                 manager,
                 registered: Vec::new(),

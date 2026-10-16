@@ -67,7 +67,7 @@ impl CancelToken {
     }
 
     pub fn is_cancelled(&self) -> bool {
-        *self.0 .0.lock().unwrap_or_else(|e| e.into_inner())
+        *self.0.0.lock().unwrap_or_else(|e| e.into_inner())
     }
 
     /// Sleep for `timeout` unless cancelled first. Returns whether it was cancelled.
@@ -107,9 +107,7 @@ pub fn type_text<K: Keyboard>(
             return Err(Error::Cancelled(STOPPED.into()));
         }
         if Instant::now() >= deadline {
-            return Err(Error::Operation(
-                "Отпустите клавиши сочетания перед печатью".into(),
-            ));
+            return Err(Error::Operation("Отпустите клавиши сочетания перед печатью".into()));
         }
     }
     let target = keyboard.focused_target();
@@ -131,11 +129,7 @@ pub fn type_text<K: Keyboard>(
         Ok(())
     };
 
-    let chars: Vec<char> = text
-        .replace("\r\n", "\n")
-        .replace('\r', "\n")
-        .chars()
-        .collect();
+    let chars: Vec<char> = text.replace("\r\n", "\n").replace('\r', "\n").chars().collect();
     for (index, &ch) in chars.iter().enumerate() {
         check()?;
         match ch {
@@ -254,27 +248,11 @@ mod tests {
             spaces_per_tab: 2,
             ..fast()
         };
-        type_text(
-            &fake,
-            "Ж\r\n\t🙂\n",
-            &settings,
-            &CancelToken::new(),
-            |_, _| {},
-            None,
-        )
-        .unwrap();
+        type_text(&fake, "Ж\r\n\t🙂\n", &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
         use Event::*;
         assert_eq!(
             fake.events(),
-            [
-                Text('Ж'),
-                Enter,
-                Indent,
-                Text(' '),
-                Text(' '),
-                Text('🙂'),
-                Enter
-            ]
+            [Text('Ж'), Enter, Indent, Text(' '), Text(' '), Text('🙂'), Enter]
         );
     }
 
@@ -288,15 +266,7 @@ mod tests {
     #[test]
     fn full_window_identity_is_read_once_per_run_and_per_line() {
         let fake = Fake::new();
-        type_text(
-            &fake,
-            "abcdef\nghij",
-            &fast(),
-            &CancelToken::new(),
-            |_, _| {},
-            None,
-        )
-        .unwrap();
+        type_text(&fake, "abcdef\nghij", &fast(), &CancelToken::new(), |_, _| {}, None).unwrap();
         assert_eq!(fake.full_checks.get(), 2);
     }
 
@@ -320,8 +290,7 @@ mod tests {
     fn cancel_stops_before_next_character() {
         let fake = Fake::new();
         let cancel = CancelToken::new();
-        let err =
-            type_text(&fake, "abc", &fast(), &cancel, |_, _| cancel.cancel(), None).unwrap_err();
+        let err = type_text(&fake, "abc", &fast(), &cancel, |_, _| cancel.cancel(), None).unwrap_err();
         assert!(matches!(err, Error::Cancelled(_)));
         assert_eq!(fake.events(), [Event::Text('a')]);
     }
@@ -344,15 +313,7 @@ mod tests {
     fn focus_change_before_start_never_types() {
         let fake = Fake::new();
         fake.pid.set(200);
-        let err = type_text(
-            &fake,
-            "abc",
-            &fast(),
-            &CancelToken::new(),
-            |_, _| {},
-            Some(&100),
-        )
-        .unwrap_err();
+        let err = type_text(&fake, "abc", &fast(), &CancelToken::new(), |_, _| {}, Some(&100)).unwrap_err();
         assert!(matches!(err, Error::Cancelled(_)));
         assert!(fake.events().is_empty());
     }

@@ -3,9 +3,9 @@ use std::mem::size_of;
 
 use windows::Win32::Foundation::HWND;
 use windows::Win32::UI::Input::KeyboardAndMouse::{
-    GetAsyncKeyState, SendInput, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT, KEYBD_EVENT_FLAGS,
-    KEYEVENTF_EXTENDEDKEY, KEYEVENTF_KEYUP, KEYEVENTF_UNICODE, VIRTUAL_KEY, VK_CONTROL, VK_HOME,
-    VK_LWIN, VK_MENU, VK_RETURN, VK_RWIN, VK_SHIFT, VK_TAB,
+    GetAsyncKeyState, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBD_EVENT_FLAGS, KEYBDINPUT, KEYEVENTF_EXTENDEDKEY,
+    KEYEVENTF_KEYUP, KEYEVENTF_UNICODE, SendInput, VIRTUAL_KEY, VK_CONTROL, VK_HOME, VK_LWIN, VK_MENU, VK_RETURN,
+    VK_RWIN, VK_SHIFT, VK_TAB,
 };
 use windows::Win32::UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowThreadProcessId};
 
@@ -69,8 +69,7 @@ fn send(events: &[INPUT]) -> Result<()> {
             unsafe { SendInput(&releases, size_of::<INPUT>() as i32) };
         }
         return Err(Error::Operation(
-            "Windows отклонила ввод. Проверьте активное окно и уровни прав приложения и редактора."
-                .into(),
+            "Windows отклонила ввод. Проверьте активное окно и уровни прав приложения и редактора.".into(),
         ));
     }
     Ok(())
@@ -82,10 +81,7 @@ fn press(vk: VIRTUAL_KEY, extended: bool) -> Result<()> {
     } else {
         KEYBD_EVENT_FLAGS(0)
     };
-    send(&[
-        key_input(vk, 0, flags),
-        key_input(vk, 0, flags | KEYEVENTF_KEYUP),
-    ])
+    send(&[key_input(vk, 0, flags), key_input(vk, 0, flags | KEYEVENTF_KEYUP)])
 }
 
 impl Keyboard for WindowsKeyboard {

@@ -36,12 +36,7 @@ pub fn encode_png(image: &RgbaImage) -> Result<Vec<u8>> {
         .collect();
     let mut out = Vec::with_capacity(rgb.len() / 4);
     PngEncoder::new_with_quality(&mut out, CompressionType::Fast, FilterType::Adaptive)
-        .write_image(
-            &rgb,
-            image.width(),
-            image.height(),
-            image::ExtendedColorType::Rgb8,
-        )
+        .write_image(&rgb, image.width(), image.height(), image::ExtendedColorType::Rgb8)
         .map_err(|e| Error::Operation(format!("Не удалось сохранить снимок: {e}")))?;
     Ok(out)
 }
@@ -51,7 +46,7 @@ pub use native::*;
 
 #[cfg(any(windows, target_os = "macos"))]
 mod native {
-    use super::{native_rect, Region};
+    use super::{Region, native_rect};
     use crate::{Error, Result};
     use image::RgbaImage;
     use xcap::Monitor;
@@ -78,10 +73,7 @@ mod native {
     fn info(monitor: &Monitor) -> Result<MonitorInfo> {
         Ok(MonitorInfo {
             id: monitor.id().map_err(failed)?,
-            name: monitor
-                .friendly_name()
-                .or_else(|_| monitor.name())
-                .unwrap_or_default(),
+            name: monitor.friendly_name().or_else(|_| monitor.name()).unwrap_or_default(),
             x: monitor.x().map_err(failed)?,
             y: monitor.y().map_err(failed)?,
             width: monitor.width().map_err(failed)?,
@@ -105,11 +97,7 @@ mod native {
             .ok_or_else(|| Error::Operation("Монитор отключён. Выделите область заново.".into()))?;
         let info = info(&monitor)?;
         // Windows desktop coordinates are physical pixels; macOS uses points.
-        let scale = if cfg!(windows) {
-            info.scale_factor as f64
-        } else {
-            1.0
-        };
+        let scale = if cfg!(windows) { info.scale_factor as f64 } else { 1.0 };
         let (x, y, w, h) = native_rect(region, scale, (info.width, info.height))
             .ok_or_else(|| Error::Operation("Выделенная область пуста".into()))?;
         monitor.capture_region(x, y, w, h).map_err(failed)
@@ -154,9 +142,7 @@ mod tests {
 
     #[test]
     fn png_round_trips_without_alpha() {
-        let image = RgbaImage::from_fn(7, 3, |x, y| {
-            image::Rgba([x as u8 * 30, y as u8 * 80, 7, 255])
-        });
+        let image = RgbaImage::from_fn(7, 3, |x, y| image::Rgba([x as u8 * 30, y as u8 * 80, 7, 255]));
         let png = encode_png(&image).unwrap();
         let decoded = image::load_from_memory(&png).unwrap();
         assert_eq!(decoded.color(), image::ColorType::Rgb8);

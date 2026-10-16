@@ -10,10 +10,10 @@ fn main() {}
 mod native {
     use std::time::{Duration, Instant};
 
-    use ctrlcctrlv_platform::capture::{capture_region, encode_png, monitors, Region};
+    use ctrlcctrlv_platform::capture::{Region, capture_region, encode_png, monitors};
     use ctrlcctrlv_platform::clipboard::Clipboard;
-    use ctrlcctrlv_platform::typing::{type_text, CancelToken, TypingSettings};
-    use ctrlcctrlv_platform::{permissions, NativeKeyboard};
+    use ctrlcctrlv_platform::typing::{CancelToken, TypingSettings, type_text};
+    use ctrlcctrlv_platform::{NativeKeyboard, permissions};
 
     pub fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("{:?}", permissions());
@@ -58,19 +58,8 @@ mod native {
                 ..Default::default()
             };
             let started = Instant::now();
-            type_text(
-                &NativeKeyboard,
-                text,
-                &settings,
-                &CancelToken::new(),
-                |_, _| {},
-                None,
-            )?;
-            println!(
-                "typed {} chars in {:?}",
-                text.chars().count(),
-                started.elapsed()
-            );
+            type_text(&NativeKeyboard, text, &settings, &CancelToken::new(), |_, _| {}, None)?;
+            println!("typed {} chars in {:?}", text.chars().count(), started.elapsed());
         }
         Ok(())
     }

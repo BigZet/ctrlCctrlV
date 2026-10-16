@@ -3,8 +3,7 @@ use std::ptr::{self, NonNull};
 
 use objc2_app_kit::NSWorkspace;
 use objc2_application_services::{
-    kAXTrustedCheckOptionPrompt, AXError, AXIsProcessTrusted, AXIsProcessTrustedWithOptions,
-    AXUIElement,
+    AXError, AXIsProcessTrusted, AXIsProcessTrustedWithOptions, AXUIElement, kAXTrustedCheckOptionPrompt,
 };
 use objc2_core_foundation::{CFBoolean, CFDictionary, CFRetained, CFString, CFType};
 use objc2_core_graphics::{
@@ -62,9 +61,7 @@ pub fn open_permission_settings(permission: Permission) -> Result<bool> {
         .status()
         .is_ok_and(|status| status.success());
     if !opened {
-        return Err(Error::Operation(
-            "Не удалось открыть системные настройки macOS".into(),
-        ));
+        return Err(Error::Operation("Не удалось открыть системные настройки macOS".into()));
     }
     Ok(true)
 }
@@ -103,9 +100,7 @@ fn post(code: CGKeyCode, flags: CGEventFlags, text: Option<&[u16]>) -> Result<()
         CGEvent::set_flags(Some(&event), flags);
         if let Some(units) = text {
             // Quartz expects UTF-16 code units; non-BMP characters are a surrogate pair.
-            unsafe {
-                CGEvent::keyboard_set_unicode_string(Some(&event), units.len() as _, units.as_ptr())
-            };
+            unsafe { CGEvent::keyboard_set_unicode_string(Some(&event), units.len() as _, units.as_ptr()) };
         }
         CGEvent::post(CGEventTapLocation::HIDEventTap, Some(&event));
     }
@@ -136,8 +131,7 @@ impl Keyboard for MacKeyboard {
         }
         let mut value: *const CFType = ptr::null();
         let attribute = CFString::from_static_str("AXFocusedWindow");
-        let error =
-            unsafe { application.copy_attribute_value(&attribute, NonNull::from(&mut value)) };
+        let error = unsafe { application.copy_attribute_value(&attribute, NonNull::from(&mut value)) };
         let value = NonNull::new(value.cast_mut())?;
         // Copy* returns a +1 reference; take ownership before any early return.
         let value = unsafe { CFRetained::from_raw(value) };
