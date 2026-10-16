@@ -1,0 +1,44 @@
+name: Rust core
+
+on:
+  push:
+    branches: ['main', 'claude/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    env:
+      CARGO_TERM_COLOR: always
+      PYTHONUTF8: '1'
+      # Compatibility tests run the Python app's own code and must not be skipped.
+      CTRLCCTRLV_REQUIRE_PYTHON: '1'
+      CTRLCCTRLV_PYTHON: python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install "httpx>=0.27,<1" "keyring>=25,<26"
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
+      - name: Key shared with Python keyring (Credential Manager)
+        if: runner.os == 'Windows'
+        env:
+          CTRLCCTRLV_KEYRING_TEST: '1'
+        run: cargo test --test credentials -- --nocapture
