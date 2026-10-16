@@ -1,0 +1,30 @@
+name: Rust platform layer
+
+on:
+  push:
+    branches: ['main']
+    paths: ['crates/platform/**', '.github/workflows/rust-platform.yml']
+  pull_request:
+    paths: ['crates/platform/**', '.github/workflows/rust-platform.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  platform:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: crates/platform
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup component add clippy
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+      - run: cargo build --release --example smoke
