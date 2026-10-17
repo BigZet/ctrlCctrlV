@@ -336,6 +336,16 @@ pub fn http_error(status: u16, body: &[u8]) -> String {
         };
         return format!("OCR HTTP 400. {reason} Буфер не изменён.");
     }
+    if matches!(status, 401 | 403)
+        && let Some(provider) = upstream_provider(body)
+    {
+        // OpenRouter accepted the key; the upstream provider refused it, for
+        // example a broken bring-your-own key for that provider.
+        return format!(
+            "OCR HTTP {status} от провайдера {provider}. Ключ OpenRouter в порядке: проверьте ключ этого провайдера \
+             в OpenRouter (Settings → Integrations) или выберите другую модель. Буфер не изменён."
+        );
+    }
     let reason = match status {
         401 => "Проверьте API-ключ.",
         402 => "Недостаточно средств OpenRouter.",
@@ -345,6 +355,17 @@ pub fn http_error(status: u16, body: &[u8]) -> String {
         _ => "Сервис недоступен. Повторите позже.",
     };
     format!("OCR HTTP {status}. {reason} Буфер не изменён.")
+}
+
+/// The upstream provider OpenRouter names in an error, if it is a plain name.
+/// Only the name is shown: provider messages may quote the request.
+fn upstream_provider(body: &[u8]) -> Option<String> {
+    let value: Value = serde_json::from_slice(body).ok()?;
+    let name = value.pointer("/error/metadata/provider_name")?.as_str()?.trim();
+    let plain = !name.is_empty()
+        && name.chars().count() <= 64
+        && name.chars().all(|c| c.is_alphanumeric() || matches!(c, ' ' | '-' | '_' | '.'));
+    plain.then(|| name.to_string())
 }
 
 /// One provider's outcome in a side-by-side comparison.

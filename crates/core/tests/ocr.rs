@@ -323,3 +323,16 @@ async fn stream_falls_back_to_a_plain_answer_and_rejects_cut_streams() {
     let error = provider.recognize_stream(b"png", &Operation::new(), &Request::default(), &|_| {}).await.unwrap_err();
     assert!(error.to_string().contains("401"));
 }
+
+#[test]
+fn names_the_upstream_provider_that_refused_the_request() {
+    let body =
+        br#"{"error": {"code": 401, "message": "secret prompt text", "metadata": {"provider_name": "Anthropic"}}}"#;
+    let message = ctrlcctrlv_core::ocr::http_error(401, body);
+    assert!(message.contains("от провайдера Anthropic"), "{message}");
+    assert!(!message.contains("secret"));
+    // Without a plain provider name the message stays the Python app's.
+    let odd = br#"{"error": {"metadata": {"provider_name": "<script>"}}}"#;
+    assert_eq!(ctrlcctrlv_core::ocr::http_error(401, odd), "OCR HTTP 401. Проверьте API-ключ. Буфер не изменён.");
+    assert_eq!(ctrlcctrlv_core::ocr::http_error(401, b""), "OCR HTTP 401. Проверьте API-ключ. Буфер не изменён.");
+}
