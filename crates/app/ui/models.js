@@ -1,8 +1,11 @@
-// The models page: local models with downloads, and the OpenRouter catalog.
+// The models page: the only place models get their roles (the one behind the
+// hotkey, the ones checked in the result window), local models with
+// downloads, and the OpenRouter catalog.
 const Models = {
   tab: "local",
   library: null,
   catalog: { models: [], favorites: [] },
+  view: null,
   settings: null,
   progress: null,
 
@@ -46,11 +49,13 @@ const Models = {
     if (library) this.library = library;
     if (catalog) this.catalog = catalog;
     if (view) {
+      this.view = view;
       this.settings = view.settings;
       $("#m-key-state").textContent = view.hasKey
         ? "Ключ сохранён в системном хранилище. Чтобы удалить его, сохраните пустое поле."
         : "Ключ не сохранён. Он хранится в Credential Manager или Keychain, не в файлах.";
     }
+    this.renderRoles();
     this.renderLocal();
     this.renderCatalog();
   },
@@ -60,10 +65,78 @@ const Models = {
     if ((await call("settings_save", { settings })) !== undefined) toast("Настройки сохранены");
   },
 
+  /// `local:id` or `openrouter:id` of the model behind the capture hotkey.
+  hotkeyKey() {
+    const s = this.settings;
+    return s.provider === "openrouter" ? `openrouter:${s.remote_model}` : `local:${s.local_model}`;
+  },
+
+  pickedKeys() {
+    return new Set((this.view?.reviewModels || []).map(choiceKey));
+  },
+
+  renderRoles() {
+    if (!this.library || !this.view) return;
+    const s = this.settings;
+    const choices = modelChoices(this.library, this.catalog, this.view);
+    const where = (c) => (c.provider === "local" ? "на компьютере" : "OpenRouter");
+    const current = this.hotkeyKey();
+    const options = choices.map((c) => el("option", { value: choiceKey(c), selected: choiceKey(c) === current }, `${c.label} · ${where(c)}`));
+    if (!choices.some((c) => choiceKey(c) === current)) {
+      const why = s.provider === "openrouter" ? "нужен ключ OpenRouter" : "не установлена";
+      options.unshift(el("option", { value: current, selected: true }, `${current.slice(current.indexOf(":") + 1)} · ${why}`));
+    }
+    const select = el("select", { onchange: () => {
+      const value = select.value;
+      const provider = value.slice(0, value.indexOf(":"));
+      const model = value.slice(value.indexOf(":") + 1);
+      this.useFor(provider === "local" ? "local_model" : "remote_model", model, { provider });
+    } }, options);
+    const hotkey = el("div", { class: "row" }, select);
+    if (s.provider === "openrouter") {
+      hotkey.append(el("select", { title: "Протокол запроса к этой модели", onchange: (event) => this.useFor("remote_mode", event.target.value) },
+        el("option", { value: "json", selected: s.remote_mode !== "transcription" }, "JSON с инструкцией"),
+        el("option", { value: "transcription", selected: s.remote_mode === "transcription" }, "Только изображение (OCR-модели без инструкций)")));
+    }
+    const picked = this.pickedKeys();
+    const chips = choices.map((c) => el("button", {
+      class: picked.has(choiceKey(c)) ? "chip on" : "chip",
+      title: c.reviews ? c.model : "Только распознаёт заново, проверять текст не умеет",
+      onclick: () => this.togglePicked(c, choices),
+    }, picked.has(choiceKey(c)) ? "✓ " : "", c.label,
+      el("span", { class: "where" }, c.provider === "local" ? "лок" : "облако"),
+      c.reviews ? null : el("span", { class: "where" }, "только OCR")));
+    if (chips.length === 0) chips.push(el("span", { class: "muted small" }, "Установите локальную модель или добавьте ключ и отметьте ★ облачные."));
+    $("#m-roles").replaceChildren(
+      el("div", { class: "role" },
+        el("b", {}, "По горячей клавише распознаёт", el("small", {}, `${s.capture_hotkey} → буфер обмена и окно результата`)),
+        hotkey),
+      el("div", { class: "role" },
+        el("b", {}, "В окне результата отмечены", el("small", {}, "Запускаются кнопкой «Запустить»; там же их можно менять, выбор запоминается")),
+        el("div", { class: "chips" }, chips)),
+      el("p", { class: "muted small" },
+        "В окне результата доступны все установленные локальные модели и облачные со звёздочкой ★ из каталога OpenRouter. ",
+        "Облачные работают параллельно, локальные по очереди."));
+  },
+
+  async togglePicked(choice, choices) {
+    const picked = this.pickedKeys();
+    const key = choiceKey(choice);
+    if (picked.has(key)) picked.delete(key);
+    else picked.add(key);
+    const models = choices.filter((c) => picked.has(choiceKey(c))).map(({ provider, model }) => ({ provider, model }));
+    const saved = await call("review_models_set", { models });
+    if (saved) {
+      this.view.reviewModels = saved;
+      this.renderRoles();
+      this.renderLocal();
+      this.renderCatalog();
+    }
+  },
+
   renderLocal() {
     const library = this.library;
     if (!library) return;
-    const s = this.settings || {};
     const loaded = library.models.find((m) => m.id === library.loaded);
     $("#m-engine").replaceChildren(
       el("span", { class: "dot", style: library.loaded ? "" : "background: var(--border-strong)" }),
@@ -81,8 +154,8 @@ const Models = {
         el("span", { class: "tag" }, model.license),
       ];
       if (model.installed) tags.unshift(el("span", { class: "tag ok" }, "✓ установлена"));
-      if (s.local_model === model.id) tags.push(el("span", { class: "tag on" }, "OCR"));
-      if (s.review_local_model === model.id) tags.push(el("span", { class: "tag on" }, "проверка"));
+      if (this.hotkeyKey() === `local:${model.id}`) tags.push(el("span", { class: "tag on" }, "по горячей клавише"));
+      if (this.pickedKeys().has(`local:${model.id}`)) tags.push(el("span", { class: "tag on" }, "в окне результата"));
       const actions = el("div", { class: "row" });
       if (installing) {
         const p = this.progress;
@@ -94,16 +167,9 @@ const Models = {
         actions.append(el("button", { class: "primary", disabled: library.installing,
           onclick: () => call("model_install", { id: model.id }).then(() => this.load()) }, "Установить"));
       } else {
-        actions.append(...[
-          el("button", { disabled: s.local_model === model.id,
-            onclick: () => this.useFor("local_model", model.id, { provider: "local" }) }, "Для OCR"),
-          model.reviews
-            ? el("button", { disabled: s.review_local_model === model.id,
-              onclick: () => this.useFor("review_local_model", model.id, { review_provider: "local" }) }, "Для проверки")
-            : null,
+        actions.append(
           el("span", { class: "spacer" }),
-          el("button", { class: "ghost danger", onclick: (event) => this.remove(model, event.currentTarget) }, "Удалить"),
-        ].filter(Boolean));
+          el("button", { class: "ghost danger", onclick: (event) => this.remove(model, event.currentTarget) }, "Удалить"));
       }
       return el("div", { class: "card model" },
         el("h3", {}, model.label),
@@ -152,32 +218,31 @@ const Models = {
     const query = $("#m-search").value.trim().toLowerCase();
     const onlyFavorites = $("#m-only-fav").checked;
     const favorites = new Set(this.catalog.favorites);
-    const s = this.settings || {};
+    const hotkey = this.settings ? this.hotkeyKey() : "";
+    const picked = this.pickedKeys();
     const models = this.catalog.models.filter((m) =>
       (!onlyFavorites || favorites.has(m.id)) &&
       (!query || m.id.toLowerCase().includes(query) || m.name.toLowerCase().includes(query)));
     const rows = models.slice(0, 300).map((model) => {
       const favorite = favorites.has(model.id);
       return el("div", { class: "catalog-row" },
-        el("button", { class: favorite ? "star on" : "star", title: favorite ? "Убрать из избранного" : "В избранное — появится в окне результата",
+        el("button", { class: favorite ? "star on" : "star",
+          title: favorite ? "Убрать из окна результата" : "Показывать в окне результата и в списках выше",
           onclick: async () => {
             const list = await call("catalog_favorite", { id: model.id, favorite: !favorite });
             if (list) {
               this.catalog.favorites = list;
+              this.renderRoles();
               this.renderCatalog();
               Result.loadChoices();
             }
           } }, favorite ? "★" : "☆"),
         el("div", { class: "name" },
-          el("div", {}, model.name, s.remote_model === model.id ? el("span", { class: "tag on", style: "margin-left: 6px" }, "OCR") : null,
-            s.review_remote_model === model.id ? el("span", { class: "tag on", style: "margin-left: 6px" }, "проверка") : null),
+          el("div", {}, model.name,
+            hotkey === `openrouter:${model.id}` ? el("span", { class: "tag on", style: "margin-left: 6px" }, "по горячей клавише") : null,
+            picked.has(`openrouter:${model.id}`) ? el("span", { class: "tag on", style: "margin-left: 6px" }, "в окне результата") : null),
           el("div", { class: "id" }, model.id, model.structured ? "" : " · без JSON-режима")),
-        el("div", { class: "price", title: "Цена за миллион токенов: вход / выход" }, `$${model.input_price} / $${model.output_price}`),
-        el("div", { class: "row" },
-          el("button", { class: "icon", disabled: s.remote_model === model.id,
-            onclick: () => this.useFor("remote_model", model.id, { provider: "openrouter" }) }, "Для OCR"),
-          el("button", { class: "icon", disabled: s.review_remote_model === model.id,
-            onclick: () => this.useFor("review_remote_model", model.id, { review_provider: "openrouter" }) }, "Для проверки")));
+        el("div", { class: "price", title: "Цена за миллион токенов: вход / выход" }, `$${model.input_price} / $${model.output_price}`));
     });
     if (rows.length === 0) {
       rows.push(el("div", { class: "catalog-row muted" }, el("span"),

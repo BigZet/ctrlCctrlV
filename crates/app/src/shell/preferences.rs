@@ -2,22 +2,70 @@
 //! apply at once: hotkeys are registered again, the tray menu shows them.
 use ctrlcctrlv_core::credentials::{Credentials, check_key};
 use ctrlcctrlv_core::settings::{Settings, data_directory};
+use ctrlcctrlv_core::ui_state::ModelRef;
 use serde::Serialize;
 use tauri::{AppHandle, Manager};
 
-use super::{Shell, changed, hotkeys, tray};
+use super::{Shell, changed, hotkeys, lock, tray};
+use crate::model::ModelChoice;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsView {
     settings: Settings,
     has_key: bool,
+    /// Checked by default in the result window; the first one is also the
+    /// Python app's review model.
+    review_models: Vec<ModelChoice>,
 }
 
 #[tauri::command]
 pub fn settings_get(app: AppHandle) -> SettingsView {
+    let shell = app.state::<Shell>();
     let has_key = Credentials::system().and_then(|c| c.read()).is_ok_and(|key| !key.is_empty());
-    SettingsView { settings: app.state::<Shell>().settings(), has_key }
+    SettingsView { settings: shell.settings(), has_key, review_models: review_models(&shell) }
+}
+
+/// The stored list, or the Python app's single review model before the list
+/// was ever saved.
+fn review_models(shell: &Shell) -> Vec<ModelChoice> {
+    let stored = lock(&shell.ui).review_models();
+    if !stored.is_empty() {
+        return stored.into_iter().map(|m| ModelChoice { provider: m.provider, model: m.model }).collect();
+    }
+    let settings = shell.settings();
+    let local = settings.review_provider == "local";
+    let model = if local { settings.review_local_model } else { settings.review_remote_model };
+    vec![ModelChoice { provider: if local { "local" } else { "openrouter" }.into(), model }]
+}
+
+/// Saves the default selection of the result window. The first model also
+/// becomes the review model in `settings.json`, so the Python app follows.
+#[tauri::command]
+pub fn review_models_set(app: AppHandle, models: Vec<ModelChoice>) -> Result<Vec<ModelChoice>, String> {
+    let shell = app.state::<Shell>();
+    let mut seen = std::collections::HashSet::new();
+    let models: Vec<ModelChoice> = models.into_iter().filter(|m| seen.insert(m.clone())).collect();
+    let refs: Vec<ModelRef> =
+        models.iter().map(|m| ModelRef { provider: m.provider.clone(), model: m.model.clone() }).collect();
+    lock(&shell.ui).set_review_models(&refs).map_err(|e| e.to_string())?;
+    if let Some(first) = models.first() {
+        let mut settings = shell.settings();
+        settings.review_provider = first.provider.clone();
+        if first.local() {
+            settings.review_local_model = first.model.clone();
+        } else {
+            settings.review_remote_model = first.model.clone();
+        }
+        // A model the Python app would refuse (an OCR-only local one) is kept
+        // out of its field; the list itself still holds it.
+        if settings.validate(&shell.models).is_ok() {
+            settings.save(&data_directory(), &shell.models).map_err(|e| e.to_string())?;
+            shell.set_settings(settings);
+        }
+    }
+    changed(&app);
+    Ok(models)
 }
 
 #[tauri::command]

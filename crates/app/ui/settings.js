@@ -1,8 +1,6 @@
 // The settings page, written to the same settings.json as the Python app.
 const SettingsPage = {
   settings: null,
-  library: null,
-  catalog: [],
 
   init() {
     $("#s-save").addEventListener("click", () => this.save());
@@ -19,34 +17,21 @@ const SettingsPage = {
   },
 
   async load() {
-    const [view, library, catalog] = await Promise.all([call("settings_get"), call("models_list"), call("catalog_list")]);
-    if (!view || !library) return;
+    const view = await call("settings_get");
+    if (!view) return;
     this.settings = view.settings;
-    this.library = library;
-    this.catalog = catalog?.models || [];
     this.render();
   },
 
   render() {
-    const local = this.library.models.map((m) => [m.id, `${m.label}${m.installed ? "" : " (не установлена)"}`]);
-    const reviewers = this.library.models.filter((m) => m.reviews).map((m) => [m.id, m.label]);
-    const providers = [["local", "Локальная модель"], ["openrouter", "OpenRouter"]];
-    const remoteList = el("datalist", { id: "s-remote-models" }, this.catalog.map((m) => el("option", { value: m.id }, m.name)));
-    $("#s-form").replaceChildren(remoteList,
+    $("#s-form").replaceChildren(
       this.group("Распознавание", [
-        this.select("provider", "Где распознавать", providers),
-        this.select("local_model", "Локальная модель", local),
-        this.text("remote_model", "Модель OpenRouter", "s-remote-models"),
-        this.select("remote_mode", "Протокол OpenRouter", [["json", "JSON с инструкцией"], ["transcription", "Только изображение"]],
-          "Для специализированных OCR-моделей без инструкций"),
+        el("p", { class: "muted small", style: "margin: 0" },
+          "Какая модель распознаёт по горячей клавише и какие проверяют результат — в разделе ",
+          el("button", { class: "link", type: "button", onclick: () => App.show("models") }, "Модели"), "."),
         this.select("capture_format", "Формат", [["auto", "Автоматически"], ["text", "Текст"], ["csv", "Таблица (CSV)"]]),
-        this.number("max_tokens", "Предел ответа, токенов", 128, 8192, 1),
+        this.number("max_tokens", "Предел ответа, токенов", 128, 8192, 1, "Общий для всех моделей"),
         this.check("show_preview", "Открывать окно результата", "Иначе текст только копируется"),
-      ]),
-      this.group("Проверка", [
-        this.select("review_provider", "Где проверять по умолчанию", providers),
-        this.select("review_local_model", "Локальная модель", reviewers),
-        this.text("review_remote_model", "Модель OpenRouter", "s-remote-models"),
       ]),
       this.group("Горячие клавиши", [
         this.hotkey("capture_hotkey", "Распознать область"),
@@ -79,11 +64,6 @@ const SettingsPage = {
     const list = known ? options : [[value, value], ...options];
     return el("label", { class: "field" }, this.label(text, hint),
       el("select", { name }, list.map(([id, label]) => el("option", { value: id, selected: id === value }, label))));
-  },
-
-  text(name, text, list) {
-    return el("label", { class: "field" }, this.label(text),
-      el("input", { name, value: this.settings[name], list, spellcheck: "false" }));
   },
 
   /// `scale` converts the stored value for display (seconds shown as milliseconds).

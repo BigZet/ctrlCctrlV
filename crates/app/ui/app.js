@@ -42,6 +42,22 @@ async function call(command, args) {
   }
 }
 
+// The models the result window can run: installed local ones and, with a
+// key, the starred OpenRouter models plus the ones already given a role.
+function modelChoices(library, catalog, view) {
+  const names = new Map(catalog.models.map((m) => [m.id, m.name]));
+  const local = library.models.filter((m) => m.installed)
+    .map((m) => ({ provider: "local", model: m.id, label: m.label.replace(/ · .*$/, ""), reviews: m.reviews }));
+  const picked = view.reviewModels.filter((m) => m.provider === "openrouter").map((m) => m.model);
+  const ids = [...new Set([...catalog.favorites, ...picked, view.settings.remote_model])].filter(Boolean);
+  const remote = view.hasKey
+    ? ids.map((id) => ({ provider: "openrouter", model: id, label: names.get(id) || id, reviews: true }))
+    : [];
+  return [...local, ...remote];
+}
+
+const choiceKey = (choice) => `${choice.provider}:${choice.model}`;
+
 function formatSize(bytes) {
   return bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} ГБ` : `${Math.round(bytes / 1e6)} МБ`;
 }

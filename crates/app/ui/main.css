@@ -168,6 +168,13 @@ mark { color: inherit; border-radius: 2px; }
 
 /* Models */
 .tab { display: flex; flex-direction: column; gap: 12px; }
+.roles { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.roles .role { display: grid; grid-template-columns: 230px 1fr; gap: 10px; align-items: center; }
+.roles .role > b { font-weight: 600; }
+.roles .role small { display: block; color: var(--muted); font-size: 11.5px; font-weight: 400; }
+.roles select { max-width: 420px; }
+.roles p { margin: 0; }
+button.link { border: none; background: none; padding: 0; color: var(--accent); font: inherit; font-size: inherit; text-decoration: underline; cursor: pointer; }
 .engine { display: flex; align-items: center; gap: 12px; }
 .model-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
 .model { display: flex; flex-direction: column; gap: 8px; }
@@ -180,7 +187,7 @@ mark { color: inherit; border-radius: 2px; }
 .key { display: flex; flex-direction: column; gap: 8px; max-width: 640px; }
 .key label { font-weight: 600; }
 .catalog { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); overflow: hidden; }
-.catalog-row { display: grid; grid-template-columns: 28px 1fr auto auto; gap: 10px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.catalog-row { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--border); }
 .catalog-row:last-child { border-bottom: none; }
 .catalog-row .name { min-width: 0; }
 .catalog-row .name div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -10,7 +10,8 @@ const Result = {
   /// Who produced the text in the editor, stored in history with it.
   textModel: "",
   kind: localStorage.getItem("recheck-kind") || "review",
-  picked: new Set(JSON.parse(localStorage.getItem("recheck-models") || "null") || []),
+  /// Keys of the models checked by default, kept in the app's ui-state.
+  picked: new Set(),
   choices: [],
   settings: null,
   busy: false,
@@ -41,6 +42,7 @@ const Result = {
     $("#r-stop").addEventListener("click", () => invoke("run_action", { action: "cancel" }));
     $("#r-compare").addEventListener("click", () => this.openCompare());
     $("#r-compare-close").addEventListener("click", () => { $("#r-compare-view").hidden = true; });
+    $("#r-models-hint button").addEventListener("click", () => App.show("models"));
     listen("ocr-session", ({ payload }) => this.open(payload));
     listen("ocr-run", ({ payload }) => this.update(payload));
     this.setKind(this.kind);
@@ -299,23 +301,13 @@ const Result = {
     const [library, catalog, view] = await Promise.all([call("models_list"), call("catalog_list"), call("settings_get")]);
     if (!library || !catalog || !view) return;
     this.settings = view.settings;
-    const names = new Map(catalog.models.map((m) => [m.id, m.name]));
-    const local = library.models.filter((m) => m.installed)
-      .map((m) => ({ provider: "local", model: m.id, label: m.label.replace(/ · .*$/, ""), reviews: m.reviews }));
-    const remoteIds = [...new Set([...catalog.favorites, view.settings.review_remote_model, view.settings.remote_model])];
-    const remote = view.hasKey
-      ? remoteIds.filter(Boolean).map((id) => ({ provider: "openrouter", model: id, label: names.get(id) || id, reviews: true }))
-      : [];
-    this.choices = [...local, ...remote];
-    if (this.picked.size === 0) {
-      const s = view.settings;
-      this.picked.add(s.review_provider === "local" ? `local:${s.review_local_model}` : `openrouter:${s.review_remote_model}`);
-    }
+    this.choices = modelChoices(library, catalog, view);
+    this.picked = new Set(view.reviewModels.map(choiceKey));
     this.renderChoices();
   },
 
   renderChoices() {
-    const key = (choice) => `${choice.provider}:${choice.model}`;
+    const key = choiceKey;
     const nodes = this.choices.map((choice) => {
       const usable = this.kind === "ocr" || choice.reviews;
       const on = usable && this.picked.has(key(choice));
@@ -323,13 +315,10 @@ const Result = {
         class: on ? "chip on" : "chip",
         disabled: !usable,
         title: usable ? choice.model : "Эта модель только распознаёт, проверять текст она не умеет",
-        onclick: () => {
-          if (this.picked.has(key(choice))) this.picked.delete(key(choice));
-          else this.picked.add(key(choice));
-          localStorage.setItem("recheck-models", JSON.stringify([...this.picked]));
-          this.renderChoices();
-        },
-      }, on ? "✓ " : "", choice.label, el("span", { class: "where" }, choice.provider === "local" ? "лок" : "облако"));
+        onclick: () => this.togglePicked(choice),
+      }, on ? "✓ " : "", choice.label,
+        el("span", { class: "where" }, choice.provider === "local" ? "лок" : "облако"),
+        usable ? null : el("span", { class: "where" }, "только OCR"));
     });
     if (nodes.length === 0) {
       nodes.push(el("span", { class: "muted small" },
@@ -337,6 +326,21 @@ const Result = {
     }
     $("#r-models").replaceChildren(...nodes);
     this.refreshRunButton();
+  },
+
+  /// The selection is the same list the models page edits, so it survives
+  /// restarts and the next capture starts with it.
+  async togglePicked(choice) {
+    const key = choiceKey(choice);
+    if (this.picked.has(key)) this.picked.delete(key);
+    else this.picked.add(key);
+    this.renderChoices();
+    const models = this.choices.filter((c) => this.picked.has(choiceKey(c))).map(({ provider, model }) => ({ provider, model }));
+    const saved = await call("review_models_set", { models });
+    if (saved) {
+      this.picked = new Set(saved.map(choiceKey));
+      this.renderChoices();
+    }
   },
 
   selectedChoices() {

@@ -66,6 +66,7 @@
             </div>
             <p class="muted small" id="r-kind-hint"></p>
             <div class="chips" id="r-models"></div>
+            <p class="muted small" id="r-models-hint">Отмеченные модели запоминаются. Список и модель для горячей клавиши — в разделе <button class="link" data-page="models">Модели</button>.</p>
             <div class="row">
               <button id="r-run" class="primary">Запустить</button>
               <button id="r-stop" class="ghost" hidden>Стоп</button>
@@ -96,6 +97,7 @@
         </div>
         <span class="spacer"></span>
       </header>
+      <div class="card roles" id="m-roles"></div>
       <div class="tab" id="m-local">
         <div class="card engine" id="m-engine"></div>
         <div class="model-list" id="m-list"></div>
@@ -114,6 +116,7 @@
           <label class="check"><input type="checkbox" id="m-only-fav"> Только избранные</label>
           <button id="m-refresh">Обновить каталог</button>
         </div>
+        <p class="muted small">★ — показывать модель в окне результата и в списках выше. Все облачные модели работают только с сохранённым ключом.</p>
         <div class="catalog" id="m-catalog"></div>
       </div>
     </section>

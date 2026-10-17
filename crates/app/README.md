@@ -19,7 +19,8 @@ hosts only the portable logic in `src/model.rs` and its tests are built.
 Settings, history, models and the OpenRouter key are shared with the Python
 app (same data directory), so a model installed there is used here.
 
-Settings, `ui-state.json` (history pins, favourite OpenRouter models),
+Settings, `ui-state.json` (history pins, favourite OpenRouter models, the
+models checked by default in the result window),
 `history.sqlite3` and `openrouter-models.json` are the Python app's files.
 
 The Rust side talks to the web UI only through the events and commands named

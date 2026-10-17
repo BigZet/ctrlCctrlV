@@ -305,6 +305,7 @@ pub fn run() {
             library::catalog_favorite,
             preferences::settings_get,
             preferences::settings_save,
+            preferences::review_models_set,
             preferences::api_key_save,
         ])
         .setup(|app| {
