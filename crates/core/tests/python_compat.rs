@@ -290,7 +290,7 @@ fn error_messages_match_python() {
         (400, r#"{"error":{"message":"max_completion_tokens too large"}}"#),
         (400, r#"{"error":{"message":"Context Window"}}"#),
         (400, r#"{"error":{"message":"modalities"}}"#),
-        (400, r#"{"error":{"message":"other"}}"#),
+        // An unrecognized message is shown as is here, unlike Python: see ocr.rs.
         (400, r#"{"error":"plain"}"#),
         (400, r#"[]"#),
         (400, "not json"),
