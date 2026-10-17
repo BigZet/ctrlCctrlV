@@ -1,0 +1,55 @@
+name: Rust desktop shell
+
+on:
+  push:
+    branches: ['main', 'claude/**']
+    paths: ['crates/**', 'Cargo.toml', 'Cargo.lock', '.github/workflows/rust-app.yml']
+  pull_request:
+    paths: ['crates/**', 'Cargo.toml', 'Cargo.lock', '.github/workflows/rust-app.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            # Windows 11 ships WebView2, so the plain executable runs as is.
+            bundle: --no-bundle
+            artifact: target/release/ctrlcctrlv.exe
+          - os: macos-15
+            # An .app bundle gives macOS privacy prompts a stable identity.
+            bundle: --bundles app
+            artifact: target/release/bundle/macos/ctrlCctrlV.zip
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: cargo clippy -p ctrlcctrlv-app --all-targets -- -D warnings
+      - run: cargo test -p ctrlcctrlv-app
+      - name: Build the app
+        working-directory: crates/app
+        run: npx --yes @tauri-apps/cli@2.12.3 build --ci ${{ matrix.bundle }}
+      - name: Pack the bundle
+        if: runner.os == 'macOS'
+        # Artifacts drop file modes; a zip made by ditto keeps the bundle runnable.
+        working-directory: target/release/bundle/macos
+        run: ditto -c -k --keepParent ctrlCctrlV.app ctrlCctrlV.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ctrlcctrlv-${{ runner.os }}
+          path: ${{ matrix.artifact }}
+          if-no-files-found: error
