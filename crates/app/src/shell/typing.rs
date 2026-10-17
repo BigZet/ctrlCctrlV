@@ -36,7 +36,7 @@ pub fn start(app: &AppHandle, delay: Option<Duration>) {
     if !shell.begin(Activity::Typing(token.clone())) {
         return busy(app);
     }
-    let settings = typing_settings(&shell.settings);
+    let settings = typing_settings(&shell.settings());
     let app = app.clone();
     std::thread::spawn(move || {
         if let Some(delay) = delay {

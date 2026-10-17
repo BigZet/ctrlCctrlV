@@ -26,16 +26,19 @@ thread_local! {
     static HOTKEYS: RefCell<Option<Hotkeys<Action>>> = const { RefCell::new(None) };
 }
 
+fn bindings(settings: &Settings) -> [(Action, &str); 3] {
+    [
+        (Action::Capture, settings.capture_hotkey.as_str()),
+        (Action::Type, settings.typing_hotkey.as_str()),
+        (Action::Cancel, settings.cancel_hotkey.as_str()),
+    ]
+}
+
 /// Registers the capture, typing and cancel shortcuts. Call on the main thread.
 pub fn install(app: &AppHandle, settings: &Settings) -> Result<(), String> {
     let mut hotkeys = Hotkeys::new().map_err(|e| e.to_string())?;
-    hotkeys
-        .register(&[
-            (Action::Capture, settings.capture_hotkey.as_str()),
-            (Action::Type, settings.typing_hotkey.as_str()),
-            (Action::Cancel, settings.cancel_hotkey.as_str()),
-        ])
-        .map_err(|e| e.to_string())?;
+    let registered = hotkeys.register(&bindings(settings)).map_err(|e| e.to_string());
+    // Kept even when registration failed, so changed settings can retry.
     HOTKEYS.with(|slot| *slot.borrow_mut() = Some(hotkeys));
     let app = app.clone();
     GlobalHotKeyEvent::set_event_handler(Some(move |event: GlobalHotKeyEvent| {
@@ -45,5 +48,13 @@ pub fn install(app: &AppHandle, settings: &Settings) -> Result<(), String> {
             tauri::async_runtime::spawn(super::dispatch(app.clone(), action));
         }
     }));
-    Ok(())
+    registered
+}
+
+/// Registers the shortcuts from changed settings. Call on the main thread.
+pub fn reload(settings: &Settings) -> Result<(), String> {
+    HOTKEYS.with(|slot| match slot.borrow_mut().as_mut() {
+        Some(hotkeys) => hotkeys.register(&bindings(settings)).map_err(|e| e.to_string()),
+        None => Err("Горячие клавиши недоступны".into()),
+    })
 }

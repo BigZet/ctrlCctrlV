@@ -9,6 +9,8 @@ use crate::error::{Error, Result, seconds};
 use crate::http::Http;
 use crate::lighton::clean_lighton_code;
 use crate::operation::Operation;
+pub use crate::stream::Partial;
+use crate::stream::{PARTIAL_INTERVAL, SseParser, Streamed};
 
 pub const PROMPT: &str = concat!(
     "Transcribe ALL visible text from the image literally. Preserve indentation, blank lines, ",
@@ -163,15 +165,82 @@ impl OcrProvider {
         let value: Value =
             serde_json::from_slice(&body).map_err(|_| Error::operation("Некорректный ответ сервиса OCR"))?;
         let raw_text = parse_completion(&value, self.mode)?;
+        Ok(self.finish(raw_text))
+    }
+
+    /// Like [`OcrProvider::recognize_result`], but asks for a streamed answer
+    /// and calls `partial` with the text recognized so far while it arrives.
+    /// The final result is checked exactly like a non-streamed one.
+    pub async fn recognize_stream(
+        &self,
+        png: &[u8],
+        operation: &Operation,
+        request: &Request<'_>,
+        partial: Partial<'_>,
+    ) -> Result<OcrResult> {
+        operation.check()?;
+        let mut payload = self.payload(png, request);
+        payload["stream"] = Value::Bool(true);
+        let content = operation.run(self.send_stream(&payload, operation, partial)).await?;
+        let raw_text = match content {
+            Streamed::Content(content) => match self.mode {
+                PromptMode::Transcription => content,
+                PromptMode::Json => {
+                    let malformed = || Error::operation("OCR вернул некорректный ответ. Буфер не изменён.");
+                    let value: Value = serde_json::from_str(&content).map_err(|_| malformed())?;
+                    value.get("text").and_then(Value::as_str).map(str::to_string).ok_or_else(malformed)?
+                }
+            },
+            Streamed::Whole(body) => {
+                let value: Value =
+                    serde_json::from_slice(&body).map_err(|_| Error::operation("Некорректный ответ сервиса OCR"))?;
+                parse_completion(&value, self.mode)?
+            }
+        };
+        Ok(self.finish(raw_text))
+    }
+
+    fn finish(&self, raw_text: String) -> OcrResult {
         let text = if self.mode == PromptMode::Transcription && self.model.to_lowercase().contains("lighton") {
             clean_lighton_code(&raw_text)
         } else {
             raw_text.clone()
         };
-        Ok(OcrResult { text, raw_text })
+        OcrResult { text, raw_text }
     }
 
-    async fn send(&self, payload: &Value, operation: &Operation) -> Result<Vec<u8>> {
+    async fn send_stream(&self, payload: &Value, operation: &Operation, partial: Partial<'_>) -> Result<Streamed> {
+        let response =
+            self.request(payload, operation)?.send().await.map_err(|error| self.transport(error, operation))?;
+        let status = response.status().as_u16();
+        let streamed = response
+            .headers()
+            .get(reqwest::header::CONTENT_TYPE)
+            .and_then(|value| value.to_str().ok())
+            .is_some_and(|value| value.starts_with("text/event-stream"));
+        if status != 200 || !streamed {
+            // An error, or a server that ignored `stream` and answered at once.
+            return self.read_body(status, response, operation).await.map(Streamed::Whole);
+        }
+        let mut stream = response.bytes_stream();
+        let mut events = SseParser::new(self.mode);
+        let mut shown = std::time::Instant::now();
+        while let Some(chunk) = stream.next().await {
+            let chunk = chunk.map_err(|error| self.transport(error, operation))?;
+            if events.feed(&chunk)? {
+                break;
+            }
+            if shown.elapsed() >= PARTIAL_INTERVAL {
+                shown = std::time::Instant::now();
+                partial(&events.visible());
+            }
+        }
+        let content = events.finish()?;
+        partial(&events.visible());
+        Ok(Streamed::Content(content))
+    }
+
+    fn request(&self, payload: &Value, operation: &Operation) -> Result<reqwest::RequestBuilder> {
         let mut builder = self
             .http
             .client(self.local)
@@ -184,8 +253,10 @@ impl OcrProvider {
         if let Some(remaining) = operation.check()? {
             builder = builder.timeout(remaining);
         }
-        let response = builder.send().await.map_err(|error| self.transport(error, operation))?;
-        let status = response.status().as_u16();
+        Ok(builder)
+    }
+
+    async fn read_body(&self, status: u16, response: reqwest::Response, operation: &Operation) -> Result<Vec<u8>> {
         let mut stream = response.bytes_stream();
         let mut body = Vec::new();
         let limit = if status == 200 { MAX_BODY } else { MAX_ERROR_BODY };
@@ -204,6 +275,13 @@ impl OcrProvider {
             return Err(Error::operation(http_error(status, &body)));
         }
         Ok(body)
+    }
+
+    async fn send(&self, payload: &Value, operation: &Operation) -> Result<Vec<u8>> {
+        let response =
+            self.request(payload, operation)?.send().await.map_err(|error| self.transport(error, operation))?;
+        let status = response.status().as_u16();
+        self.read_body(status, response, operation).await
     }
 
     fn timeout(&self, operation: &Operation) -> Error {
@@ -235,15 +313,17 @@ pub fn http_error(status: u16, body: &[u8]) -> String {
             && let Some(Value::Object(error)) = object.get("error")
         {
             message = match error.get("message") {
-                Some(Value::String(text)) => text.to_lowercase(),
-                Some(other) => crate::pyjson::dumps(other).to_lowercase(),
+                Some(Value::String(text)) => text.clone(),
+                Some(other) => crate::pyjson::dumps(other),
                 None => String::new(),
             };
             if let Some(Value::String(raw)) = error.get("metadata").and_then(|m| m.get("raw")) {
                 message.push(' ');
-                message.push_str(&raw.to_lowercase());
+                message.push_str(raw);
             }
         }
+        let detail = message.split_whitespace().collect::<Vec<_>>().join(" ");
+        let message = message.to_lowercase();
         let has = |words: &[&str]| words.iter().any(|word| message.contains(word));
         let reason = if has(&["response_format", "json_object", "json_schema"]) {
             "Провайдер не поддерживает выбранный JSON-формат. Выберите другую vision-модель."
@@ -254,9 +334,26 @@ pub fn http_error(status: u16, body: &[u8]) -> String {
         } else if has(&["image", "vision", "multimodal", "modality", "modalities"]) {
             "Модель или её провайдер не принимает изображения. Выберите другую vision-модель."
         } else {
-            "Провайдер отклонил запрос. Обновите каталог или выберите другую vision-модель."
+            // Unrecognized: show what the provider said, so it can be acted on.
+            let detail: String = detail.chars().take(300).collect();
+            return if detail.is_empty() {
+                "OCR HTTP 400. Провайдер отклонил запрос. Обновите каталог или выберите другую vision-модель. Буфер не изменён."
+                    .into()
+            } else {
+                format!("OCR HTTP 400. Провайдер отклонил запрос: {detail}. Буфер не изменён.")
+            };
         };
         return format!("OCR HTTP 400. {reason} Буфер не изменён.");
+    }
+    if matches!(status, 401 | 403)
+        && let Some(provider) = upstream_provider(body)
+    {
+        // OpenRouter accepted the key; the upstream provider refused it, for
+        // example a broken bring-your-own key for that provider.
+        return format!(
+            "OCR HTTP {status} от провайдера {provider}. Ключ OpenRouter в порядке: проверьте ключ этого провайдера \
+             в OpenRouter (Settings → Integrations) или выберите другую модель. Буфер не изменён."
+        );
     }
     let reason = match status {
         401 => "Проверьте API-ключ.",
@@ -267,6 +364,17 @@ pub fn http_error(status: u16, body: &[u8]) -> String {
         _ => "Сервис недоступен. Повторите позже.",
     };
     format!("OCR HTTP {status}. {reason} Буфер не изменён.")
+}
+
+/// The upstream provider OpenRouter names in an error, if it is a plain name.
+/// Only the name is shown: provider messages may quote the request.
+fn upstream_provider(body: &[u8]) -> Option<String> {
+    let value: Value = serde_json::from_slice(body).ok()?;
+    let name = value.pointer("/error/metadata/provider_name")?.as_str()?.trim();
+    let plain = !name.is_empty()
+        && name.chars().count() <= 64
+        && name.chars().all(|c| c.is_alphanumeric() || matches!(c, ' ' | '-' | '_' | '.'));
+    plain.then(|| name.to_string())
 }
 
 /// One provider's outcome in a side-by-side comparison.

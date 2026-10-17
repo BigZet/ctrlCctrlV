@@ -193,7 +193,8 @@ async fn http_400_reasons_are_classified() {
         (r#"{"error":{"message":"bad","metadata":{"raw":"Temperature must be 1"}}}"#, "temperature"),
         (r#"{"error":{"message":"Context length exceeded"}}"#, "лимит модели"),
         (r#"{"error":{"message":"No endpoints support image input"}}"#, "не принимает изображения"),
-        ("not json", "Провайдер отклонил запрос"),
+        ("not json", "Провайдер отклонил запрос. Обновите каталог"),
+        (r#"{"error":{"message":"Unsupported   parameter: top_k"}}"#, "отклонил запрос: Unsupported parameter: top_k."),
     ] {
         let (_server, url) = endpoint(move |_| Reply::bytes(400, body.as_bytes(), &[])).await;
         let error = OcrProvider::new(url, "m", "k").local().recognize(b"png", &Operation::new()).await.unwrap_err();
@@ -281,4 +282,58 @@ async fn review_context_is_sent_as_python_json_text() {
     let content = &server.requests()[0].json()["messages"][0]["content"];
     assert_eq!(content[0]["text"], "Check");
     assert_eq!(content[2]["text"], "{\"text\": \"Привет\\n\", \"score\": 0.5, \"lines\": [1, 2]}");
+}
+
+#[tokio::test]
+async fn streams_partial_text_and_checks_the_final_answer() {
+    let events = [
+        r#"{"choices":[{"delta":{"content":"{\"text\": \"line 1\\n"}}]}"#,
+        r#"{"choices":[{"delta":{"content":"line 2\"}"},"finish_reason":"stop"}]}"#,
+    ];
+    let body: String = events.iter().map(|event| format!("data: {event}\n\n")).collect::<String>() + "data: [DONE]\n\n";
+    let (server, url) =
+        endpoint(move |_| Reply::bytes(200, body.as_bytes(), &[("Content-Type", "text/event-stream")])).await;
+    let seen = std::sync::Mutex::new(Vec::new());
+    let partial = |text: &str| seen.lock().unwrap().push(text.to_string());
+    let result = OcrProvider::new(url, "model", "k")
+        .local()
+        .recognize_stream(b"png", &Operation::new(), &Request::default(), &partial)
+        .await
+        .unwrap();
+    assert_eq!(result.text, "line 1\nline 2");
+    assert_eq!(seen.lock().unwrap().last().map(String::as_str), Some("line 1\nline 2"));
+    assert_eq!(server.requests()[0].json()["stream"], true);
+}
+
+#[tokio::test]
+async fn stream_falls_back_to_a_plain_answer_and_rejects_cut_streams() {
+    let (_server, url) = endpoint(|_| Reply::json(200, completion("plain", Some("stop"), false))).await;
+    let provider = OcrProvider::new(url, "model", "k").local();
+    let result = provider.recognize_stream(b"png", &Operation::new(), &Request::default(), &|_| {}).await.unwrap();
+    assert_eq!(result.text, "plain");
+
+    let body = "data: {\"choices\":[{\"delta\":{\"content\":\"{\\\"text\\\": \\\"cut\"}}]}\n\n";
+    let (_server, url) =
+        endpoint(move |_| Reply::bytes(200, body.as_bytes(), &[("Content-Type", "text/event-stream")])).await;
+    let provider = OcrProvider::new(url, "model", "k").local();
+    let error = provider.recognize_stream(b"png", &Operation::new(), &Request::default(), &|_| {}).await.unwrap_err();
+    assert!(error.to_string().contains("неполный"));
+
+    let (_server, url) = endpoint(|_| Reply::json(401, serde_json::json!({}))).await;
+    let provider = OcrProvider::new(url, "model", "k").local();
+    let error = provider.recognize_stream(b"png", &Operation::new(), &Request::default(), &|_| {}).await.unwrap_err();
+    assert!(error.to_string().contains("401"));
+}
+
+#[test]
+fn names_the_upstream_provider_that_refused_the_request() {
+    let body =
+        br#"{"error": {"code": 401, "message": "secret prompt text", "metadata": {"provider_name": "Anthropic"}}}"#;
+    let message = ctrlcctrlv_core::ocr::http_error(401, body);
+    assert!(message.contains("от провайдера Anthropic"), "{message}");
+    assert!(!message.contains("secret"));
+    // Without a plain provider name the message stays the Python app's.
+    let odd = br#"{"error": {"metadata": {"provider_name": "<script>"}}}"#;
+    assert_eq!(ctrlcctrlv_core::ocr::http_error(401, odd), "OCR HTTP 401. Проверьте API-ключ. Буфер не изменён.");
+    assert_eq!(ctrlcctrlv_core::ocr::http_error(401, b""), "OCR HTTP 401. Проверьте API-ключ. Буфер не изменён.");
 }

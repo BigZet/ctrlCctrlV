@@ -13,16 +13,16 @@
         "label": "main",
         "title": "ctrlCctrlV",
         "url": "index.html",
-        "width": 560,
-        "height": 420,
-        "minWidth": 420,
-        "minHeight": 300,
+        "width": 1180,
+        "height": 760,
+        "minWidth": 900,
+        "minHeight": 560,
         "visible": false,
         "center": true
       }
     ],
     "security": {
-      "csp": "default-src 'self'; style-src 'self'; script-src 'self'; connect-src ipc: http://ipc.localhost"
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self'; connect-src ipc: http://ipc.localhost"
     }
   },
   "bundle": {

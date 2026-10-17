@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use ctrlcctrlv_core::credentials::{Credentials, MemoryStore, SecretStore};
+use ctrlcctrlv_core::credentials::{Credentials, MemoryStore, SecretStore, check_key};
 
 #[test]
 fn empty_value_removes_a_stored_key() {
@@ -13,6 +13,15 @@ fn empty_value_removes_a_stored_key() {
     assert_eq!(store.get().unwrap(), None);
     // Removing an absent key is not an error.
     credentials.write("").unwrap();
+}
+
+#[test]
+fn only_openrouter_keys_pass_the_check() {
+    assert!(check_key("sk-or-v1-0123456789abcdef").is_ok());
+    let long = "sk-or-".repeat(60);
+    for value in ["", "0123456789abcdef", "sk-or-v1 0123", "sk-or-v1-abc\nтекст", &long] {
+        assert!(check_key(value).is_err(), "{value:?}");
+    }
 }
 
 /// Uses the real Windows Credential Manager or macOS keychain and the Python

@@ -133,12 +133,14 @@ fn create(app: &AppHandle, label: &str, monitor: &Monitor) -> tauri::Result<Webv
     let (position, size, scale) = (*monitor.position(), *monitor.size(), monitor.scale_factor());
     if cfg!(target_os = "macos") {
         // macOS places windows in points; converting with the monitor's own
-        // scale stays right when monitors have different scales.
-        window.set_position(LogicalPosition::new(position.x as f64 / scale, position.y as f64 / scale))?;
+        // scale stays right when monitors have different scales. Size goes
+        // first: Cocoa keeps the bottom-left corner when resizing, so a window
+        // placed at its default height and then enlarged grows up off screen.
         window.set_size(LogicalSize::new(size.width as f64 / scale, size.height as f64 / scale))?;
+        window.set_position(LogicalPosition::new(position.x as f64 / scale, position.y as f64 / scale))?;
     } else {
-        window.set_position(PhysicalPosition::new(position.x, position.y))?;
         window.set_size(PhysicalSize::new(size.width, size.height))?;
+        window.set_position(PhysicalPosition::new(position.x, position.y))?;
     }
     Ok(window)
 }
