@@ -1,0 +1,179 @@
+name: Publish Rust desktop release
+
+# Builds the Tauri app from a version tag and publishes it as a GitHub release:
+# `git tag v0.2.0 && git push origin v0.2.0`. The tag must equal the workspace
+# version in Cargo.toml and docs/releases/<tag>.md must hold the notes.
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rust-release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: The tag names the workspace version and has release notes
+        id: version
+        shell: bash
+        run: |
+          [[ "${{ github.ref_type }}" == tag ]] || { echo "Run this workflow on a version tag"; exit 1; }
+          tag="${{ github.ref_name }}"
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Tag $tag is not v<major>.<minor>.<patch>"; exit 1; }
+          version="$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -n 1)"
+          [[ "$tag" == "v$version" ]] || { echo "Tag $tag does not match workspace version $version"; exit 1; }
+          [[ -s "docs/releases/$tag.md" ]] || { echo "docs/releases/$tag.md is missing"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            # Windows 11 ships WebView2, so the plain executable runs as is.
+            bundle: --no-bundle
+            asset: ctrlCctrlV-${{ needs.check.outputs.version }}-windows-x64.exe
+          - os: macos-15
+            # An .app bundle gives macOS privacy prompts a stable identity.
+            bundle: --bundles app
+            asset: ctrlCctrlV-${{ needs.check.outputs.version }}-macos-arm64.zip
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: cargo clippy -p ctrlcctrlv-app --all-targets -- -D warnings
+      - run: cargo test -p ctrlcctrlv-app
+      - name: Build the app
+        working-directory: crates/app
+        run: npx --yes @tauri-apps/cli@2.12.3 build --ci ${{ matrix.bundle }}
+      - name: Name the Windows asset
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir release-assets
+          cp target/release/ctrlcctrlv.exe "release-assets/${{ matrix.asset }}"
+      - name: Pack the macOS bundle
+        if: runner.os == 'macOS'
+        # Artifacts drop file modes; a zip made by ditto keeps the bundle runnable.
+        shell: bash
+        run: |
+          mkdir release-assets
+          ditto -c -k --keepParent target/release/bundle/macos/ctrlCctrlV.app "release-assets/${{ matrix.asset }}"
+      - name: Write the checksum
+        shell: bash
+        working-directory: release-assets
+        run: |
+          if command -v sha256sum > /dev/null; then sha256sum "${{ matrix.asset }}"; else shasum -a 256 "${{ matrix.asset }}"; fi > "${{ matrix.asset }}.sha256"
+          cat "${{ matrix.asset }}.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ runner.os }}
+          path: release-assets/*
+          if-no-files-found: error
+
+  publish:
+    needs: [check, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ github.ref_name }}
+      RELEASE_VERSION: ${{ needs.check.outputs.version }}
+      RELEASE_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: source
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: downloaded
+      - name: Verify checksums and prepare release assets
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, os, shutil
+          from pathlib import Path
+          version = os.environ['RELEASE_VERSION']
+          binaries = [f'ctrlCctrlV-{version}-windows-x64.exe', f'ctrlCctrlV-{version}-macos-arm64.zip']
+          files = {p.name: p for p in Path('downloaded').rglob('*') if p.is_file()}
+          assert set(files) == {name for b in binaries for name in (b, b + '.sha256')}, sorted(files)
+          target = Path('release-assets')
+          target.mkdir()
+          sums = []
+          for binary in binaries:
+              with files[binary].open('rb') as stream:
+                  digest = hashlib.file_digest(stream, 'sha256').hexdigest()
+              recorded = files[binary + '.sha256'].read_text().split()
+              assert recorded[0] == digest and recorded[-1].lstrip('*') == binary, f'Checksum mismatch: {binary}'
+              sums.append(f'{digest}  {binary}')
+              shutil.copy2(files[binary], target / binary)
+          (target / 'SHA256SUMS.txt').write_text('\n'.join(sums) + '\n')
+          notes = Path(f"source/docs/releases/{os.environ['RELEASE_TAG']}.md").read_text()
+          repository = os.environ['GITHUB_REPOSITORY']
+          run = f"https://github.com/{repository}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          notes += f"\n## Проверка сборки\n\n[Windows и macOS: clippy, тесты и сборка]({run}) прошли для коммита `{os.environ['RELEASE_SHA']}`. SHA256 проверены перед публикацией.\n"
+          Path('release-notes.md').write_text(notes)
+          PY
+      - name: Upload a draft and publish only when every asset matches
+        shell: bash
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,targetCommitish > existing-release.json 2>/dev/null; then
+            python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          release = json.loads(Path('existing-release.json').read_text())
+          assert release['isDraft'], 'Refusing to modify an already published release'
+          assert release['targetCommitish'] == os.environ['RELEASE_SHA'], 'Draft targets a different commit'
+          PY
+            gh release upload "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --notes-file release-notes.md
+          else
+            # A preview next to the Python app, so the Python release stays "latest".
+            gh release create "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --verify-tag --target "$RELEASE_SHA" --draft --prerelease --title "ctrlCctrlV $RELEASE_TAG (Rust)" --notes-file release-notes.md
+          fi
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,assets > uploaded-release.json
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          release = json.loads(Path('uploaded-release.json').read_text())
+          assert release['isDraft'], 'Release must remain a draft until verification finishes'
+          expected = {}
+          for path in Path('release-assets').iterdir():
+              with path.open('rb') as stream:
+                  expected[path.name] = (path.stat().st_size, 'sha256:' + hashlib.file_digest(stream, 'sha256').hexdigest())
+          assert len(release['assets']) == len(expected) and all(asset['state'] == 'uploaded' for asset in release['assets']), 'Incomplete or extra remote assets'
+          actual = {asset['name']: (asset['size'], asset['digest']) for asset in release['assets']}
+          assert actual == expected, 'Uploaded asset names, sizes or SHA256 digests differ'
+          PY
+          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --prerelease
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json url,isDraft,isPrerelease,tagName
