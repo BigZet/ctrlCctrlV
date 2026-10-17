@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ctrlCctrlV</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <header>
+    <div id="status" role="status">Готово</div>
+    <progress id="typing" max="1" value="0" hidden></progress>
+  </header>
+  <nav>
+    <button data-action="capture">Распознать область</button>
+    <button data-action="typeDelayed">Напечатать буфер через 3 с</button>
+    <button data-action="cancel">Остановить</button>
+  </nav>
+  <main>
+    <div id="meta"></div>
+    <textarea id="result" spellcheck="false" placeholder="Здесь появится распознанный текст"></textarea>
+    <div class="row">
+      <button id="copy" disabled>Скопировать снова</button>
+    </div>
+  </main>
+  <footer id="hotkeys"></footer>
+  <script src="main.js"></script>
+</body>
+</html>
