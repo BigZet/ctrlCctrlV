@@ -9,6 +9,4 @@ dist/
 .env
 artifacts/
 
-
-# Rust
 target/

@@ -15,10 +15,7 @@ use crate::{Error, Permission, Permissions, Result};
 /// These operations have no macOS-style privacy grant on Windows. `SendInput`
 /// fails instead for protected or elevated target windows.
 pub fn permissions() -> Permissions {
-    Permissions {
-        accessibility: true,
-        screen_capture: true,
-    }
+    Permissions { accessibility: true, screen_capture: true }
 }
 
 /// Returns whether a system prompt was shown; never on Windows.
@@ -43,15 +40,7 @@ pub struct WindowsKeyboard;
 fn key_input(vk: VIRTUAL_KEY, scan: u16, flags: KEYBD_EVENT_FLAGS) -> INPUT {
     INPUT {
         r#type: INPUT_KEYBOARD,
-        Anonymous: INPUT_0 {
-            ki: KEYBDINPUT {
-                wVk: vk,
-                wScan: scan,
-                dwFlags: flags,
-                time: 0,
-                dwExtraInfo: 0,
-            },
-        },
+        Anonymous: INPUT_0 { ki: KEYBDINPUT { wVk: vk, wScan: scan, dwFlags: flags, time: 0, dwExtraInfo: 0 } },
     }
 }
 
@@ -76,11 +65,7 @@ fn send(events: &[INPUT]) -> Result<()> {
 }
 
 fn press(vk: VIRTUAL_KEY, extended: bool) -> Result<()> {
-    let flags = if extended {
-        KEYEVENTF_EXTENDEDKEY
-    } else {
-        KEYBD_EVENT_FLAGS(0)
-    };
+    let flags = if extended { KEYEVENTF_EXTENDEDKEY } else { KEYBD_EVENT_FLAGS(0) };
     send(&[key_input(vk, 0, flags), key_input(vk, 0, flags | KEYEVENTF_KEYUP)])
 }
 
@@ -106,10 +91,7 @@ impl Keyboard for WindowsKeyboard {
         if unsafe { GetWindowThreadProcessId(hwnd, Some(&mut pid)) } == 0 {
             return None;
         }
-        Some(WindowTarget {
-            hwnd: hwnd.0 as isize,
-            pid,
-        })
+        Some(WindowTarget { hwnd: hwnd.0 as isize, pid })
     }
 
     fn still_focused(&self, target: &WindowTarget) -> bool {

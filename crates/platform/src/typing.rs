@@ -77,9 +77,8 @@ impl CancelToken {
         if timeout.is_zero() {
             return *guard;
         }
-        let (guard, _) = wake
-            .wait_timeout_while(guard, timeout, |cancelled| !*cancelled)
-            .unwrap_or_else(|e| e.into_inner());
+        let (guard, _) =
+            wake.wait_timeout_while(guard, timeout, |cancelled| !*cancelled).unwrap_or_else(|e| e.into_inner());
         *guard
     }
 }
@@ -97,9 +96,7 @@ pub fn type_text<K: Keyboard>(
     expected: Option<&K::Target>,
 ) -> Result<()> {
     if !keyboard.accessibility_granted() {
-        return Err(Error::Operation(
-            "Разрешите управление вводом в разделе «Система»".into(),
-        ));
+        return Err(Error::Operation("Разрешите управление вводом в разделе «Система»".into()));
     }
     let deadline = Instant::now() + Duration::from_secs(5);
     while keyboard.modifiers_pressed() {
@@ -184,12 +181,7 @@ mod tests {
 
     impl Fake {
         fn new() -> Self {
-            Self {
-                events: RefCell::default(),
-                pid: Cell::new(100),
-                full_checks: Cell::new(0),
-                on_character: None,
-            }
+            Self { events: RefCell::default(), pid: Cell::new(100), full_checks: Cell::new(0), on_character: None }
         }
         fn events(&self) -> Vec<Event> {
             self.events.borrow().clone()
@@ -243,17 +235,10 @@ mod tests {
     #[test]
     fn unicode_crlf_tabs_and_autoindent() {
         let fake = Fake::new();
-        let settings = TypingSettings {
-            autoindent: true,
-            spaces_per_tab: 2,
-            ..fast()
-        };
+        let settings = TypingSettings { autoindent: true, spaces_per_tab: 2, ..fast() };
         type_text(&fake, "Ж\r\n\t🙂\n", &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
         use Event::*;
-        assert_eq!(
-            fake.events(),
-            [Text('Ж'), Enter, Indent, Text(' '), Text(' '), Text('🙂'), Enter]
-        );
+        assert_eq!(fake.events(), [Text('Ж'), Enter, Indent, Text(' '), Text(' '), Text('🙂'), Enter]);
     }
 
     #[test]
@@ -273,15 +258,7 @@ mod tests {
     #[test]
     fn focus_change_stops_before_next_character() {
         let fake = Fake::new();
-        let err = type_text(
-            &fake,
-            "abc",
-            &fast(),
-            &CancelToken::new(),
-            |_, _| fake.pid.set(200),
-            None,
-        )
-        .unwrap_err();
+        let err = type_text(&fake, "abc", &fast(), &CancelToken::new(), |_, _| fake.pid.set(200), None).unwrap_err();
         assert!(matches!(err, Error::Cancelled(ref m) if m.contains("приложение")));
         assert_eq!(fake.events(), [Event::Text('a')]);
     }
@@ -301,10 +278,7 @@ mod tests {
         let mut fake = Fake::new();
         let hook = cancel.clone();
         fake.on_character = Some(Box::new(move || hook.cancel()));
-        let settings = TypingSettings {
-            spaces_per_tab: 4,
-            ..fast()
-        };
+        let settings = TypingSettings { spaces_per_tab: 4, ..fast() };
         assert!(type_text(&fake, "\tabc", &settings, &cancel, |_, _| {}, None).is_err());
         assert_eq!(fake.events(), [Event::Text(' ')]);
     }

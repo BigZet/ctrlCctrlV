@@ -29,11 +29,7 @@ pub fn native_rect(region: Region, scale: f64, bounds: (u32, u32)) -> Option<(u3
 /// Encode as RGB PNG with fast compression. Screen captures are opaque, so the
 /// alpha channel only costs encoding time and upload size.
 pub fn encode_png(image: &RgbaImage) -> Result<Vec<u8>> {
-    let rgb: Vec<u8> = image
-        .as_raw()
-        .chunks_exact(4)
-        .flat_map(|p| [p[0], p[1], p[2]])
-        .collect();
+    let rgb: Vec<u8> = image.as_raw().chunks_exact(4).flat_map(|p| [p[0], p[1], p[2]]).collect();
     let mut out = Vec::with_capacity(rgb.len() / 4);
     PngEncoder::new_with_quality(&mut out, CompressionType::Fast, FilterType::Adaptive)
         .write_image(&rgb, image.width(), image.height(), image::ExtendedColorType::Rgb8)
@@ -110,34 +106,12 @@ mod tests {
 
     #[test]
     fn rounds_outward_and_clamps() {
-        let r = Region {
-            x: 10.4,
-            y: 0.6,
-            width: 20.2,
-            height: 5.0,
-        };
+        let r = Region { x: 10.4, y: 0.6, width: 20.2, height: 5.0 };
         assert_eq!(native_rect(r, 1.0, (100, 100)), Some((10, 0, 21, 6)));
         assert_eq!(native_rect(r, 1.5, (100, 100)), Some((15, 0, 31, 9)));
-        let off = Region {
-            x: -5.0,
-            y: 90.0,
-            width: 20.0,
-            height: 50.0,
-        };
+        let off = Region { x: -5.0, y: 90.0, width: 20.0, height: 50.0 };
         assert_eq!(native_rect(off, 1.0, (100, 100)), Some((0, 90, 15, 10)));
-        assert_eq!(
-            native_rect(
-                Region {
-                    x: 3.0,
-                    y: 3.0,
-                    width: 0.0,
-                    height: 4.0
-                },
-                1.0,
-                (100, 100)
-            ),
-            None
-        );
+        assert_eq!(native_rect(Region { x: 3.0, y: 3.0, width: 0.0, height: 4.0 }, 1.0, (100, 100)), None);
     }
 
     #[test]

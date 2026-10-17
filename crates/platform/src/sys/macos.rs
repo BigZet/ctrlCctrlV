@@ -19,10 +19,7 @@ const TAB: CGKeyCode = 48;
 const HOME: CGKeyCode = 115;
 
 pub fn permissions() -> Permissions {
-    Permissions {
-        accessibility: unsafe { AXIsProcessTrusted() },
-        screen_capture: CGPreflightScreenCaptureAccess(),
-    }
+    Permissions { accessibility: unsafe { AXIsProcessTrusted() }, screen_capture: CGPreflightScreenCaptureAccess() }
 }
 
 /// Ask macOS to prompt for `permission`. Returns whether a prompt was requested
@@ -55,9 +52,7 @@ pub fn open_permission_settings(permission: Permission) -> Result<bool> {
         Permission::ScreenCapture => "Privacy_ScreenCapture",
     };
     let opened = std::process::Command::new("/usr/bin/open")
-        .arg(format!(
-            "x-apple.systempreferences:com.apple.preference.security?{pane}"
-        ))
+        .arg(format!("x-apple.systempreferences:com.apple.preference.security?{pane}"))
         .status()
         .is_ok_and(|status| status.success());
     if !opened {
@@ -67,9 +62,7 @@ pub fn open_permission_settings(permission: Permission) -> Result<bool> {
 }
 
 fn frontmost_pid() -> Option<i32> {
-    NSWorkspace::sharedWorkspace()
-        .frontmostApplication()
-        .map(|app| app.processIdentifier())
+    NSWorkspace::sharedWorkspace().frontmostApplication().map(|app| app.processIdentifier())
 }
 
 /// The frontmost application and its focused AX window.

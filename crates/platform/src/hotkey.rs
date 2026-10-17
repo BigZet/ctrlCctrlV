@@ -86,10 +86,7 @@ mod native {
         pub fn new() -> Result<Self> {
             let manager =
                 GlobalHotKeyManager::new().map_err(|e| Error::Operation(format!("Горячие клавиши недоступны: {e}")))?;
-            Ok(Self {
-                manager,
-                registered: Vec::new(),
-            })
+            Ok(Self { manager, registered: Vec::new() })
         }
 
         /// Replace all registrations. Either every binding is registered or none.
@@ -119,10 +116,7 @@ mod native {
             if event.state() != HotKeyState::Pressed {
                 return None;
             }
-            self.registered
-                .iter()
-                .find(|(h, _)| h.id() == event.id())
-                .map(|(_, a)| a.clone())
+            self.registered.iter().find(|(h, _)| h.id() == event.id()).map(|(_, a)| a.clone())
         }
     }
 
@@ -137,12 +131,7 @@ mod native {
     fn to_hotkey(shortcut: Shortcut) -> HotKey {
         let m = shortcut.modifiers;
         let mut mods = Mods::empty();
-        for (on, flag) in [
-            (m.ctrl, Mods::CONTROL),
-            (m.alt, Mods::ALT),
-            (m.shift, Mods::SHIFT),
-            (m.cmd, Mods::META),
-        ] {
+        for (on, flag) in [(m.ctrl, Mods::CONTROL), (m.alt, Mods::ALT), (m.shift, Mods::SHIFT), (m.cmd, Mods::META)] {
             if on {
                 mods |= flag;
             }
@@ -208,25 +197,13 @@ mod tests {
         let s = parse_shortcut("ctrl+alt+cmd+4").unwrap();
         assert_eq!(s.key, Key::Char('4'));
         assert!(s.modifiers.ctrl && s.modifiers.alt && s.modifiers.cmd && !s.modifiers.shift);
-        assert_eq!(
-            parse_shortcut("Ctrl + Win + V").unwrap(),
-            parse_shortcut("ctrl+cmd+v").unwrap()
-        );
+        assert_eq!(parse_shortcut("Ctrl + Win + V").unwrap(), parse_shortcut("ctrl+cmd+v").unwrap());
         assert_eq!(parse_shortcut("ctrl+alt+esc").unwrap().key, Key::Escape);
     }
 
     #[test]
     fn rejects_invalid_values() {
-        for bad in [
-            "v",
-            "ctrl+",
-            "ctrl+f1",
-            "shift+v",
-            "ctrl+ctrl+v",
-            "hyper+v",
-            "ctrl+alt+vv",
-            "",
-        ] {
+        for bad in ["v", "ctrl+", "ctrl+f1", "shift+v", "ctrl+ctrl+v", "hyper+v", "ctrl+alt+vv", ""] {
             assert!(parse_shortcut(bad).is_err(), "{bad}");
         }
     }

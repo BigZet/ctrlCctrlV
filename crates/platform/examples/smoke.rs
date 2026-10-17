@@ -23,15 +23,7 @@ mod native {
         }
         let primary = all.iter().find(|m| m.primary).unwrap_or(&all[0]);
         let started = Instant::now();
-        let image = capture_region(
-            primary.id,
-            Region {
-                x: 0.0,
-                y: 0.0,
-                width: 400.0,
-                height: 200.0,
-            },
-        )?;
+        let image = capture_region(primary.id, Region { x: 0.0, y: 0.0, width: 400.0, height: 200.0 })?;
         let captured = started.elapsed();
         let png = encode_png(&image)?;
         println!(
@@ -52,11 +44,7 @@ mod native {
             println!("Focus a text editor; typing starts in 3 s.");
             std::thread::sleep(Duration::from_secs(3));
             let text = "Привет, ctrlCctrlV 🙂\n\tif x:\n\t\treturn 1\n";
-            let settings = TypingSettings {
-                autoindent: true,
-                spaces_per_tab: 4,
-                ..Default::default()
-            };
+            let settings = TypingSettings { autoindent: true, spaces_per_tab: 4, ..Default::default() };
             let started = Instant::now();
             type_text(&NativeKeyboard, text, &settings, &CancelToken::new(), |_, _| {}, None)?;
             println!("typed {} chars in {:?}", text.chars().count(), started.elapsed());
