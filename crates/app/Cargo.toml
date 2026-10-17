@@ -22,7 +22,7 @@ base64 = "0.23.1"
 futures-util = "0.3.34"
 global-hotkey = "0.9.0"
 tauri = { version = "2.11.6", features = ["tray-icon", "macos-private-api"] }
-tokio = { version = "1.53.3", features = ["time", "sync"] }
+tokio = { version = "1.53.3", features = ["time", "sync", "macros", "signal"] }
 tokio-util = { version = "0.7.20", default-features = false }
 
 [target.'cfg(target_os = "macos")'.dependencies]

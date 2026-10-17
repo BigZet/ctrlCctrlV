@@ -270,6 +270,31 @@ fn apply_changes(base: String, proposed: String, selected: Vec<usize>) -> Result
     review::apply(&base, &review::changes(&base, &proposed), &selected).map_err(|e| e.to_string())
 }
 
+/// A `kill` or a logout ends the process without [`RunEvent::Exit`], and the
+/// engine would outlive the app; Windows ties it to the process with a job
+/// object, so this is for macOS (and the Linux dev host).
+#[cfg(unix)]
+fn stop_engine_on_signal(handle: &AppHandle) {
+    let handle = handle.clone();
+    tauri::async_runtime::spawn(async move {
+        use tokio::signal::unix::{SignalKind, signal};
+        let (Ok(mut terminate), Ok(mut interrupt), Ok(mut hangup)) =
+            (signal(SignalKind::terminate()), signal(SignalKind::interrupt()), signal(SignalKind::hangup()))
+        else {
+            return;
+        };
+        tokio::select! {
+            _ = terminate.recv() => {}
+            _ = interrupt.recv() => {}
+            _ = hangup.recv() => {}
+        }
+        handle.exit(0);
+    });
+}
+
+#[cfg(not(unix))]
+fn stop_engine_on_signal(_handle: &AppHandle) {}
+
 pub fn run() {
     let shell = match Shell::new() {
         Ok(shell) => shell,
@@ -313,6 +338,7 @@ pub fn run() {
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             let handle = app.handle().clone();
             tray::create(&handle)?;
+            stop_engine_on_signal(&handle);
             let settings = handle.state::<Shell>().settings();
             if let Err(message) = hotkeys::install(&handle, &settings) {
                 report(&handle, Status::error(Phase::Idle, message));
