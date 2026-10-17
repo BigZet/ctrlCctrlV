@@ -6,6 +6,8 @@
 
 **[Скачать установщики Windows и macOS](https://github.com/BigZet/ctrlCctrlV/releases/latest)** · [Описание выпуска 0.1.1](docs/releases/v0.1.1.md).
 
+Предварительная версия на Rust (Tauri 2): [выпуск 0.2.0](https://github.com/BigZet/ctrlCctrlV/releases/tag/v0.2.0) · [описание](docs/releases/v0.2.0.md) · [исходники](crates/app/README.md).
+
 Новая версия использует PySide6 и работает как приложение в меню macOS или системном трее Windows. Общее ядро, интерфейс и OCR-провайдеры используются на обеих платформах. Подробности: [план](PLAN.md), [роадмап](ROADMAP.md), [замеры](docs/BENCHMARKS.md), [актуальный статус](docs/STATUS.md).
 
 Реализовано:
