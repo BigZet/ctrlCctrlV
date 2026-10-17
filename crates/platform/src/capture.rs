@@ -29,7 +29,7 @@ pub fn native_rect(region: Region, scale: f64, bounds: (u32, u32)) -> Option<(u3
 /// Encode as RGB PNG with fast compression. Screen captures are opaque, so the
 /// alpha channel only costs encoding time and upload size.
 pub fn encode_png(image: &RgbaImage) -> Result<Vec<u8>> {
-    let rgb: Vec<u8> = image.as_raw().chunks_exact(4).flat_map(|p| [p[0], p[1], p[2]]).collect();
+    let rgb: Vec<u8> = image.as_raw().as_chunks::<4>().0.iter().flat_map(|p| [p[0], p[1], p[2]]).collect();
     let mut out = Vec::with_capacity(rgb.len() / 4);
     PngEncoder::new_with_quality(&mut out, CompressionType::Fast, FilterType::Adaptive)
         .write_image(&rgb, image.width(), image.height(), image::ExtendedColorType::Rgb8)
