@@ -8,8 +8,8 @@ use crate::model::Status;
 
 const TRAY: &str = "tray";
 
-pub fn create(app: &AppHandle) -> tauri::Result<()> {
-    let settings = &app.state::<Shell>().settings;
+fn menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
+    let settings = app.state::<Shell>().settings();
     let item = |id: &str, label: String| MenuItem::with_id(app, id, label, true, None::<&str>);
     let capture = item("capture", format!("Распознать область\t{}", settings.capture_hotkey))?;
     // Opening the menu can move focus (to the taskbar on Windows), so typing
@@ -19,7 +19,19 @@ pub fn create(app: &AppHandle) -> tauri::Result<()> {
     let window = item("showWindow", "Открыть окно".into())?;
     let quit = item("quit", "Выход".into())?;
     let separator = PredefinedMenuItem::separator(app)?;
-    let menu = Menu::with_items(app, &[&capture, &delayed, &cancel, &separator, &window, &quit])?;
+    Menu::with_items(app, &[&capture, &delayed, &cancel, &separator, &window, &quit])
+}
+
+/// Shows changed hotkeys in the menu.
+pub fn refresh(app: &AppHandle) -> tauri::Result<()> {
+    if let Some(tray) = app.tray_by_id(TRAY) {
+        tray.set_menu(Some(menu(app)?))?;
+    }
+    Ok(())
+}
+
+pub fn create(app: &AppHandle) -> tauri::Result<()> {
+    let menu = menu(app)?;
     let mut tray =
         TrayIconBuilder::with_id(TRAY).tooltip("ctrlCctrlV").menu(&menu).show_menu_on_left_click(true).on_menu_event(
             |app, event| {

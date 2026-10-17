@@ -5,18 +5,24 @@ use std::time::Duration;
 
 use ctrlcctrlv_core::settings::Settings;
 use ctrlcctrlv_platform::typing::TypingSettings;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// Event names shared with `ui/*.js`.
 pub mod events {
     /// [`super::Status`]: the app's phase and the last message.
     pub const STATUS: &str = "status";
-    /// [`super::RunView`]: one model's answer for a capture.
-    pub const RESULT: &str = "ocr-result";
+    /// [`super::SessionView`]: a new capture opened in the result window.
+    pub const SESSION: &str = "ocr-session";
+    /// [`super::RunView`]: a model's answer for the capture, sent again while it streams.
+    pub const RUN: &str = "ocr-run";
     /// [`super::TypingProgress`].
     pub const TYPING: &str = "typing-progress";
     /// Sent to the overlays right before they are shown, to clear the last selection.
     pub const OVERLAY_RESET: &str = "overlay-reset";
+    /// [`super::InstallProgress`] of a model download.
+    pub const INSTALL: &str = "model-install";
+    /// Models, the engine or settings changed; pages reload what they show.
+    pub const CHANGED: &str = "changed";
 }
 
 pub const OPENROUTER_ENDPOINT: &str = "https://openrouter.ai/api/v1/chat/completions";
@@ -48,17 +54,89 @@ impl Status {
     }
 }
 
-/// One model's answer for a capture. A capture keeps its image, so later runs
-/// (another model, a re-check) arrive as more `RunView`s with the same `capture`.
-#[derive(Debug, Clone, PartialEq, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct RunView {
-    pub capture: u64,
+/// A model to run on a capture, as picked in the result window.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ModelChoice {
     /// `local` or `openrouter`, as stored in history.
     pub provider: String,
     pub model: String,
+}
+
+impl ModelChoice {
+    pub fn local(&self) -> bool {
+        self.provider == "local"
+    }
+}
+
+/// Recognize the image again, or check a transcription against it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum RunKind {
+    Ocr,
+    Review,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum RunState {
+    Waiting,
+    Running,
+    Done,
+    Failed,
+    Cancelled,
+}
+
+/// One model's answer for a capture. A capture keeps its image, so later runs
+/// (other models, re-checks of an edited text) arrive with the same `capture`;
+/// runs started together share a `round`.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RunView {
+    pub id: u64,
+    pub capture: u64,
+    pub round: u32,
+    pub kind: RunKind,
+    pub provider: String,
+    pub model: String,
+    pub label: String,
+    pub state: RunState,
+    /// The answer, or the part received so far while running.
     pub text: String,
+    /// The text a review started from, to compare the proposal with.
+    pub base: Option<String>,
+    pub error: Option<String>,
     pub elapsed_ms: u64,
+}
+
+/// The capture shown in the result window.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SessionView {
+    pub capture: u64,
+    /// `data:image/png;base64,...`, or `None` for an entry opened from history.
+    pub image: Option<String>,
+    pub text: String,
+    pub runs: Vec<RunView>,
+}
+
+/// Cloud models run in parallel; local ones one after another, since each
+/// needs the engine to itself. Duplicates are dropped, order is kept.
+pub fn split_choices(choices: &[ModelChoice]) -> (Vec<ModelChoice>, Vec<ModelChoice>) {
+    let mut seen = std::collections::HashSet::new();
+    let unique: Vec<ModelChoice> = choices.iter().filter(|c| seen.insert((*c).clone())).cloned().collect();
+    unique.into_iter().partition(|choice| !choice.local())
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InstallProgress {
+    pub model: String,
+    pub label: String,
+    pub done: u64,
+    pub total: u64,
+    /// Set once the download ends; `error` says why it failed.
+    pub finished: bool,
+    pub error: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -136,11 +214,42 @@ mod tests {
     }
 
     #[test]
+    fn runs_cloud_models_together_and_local_ones_in_turn() {
+        let choice = |provider: &str, model: &str| ModelChoice { provider: provider.into(), model: model.into() };
+        let (cloud, local) = split_choices(&[
+            choice("local", "qwen3-vl-4b"),
+            choice("openrouter", "a/b"),
+            choice("local", "lightonocr-3-0.8b"),
+            choice("openrouter", "a/b"),
+            choice("openrouter", "c/d"),
+        ]);
+        assert_eq!(cloud, [choice("openrouter", "a/b"), choice("openrouter", "c/d")]);
+        assert_eq!(local, [choice("local", "qwen3-vl-4b"), choice("local", "lightonocr-3-0.8b")]);
+        let parsed: ModelChoice = serde_json::from_str(r#"{"provider": "local", "model": "x"}"#).unwrap();
+        assert!(parsed.local());
+    }
+
+    #[test]
     fn serializes_for_the_web_ui() {
         let status = serde_json::to_value(Status::error(Phase::Recognizing, "x")).unwrap();
         assert_eq!(status, serde_json::json!({"phase": "recognizing", "message": "x", "error": true}));
-        let run = RunView { capture: 1, provider: "local".into(), model: "m".into(), text: "t".into(), elapsed_ms: 5 };
-        assert_eq!(serde_json::to_value(run).unwrap()["elapsedMs"], 5);
+        let run = RunView {
+            id: 1,
+            capture: 1,
+            round: 1,
+            kind: RunKind::Review,
+            provider: "local".into(),
+            model: "m".into(),
+            label: "M".into(),
+            state: RunState::Done,
+            text: "t".into(),
+            base: None,
+            error: None,
+            elapsed_ms: 5,
+        };
+        let value = serde_json::to_value(run).unwrap();
+        assert_eq!((value["elapsedMs"].clone(), value["kind"].clone()), (5.into(), "review".into()));
+        assert_eq!(value["state"], "done");
         assert_eq!(copied_message("абв", Duration::from_millis(1300)), "Скопировано: 3 симв. за 1.3 с");
     }
 }
