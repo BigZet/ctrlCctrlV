@@ -70,6 +70,34 @@ impl UiState {
         favorites.filter(|f| f.len() <= MAX_FAVORITES).unwrap_or_default()
     }
 
+    /// OpenRouter favourites by model id. The Python app stores every
+    /// favourite as `source:id` (`openrouter:…`, `local:…`); a bare id is one an
+    /// earlier Rust build wrote.
+    pub fn remote_favorites(&self) -> Vec<String> {
+        self.favorites()
+            .iter()
+            .filter_map(|key| match key.split_once(':') {
+                Some(("openrouter", id)) => Some(id),
+                Some(("local", _)) => None,
+                _ => Some(key.as_str()),
+            })
+            .map(str::to_string)
+            .collect()
+    }
+
+    /// Adds or removes an OpenRouter favourite in the Python app's format and
+    /// returns the remaining OpenRouter ids.
+    pub fn set_remote_favorite(&mut self, id: &str, favorite: bool) -> Result<Vec<String>> {
+        let key = format!("openrouter:{id}");
+        let mut favorites: Vec<String> = self.favorites().into_iter().filter(|f| *f != key && f != id).collect();
+        if favorite {
+            favorites.push(key);
+        }
+        favorites.sort();
+        self.set_favorites(&favorites)?;
+        Ok(self.remote_favorites())
+    }
+
     pub fn set_favorites(&mut self, favorites: &[String]) -> Result<()> {
         if favorites.len() > MAX_FAVORITES || favorites.iter().any(|f| f.is_empty() || f.len() > 256) {
             return Err(Error::invalid("Некорректный список избранных моделей"));
@@ -83,6 +111,7 @@ impl UiState {
         let models: Option<Vec<ModelRef>> = items
             .iter()
             .map(|item| serde_json::from_value::<ModelRef>(item.clone()).ok().filter(ModelRef::plausible))
+            .map(|model| model.map(ModelRef::normalized))
             .collect();
         models.filter(|m| m.len() <= MAX_REVIEW_MODELS).unwrap_or_default()
     }
@@ -112,6 +141,16 @@ impl UiState {
 }
 
 impl ModelRef {
+    /// A favourite key saved as a model id by an earlier build (`openrouter:x`).
+    fn normalized(mut self) -> Self {
+        if self.provider == "openrouter"
+            && let Some(id) = self.model.strip_prefix("openrouter:")
+        {
+            self.model = id.to_string();
+        }
+        self
+    }
+
     fn plausible(&self) -> bool {
         matches!(self.provider.as_str(), "local" | "openrouter") && !self.model.is_empty() && self.model.len() <= 256
     }
@@ -133,12 +172,28 @@ mod tests {
         let mut state = UiState::load(directory.path());
         assert_eq!(state.history_pins(), [EntryRef { id: 3, created: "c".into() }]);
         assert_eq!(state.favorites(), ["a/b"]);
+        assert_eq!(state.remote_favorites(), ["a/b"]);
         state.set_history_pins(&[EntryRef { id: 5, created: "d".into() }]).unwrap();
         let stored: Value = serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
         assert_eq!(stored["preview_sizes"], json!([440, 560]));
         assert_eq!(stored["history_pins"], json!([{"id": 5, "created": "d"}]));
         std::fs::write(&path, r#"{"history_pins": [{"id": -1, "created": "c"}]}"#).unwrap();
         assert!(UiState::load(directory.path()).history_pins().is_empty());
+    }
+
+    #[test]
+    fn favorites_use_the_python_source_prefix() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("ui-state.json");
+        std::fs::write(&path, r#"{"favorites": ["local:qwen3-vl-4b", "openrouter:q/x:free", "legacy/bare"]}"#).unwrap();
+        let mut state = UiState::load(directory.path());
+        assert_eq!(state.remote_favorites(), ["q/x:free", "legacy/bare"]);
+        assert_eq!(state.set_remote_favorite("legacy/bare", false).unwrap(), ["q/x:free"]);
+        assert_eq!(state.set_remote_favorite("a/b", true).unwrap(), ["a/b", "q/x:free"]);
+        let stored: Value = serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
+        assert_eq!(stored["favorites"], json!(["local:qwen3-vl-4b", "openrouter:a/b", "openrouter:q/x:free"]));
+        std::fs::write(&path, r#"{"review_models": [{"provider": "openrouter", "model": "openrouter:a/b"}]}"#).unwrap();
+        assert_eq!(UiState::load(directory.path()).review_models()[0].model, "a/b");
     }
 
     #[test]

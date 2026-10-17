@@ -159,7 +159,7 @@ pub struct CatalogView {
 #[tauri::command]
 pub fn catalog_list(app: AppHandle) -> CatalogView {
     let shell = app.state::<Shell>();
-    CatalogView { models: lock(&shell.catalog).clone(), favorites: lock(&shell.ui).favorites() }
+    CatalogView { models: lock(&shell.catalog).clone(), favorites: lock(&shell.ui).remote_favorites() }
 }
 
 #[tauri::command]
@@ -172,13 +172,5 @@ pub async fn catalog_refresh(app: AppHandle) -> Result<CatalogView, String> {
 
 #[tauri::command]
 pub fn catalog_favorite(app: AppHandle, id: String, favorite: bool) -> Result<Vec<String>, String> {
-    let shell = app.state::<Shell>();
-    let mut ui = lock(&shell.ui);
-    let mut favorites = ui.favorites();
-    favorites.retain(|f| *f != id);
-    if favorite {
-        favorites.push(id);
-    }
-    ui.set_favorites(&favorites).map_err(|e| e.to_string())?;
-    Ok(favorites)
+    lock(&app.state::<Shell>().ui).set_remote_favorite(&id, favorite).map_err(|e| e.to_string())
 }
