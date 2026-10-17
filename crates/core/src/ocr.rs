@@ -313,15 +313,17 @@ pub fn http_error(status: u16, body: &[u8]) -> String {
             && let Some(Value::Object(error)) = object.get("error")
         {
             message = match error.get("message") {
-                Some(Value::String(text)) => text.to_lowercase(),
-                Some(other) => crate::pyjson::dumps(other).to_lowercase(),
+                Some(Value::String(text)) => text.clone(),
+                Some(other) => crate::pyjson::dumps(other),
                 None => String::new(),
             };
             if let Some(Value::String(raw)) = error.get("metadata").and_then(|m| m.get("raw")) {
                 message.push(' ');
-                message.push_str(&raw.to_lowercase());
+                message.push_str(raw);
             }
         }
+        let detail = message.split_whitespace().collect::<Vec<_>>().join(" ");
+        let message = message.to_lowercase();
         let has = |words: &[&str]| words.iter().any(|word| message.contains(word));
         let reason = if has(&["response_format", "json_object", "json_schema"]) {
             "Провайдер не поддерживает выбранный JSON-формат. Выберите другую vision-модель."
@@ -332,7 +334,14 @@ pub fn http_error(status: u16, body: &[u8]) -> String {
         } else if has(&["image", "vision", "multimodal", "modality", "modalities"]) {
             "Модель или её провайдер не принимает изображения. Выберите другую vision-модель."
         } else {
-            "Провайдер отклонил запрос. Обновите каталог или выберите другую vision-модель."
+            // Unrecognized: show what the provider said, so it can be acted on.
+            let detail: String = detail.chars().take(300).collect();
+            return if detail.is_empty() {
+                "OCR HTTP 400. Провайдер отклонил запрос. Обновите каталог или выберите другую vision-модель. Буфер не изменён."
+                    .into()
+            } else {
+                format!("OCR HTTP 400. Провайдер отклонил запрос: {detail}. Буфер не изменён.")
+            };
         };
         return format!("OCR HTTP 400. {reason} Буфер не изменён.");
     }

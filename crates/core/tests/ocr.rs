@@ -193,7 +193,8 @@ async fn http_400_reasons_are_classified() {
         (r#"{"error":{"message":"bad","metadata":{"raw":"Temperature must be 1"}}}"#, "temperature"),
         (r#"{"error":{"message":"Context length exceeded"}}"#, "лимит модели"),
         (r#"{"error":{"message":"No endpoints support image input"}}"#, "не принимает изображения"),
-        ("not json", "Провайдер отклонил запрос"),
+        ("not json", "Провайдер отклонил запрос. Обновите каталог"),
+        (r#"{"error":{"message":"Unsupported   parameter: top_k"}}"#, "отклонил запрос: Unsupported parameter: top_k."),
     ] {
         let (_server, url) = endpoint(move |_| Reply::bytes(400, body.as_bytes(), &[])).await;
         let error = OcrProvider::new(url, "m", "k").local().recognize(b"png", &Operation::new()).await.unwrap_err();

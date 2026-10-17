@@ -121,8 +121,13 @@ async fn provider(
         let mut provider = OcrProvider::new(OPENROUTER_ENDPOINT, &choice.model, remote_key()?)
             .mode(mode)
             .max_tokens(max_tokens(&settings));
+        // As in the Python app: send only what the catalog says the model takes.
         if let Some(known) = lock(&shell.catalog).iter().find(|m| m.id == choice.model) {
             provider.response_format = known.structured;
+            provider.temperature = known.temperature.then(|| known.default_temperature.unwrap_or(0.0));
+            if let Some(limit) = known.max_completion_tokens.filter(|&limit| limit > 0) {
+                provider.max_tokens = provider.max_tokens.min(u32::try_from(limit).unwrap_or(u32::MAX));
+            }
         }
         return Ok(provider);
     }
