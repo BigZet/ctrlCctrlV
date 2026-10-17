@@ -406,7 +406,7 @@ class FakePlatform:
     def active_target(self):
         return (4242, 1)
 
-    def character(self, char):
+    def character(self, char=None):
         self.calls += 1
 
     def enter(self):
@@ -439,7 +439,7 @@ class NativeProbe:
         from ctrlcctrlv.platforms import active_target
         return active_target(self.native)
 
-    def character(self, char):
+    def character(self, char=None):
         self.calls += 1
 
     enter = tab = select_indentation = character
