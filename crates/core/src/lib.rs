@@ -20,7 +20,11 @@ pub mod models;
 pub mod ocr;
 pub mod operation;
 pub mod pyjson;
+pub mod remote_catalog;
+pub mod review;
 pub mod runtime;
 pub mod settings;
+pub mod stream;
+pub mod ui_state;
 
 pub use error::{Error, Result};
