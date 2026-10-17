@@ -1,6 +1,6 @@
 //! The settings page. Settings live in the Python app's `settings.json` and
 //! apply at once: hotkeys are registered again, the tray menu shows them.
-use ctrlcctrlv_core::credentials::Credentials;
+use ctrlcctrlv_core::credentials::{Credentials, check_key};
 use ctrlcctrlv_core::settings::{Settings, data_directory};
 use serde::Serialize;
 use tauri::{AppHandle, Manager};
@@ -59,7 +59,11 @@ fn lowercase_first(text: &str) -> String {
 /// Stores the OpenRouter key in the system credential store; empty removes it.
 #[tauri::command]
 pub fn api_key_save(app: AppHandle, key: String) -> Result<(), String> {
-    let result = Credentials::system().and_then(|c| c.write(key.trim())).map_err(|e| e.to_string());
+    let key = key.trim();
+    if !key.is_empty() {
+        check_key(key).map_err(|e| e.to_string())?;
+    }
+    let result = Credentials::system().and_then(|c| c.write(key)).map_err(|e| e.to_string());
     changed(&app);
     result
 }

@@ -13,6 +13,17 @@ use crate::error::{Error, Result};
 pub const SERVICE: &str = "ctrlCctrlV.OpenRouter";
 pub const USERNAME: &str = "api-key";
 
+/// Rejects text that cannot be an OpenRouter key (`sk-or-…`, one line), so
+/// a stray paste such as recognized text is not stored as the key.
+pub fn check_key(value: &str) -> Result<()> {
+    let plain = value.starts_with("sk-or-") && value.len() <= 256 && value.bytes().all(|b| b.is_ascii_graphic());
+    if plain {
+        Ok(())
+    } else {
+        Err(Error::invalid("Это не похоже на ключ OpenRouter: он начинается с «sk-or-» и не содержит пробелов"))
+    }
+}
+
 /// Where a secret lives; the system store in the app, memory in tests.
 pub trait SecretStore: Send + Sync {
     fn get(&self) -> Result<Option<String>>;

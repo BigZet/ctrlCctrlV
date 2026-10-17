@@ -6,7 +6,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 
 use ctrlcctrlv_core::catalog::PromptMode;
-use ctrlcctrlv_core::credentials::Credentials;
+use ctrlcctrlv_core::credentials::{Credentials, check_key};
 use ctrlcctrlv_core::history::NewRun;
 use ctrlcctrlv_core::ocr::{OcrProvider, OcrResult, Request};
 use ctrlcctrlv_core::operation::Operation;
@@ -46,6 +46,9 @@ fn remote_key() -> Result<String, String> {
     let key = Credentials::system().and_then(|c| c.read()).map_err(|e| e.to_string())?;
     if key.is_empty() {
         return Err("Введите и сохраните API-ключ OpenRouter в разделе «Модели»".into());
+    }
+    if check_key(&key).is_err() {
+        return Err("Сохранённый ключ OpenRouter повреждён. Вставьте ключ заново в разделе «Модели»".into());
     }
     Ok(key)
 }
