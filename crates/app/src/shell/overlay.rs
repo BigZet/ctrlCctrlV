@@ -36,7 +36,9 @@ fn topology(monitors: &[Monitor]) -> Vec<(i32, i32, u32, u32, u64)> {
 }
 
 /// Starts a selection, unless OCR is not ready or another operation runs.
-pub async fn begin(app: &AppHandle) {
+/// With `append` the region's text goes after the result in the result
+/// window; without a capture there it is an ordinary capture.
+pub async fn begin(app: &AppHandle, append: bool) {
     let shell = app.state::<Shell>();
     if shell.phase() != Phase::Idle {
         return busy(app);
@@ -45,12 +47,18 @@ pub async fn begin(app: &AppHandle) {
         report(app, Status::error(Phase::Idle, message));
         return show_main(app, false);
     }
-    if !shell.begin(Activity::Selecting) {
+    let append = append && lock(&shell.capture).as_ref().is_some_and(|capture| capture.png.is_some());
+    if !shell.begin(Activity::Selecting { append }) {
         return busy(app);
     }
     match show(app) {
         Ok(()) => {
-            report(app, Status::new(Phase::Selecting, "Выделите область · Esc — отмена"));
+            let message = if append {
+                "Выделите область, чтобы добавить её к результату · Esc — отмена"
+            } else {
+                "Выделите область · Esc — отмена"
+            };
+            report(app, Status::new(Phase::Selecting, message));
             // Load the local model while the user is still selecting.
             ocr::warm_up(app);
         }
@@ -181,6 +189,7 @@ pub async fn selection_finished(app: AppHandle, window: WebviewWindow, x: f64, y
     let monitor = lock(&OVERLAYS).targets.iter().find(|t| t.label == window.label()).map(|t| t.monitor);
     let shell = app.state::<Shell>();
     let operation = Operation::new();
+    let append = matches!(*lock(&shell.activity), Activity::Selecting { append: true });
     if !shell.advance(Phase::Selecting, Activity::Recognizing(operation.clone())) {
         return;
     }
@@ -190,7 +199,7 @@ pub async fn selection_finished(app: AppHandle, window: WebviewWindow, x: f64, y
         return report(&app, Status::error(Phase::Idle, "Монитор отключён. Выделите область заново."));
     };
     let region = Region { x, y, width, height };
-    tauri::async_runtime::spawn(ocr::recognize(app.clone(), operation, monitor, region));
+    tauri::async_runtime::spawn(ocr::recognize(app.clone(), operation, monitor, region, append));
 }
 
 #[tauri::command]

@@ -8,8 +8,9 @@ hosts only the portable logic in `src/model.rs` and its tests are built.
 | Tray icon and menu | `src/shell/tray.rs` |
 | Global hotkeys from `settings.json` (capture, type, cancel) | `src/shell/hotkeys.rs` |
 | Region selection: a transparent topmost window per monitor | `src/shell/overlay.rs`, `ui/overlay.*` |
-| Capture → streamed OCR (local engine or OpenRouter) → clipboard → history; re-checks of the same capture by more models | `src/shell/ocr.rs` |
-| Typing the clipboard into the focused window | `src/shell/typing.rs` |
+| Capture → streamed OCR (local engine or OpenRouter) → clipboard → history; re-checks of the same capture by more models; "add region" appends one more region's text and stacks its image under the capture | `src/shell/ocr.rs` |
+| Typing the clipboard into the focused window, with pause and continue from the same place | `src/shell/typing.rs` |
+| Typing panel: progress, pause/continue/stop; never takes focus (`WS_EX_NOACTIVATE`, non-activating `NSPanel`) | `src/shell/panel.rs`, `ui/typing.*` |
 | History: search, pins, delete with undo, stored model runs | `src/shell/history.rs`, `ui/history.js` |
 | Local models (install, delete, engine) and the OpenRouter catalog | `src/shell/library.rs`, `ui/models.js` |
 | Settings and the OpenRouter key | `src/shell/preferences.rs`, `ui/settings.js` |
@@ -51,3 +52,9 @@ npx @tauri-apps/cli@2 build --no-bundle     # Windows: target/release/ctrlcctrlv
 ```
 
 On macOS grant Screen Recording and Accessibility to the app on first use.
+
+Typing: the typing hotkey starts typing the clipboard, pauses a running job
+and continues a paused one while the clipboard still holds its text. A focus
+change or a pressed key pauses instead of stopping; "continue" types the rest
+into the window focused at that moment (after a 3 s countdown when that is
+ctrlCctrlV's own window). The cancel hotkey and "Стоп" end the job.

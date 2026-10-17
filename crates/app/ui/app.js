@@ -88,7 +88,6 @@ const App = {
     $(".text", node).textContent = value.message;
     node.classList.toggle("error", value.error);
     node.dataset.phase = value.phase;
-    if (value.phase !== "typing") $("#typing").hidden = true;
     for (const page of Object.values(this.pages)) page.status?.(value);
   },
 
@@ -107,10 +106,10 @@ document.addEventListener("click", (event) => {
 });
 
 listen("status", (event) => App.showStatus(event.payload));
-listen("typing-progress", ({ payload }) => {
+listen("typing", ({ payload }) => {
   const bar = $("#typing");
-  bar.hidden = false;
-  bar.max = payload.total;
+  bar.hidden = payload.state === "done" || payload.state === "stopped";
+  bar.max = Math.max(payload.total, 1);
   bar.value = payload.done;
 });
 listen("changed", async () => {

@@ -99,6 +99,10 @@ impl Keyboard for WindowsKeyboard {
         hwnd.0 as isize == target.hwnd
     }
 
+    fn owned_by_this_app(&self, target: &WindowTarget) -> bool {
+        target.pid == std::process::id()
+    }
+
     fn character(&self, ch: char) -> Result<()> {
         let mut units = [0u16; 2];
         let events: Vec<INPUT> = ch
