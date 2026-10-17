@@ -8,17 +8,33 @@ hosts only the portable logic in `src/model.rs` and its tests are built.
 | Tray icon and menu | `src/shell/tray.rs` |
 | Global hotkeys from `settings.json` (capture, type, cancel) | `src/shell/hotkeys.rs` |
 | Region selection: a transparent topmost window per monitor | `src/shell/overlay.rs`, `ui/overlay.*` |
-| Capture → OCR (local engine or OpenRouter) → clipboard → history | `src/shell/ocr.rs` |
+| Capture → streamed OCR (local engine or OpenRouter) → clipboard → history; re-checks of the same capture by more models | `src/shell/ocr.rs` |
 | Typing the clipboard into the focused window | `src/shell/typing.rs` |
-| Main window: status, last answer, copy again | `ui/index.html`, `ui/main.*` |
+| History: search, pins, delete with undo, stored model runs | `src/shell/history.rs`, `ui/history.js` |
+| Local models (install, delete, engine) and the OpenRouter catalog | `src/shell/library.rs`, `ui/models.js` |
+| Settings and the OpenRouter key | `src/shell/preferences.rs`, `ui/settings.js` |
+| Main window shell: navigation, status, toasts | `ui/index.html`, `ui/app.js`, `ui/main.css` |
+| Result window: editor, model answers with line changes, side-by-side comparison | `ui/result.js` |
 
 Settings, history, models and the OpenRouter key are shared with the Python
 app (same data directory), so a model installed there is used here.
 
+Settings, `ui-state.json` (history pins, favourite OpenRouter models),
+`history.sqlite3` and `openrouter-models.json` are the Python app's files.
+
 The Rust side talks to the web UI only through the events and commands named
-in `src/model.rs`. A capture keeps its PNG in memory and every answer is a
-`RunView` tagged with its capture id, so re-checks with more models,
-streaming output and a typing panel can be added without changing the flow.
+in `src/model.rs` and `src/shell/*.rs`. A capture keeps its PNG in memory and
+every answer is a `RunView` tagged with its capture id and round. In the
+result window the user picks models and runs either "recognize again" (image
+only) or "check text" (the edited text goes along as the transcription to
+correct). Cloud models run in parallel, local ones in turn, since each needs
+the engine to itself. Each finished answer is shown as line changes against
+the current text (computed in `ctrlcctrlv_core::review`), which can be applied
+selectively; every answer is stored as a run of the history entry.
+
+The UI is plain HTML, CSS and JavaScript without a bundler. To look at it in a
+browser, load `ui/index.html` with a stub `window.__TAURI__` that answers the
+commands.
 
 ## Run
 

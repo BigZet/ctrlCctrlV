@@ -7,23 +7,145 @@
   <link rel="stylesheet" href="main.css">
 </head>
 <body>
-  <header>
-    <div id="status" role="status">Готово</div>
-    <progress id="typing" max="1" value="0" hidden></progress>
-  </header>
-  <nav>
-    <button data-action="capture">Распознать область</button>
-    <button data-action="typeDelayed">Напечатать буфер через 3 с</button>
-    <button data-action="cancel">Остановить</button>
-  </nav>
-  <main>
-    <div id="meta"></div>
-    <textarea id="result" spellcheck="false" placeholder="Здесь появится распознанный текст"></textarea>
-    <div class="row">
-      <button id="copy" disabled>Скопировать снова</button>
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">⌘</span> ctrlCctrlV</div>
+    <nav id="nav">
+      <button data-page="result" class="active"><svg viewBox="0 0 24 24"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M8 9h8M8 12h8M8 15h5"/></svg>Результат</button>
+      <button data-page="models"><svg viewBox="0 0 24 24"><path d="M12 3 4 7.5v9L12 21l8-4.5v-9L12 3ZM4 7.5l8 4.5 8-4.5M12 12v9"/></svg>Модели</button>
+      <button data-page="history"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg>История</button>
+      <button data-page="settings"><svg viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Настройки</button>
+    </nav>
+    <div class="quick">
+      <button data-action="capture" class="primary wide">Распознать область</button>
+      <button data-action="typeDelayed" class="wide">Напечатать буфер через 3 с</button>
+      <button data-action="cancel" class="wide ghost">Остановить</button>
     </div>
+    <div class="status" id="status" role="status"><span class="dot"></span><span class="text">Готово</span></div>
+    <progress id="typing" max="1" value="0" hidden></progress>
+    <div class="hotkeys" id="hotkeys"></div>
+  </aside>
+
+  <main>
+    <section class="page active" id="page-result">
+      <header class="page-head">
+        <h1>Результат</h1>
+        <span class="muted" id="r-meta"></span>
+        <span class="spacer"></span>
+      </header>
+      <div class="empty" id="r-empty">
+        <div class="empty-icon">⌗</div>
+        <p>Выделите область экрана, чтобы распознать текст.</p>
+        <p class="muted" id="r-empty-hint"></p>
+        <button data-action="capture" class="primary">Распознать область</button>
+      </div>
+      <div class="result-grid" id="r-grid" hidden>
+        <div class="pane work">
+          <details class="shot" id="r-shot" open>
+            <summary>Снимок</summary>
+            <div class="shot-frame"><img id="r-image" alt="Снимок области"></div>
+          </details>
+          <div class="editor-head">
+            <span class="label">Текст</span>
+            <span class="muted" id="r-count"></span>
+            <span class="spacer"></span>
+            <button id="r-revert" class="ghost" title="Вернуть первый распознанный текст">Исходный</button>
+            <button id="r-copy" class="primary">Скопировать</button>
+          </div>
+          <div class="editor">
+            <pre class="gutter" id="r-gutter" aria-hidden="true"></pre>
+            <textarea id="r-text" spellcheck="false" wrap="off"></textarea>
+          </div>
+        </div>
+        <div class="pane side">
+          <div class="card recheck">
+            <div class="recheck-head">
+              <div class="seg" id="r-kind">
+                <button data-kind="review" class="active">Проверить текст</button>
+                <button data-kind="ocr">Распознать заново</button>
+              </div>
+            </div>
+            <p class="muted small" id="r-kind-hint"></p>
+            <div class="chips" id="r-models"></div>
+            <div class="row">
+              <button id="r-run" class="primary">Запустить</button>
+              <button id="r-stop" class="ghost" hidden>Стоп</button>
+              <span class="spacer"></span>
+              <button id="r-compare" class="ghost" disabled>Сравнить рядом</button>
+            </div>
+          </div>
+          <div class="runs" id="r-runs"></div>
+        </div>
+      </div>
+      <div class="compare" id="r-compare-view" hidden>
+        <header class="page-head">
+          <h1>Сравнение</h1>
+          <span class="muted">Подсвечено то, чем ответ модели отличается от текущего текста</span>
+          <span class="spacer"></span>
+          <button id="r-compare-close">Закрыть</button>
+        </header>
+        <div class="compare-columns" id="r-columns"></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-models">
+      <header class="page-head">
+        <h1>Модели</h1>
+        <div class="seg" id="m-tabs">
+          <button data-tab="local" class="active">На компьютере</button>
+          <button data-tab="remote">OpenRouter</button>
+        </div>
+        <span class="spacer"></span>
+      </header>
+      <div class="tab" id="m-local">
+        <div class="card engine" id="m-engine"></div>
+        <div class="model-list" id="m-list"></div>
+      </div>
+      <div class="tab" id="m-remote" hidden>
+        <div class="card key">
+          <label for="m-key">API-ключ OpenRouter</label>
+          <div class="row">
+            <input id="m-key" type="password" autocomplete="off" placeholder="sk-or-…">
+            <button id="m-key-save" class="primary">Сохранить</button>
+          </div>
+          <p class="muted small" id="m-key-state"></p>
+        </div>
+        <div class="row">
+          <input id="m-search" type="search" placeholder="Поиск по названию или идентификатору">
+          <label class="check"><input type="checkbox" id="m-only-fav"> Только избранные</label>
+          <button id="m-refresh">Обновить каталог</button>
+        </div>
+        <div class="catalog" id="m-catalog"></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-history">
+      <header class="page-head">
+        <h1>История</h1>
+        <span class="spacer"></span>
+        <input id="h-search" type="search" placeholder="Поиск по тексту">
+      </header>
+      <div class="history-grid">
+        <ul class="history-list" id="h-list"></ul>
+        <div class="card history-detail" id="h-detail"><p class="muted">Выберите запись</p></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-settings">
+      <header class="page-head">
+        <h1>Настройки</h1>
+        <span class="spacer"></span>
+        <button id="s-reset" class="ghost">Отменить изменения</button>
+        <button id="s-save" class="primary">Сохранить</button>
+      </header>
+      <form id="s-form" class="settings" autocomplete="off"></form>
+    </section>
   </main>
-  <footer id="hotkeys"></footer>
-  <script src="main.js"></script>
+
+  <div class="toasts" id="toasts"></div>
+  <script src="app.js"></script>
+  <script src="result.js"></script>
+  <script src="models.js"></script>
+  <script src="history.js"></script>
+  <script src="settings.js"></script>
 </body>
 </html>
