@@ -16,6 +16,7 @@ use ctrlcctrlv_platform::capture::{Region, capture_region, encode_png, stack_png
 use ctrlcctrlv_platform::clipboard::Clipboard;
 use ctrlcctrlv_platform::{Permission, permissions, request_permission};
 use tauri::{AppHandle, Emitter, Manager};
+use tokio_util::sync::CancellationToken;
 
 use super::{Activity, Capture, Shell, busy_message, changed, lock, report, show_main};
 use crate::model::{
@@ -85,20 +86,34 @@ pub async fn preflight(shell: &Shell) -> Result<(), String> {
     Ok(())
 }
 
-/// Starts the local engine in the background so it is ready when the selection ends.
+/// Starts the local engine in the background so it is ready when the selection
+/// ends. Cancelling the selection or the recognition stops the load.
 pub fn warm_up(app: &AppHandle) {
+    let shell = app.state::<Shell>();
+    let settings = shell.settings();
+    if settings.provider == "openrouter" {
+        return;
+    }
+    let token = CancellationToken::new();
+    if let Some(previous) = lock(&shell.warming).replace(token.clone()) {
+        previous.cancel();
+    }
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
         let shell = app.state::<Shell>();
-        let settings = shell.settings();
-        if settings.provider == "openrouter" {
-            return;
-        }
         let id = settings.local_model;
-        let mut runtime = shell.runtime.lock().await;
+        let mut runtime = tokio::select! {
+            _ = token.cancelled() => return,
+            runtime = shell.runtime.lock() => runtime,
+        };
         if runtime.provider(&id, 1).is_none() && runtime.installed(&id) {
-            // A failure is reported by `recognize`, which tries again.
-            let _ = runtime.start(&id, Operation::new().token(), &|_, _, _| {}).await;
+            *lock(&shell.warm_failure) = None;
+            if let Err(error) = runtime.start(&id, &token, &|_, _, _| {}).await
+                && !token.is_cancelled()
+            {
+                // `provider` reports it instead of loading the model again.
+                *lock(&shell.warm_failure) = Some((id, error.to_string()));
+            }
         }
     });
 }
@@ -140,10 +155,19 @@ async fn provider(
             model.label
         ));
     }
-    let mut runtime = shell.runtime.lock().await;
+    // The lock waits for a background load, which a cancel also stops.
+    let mut runtime = tokio::select! {
+        biased;
+        _ = operation.token().cancelled() => return Err("Распознавание отменено".into()),
+        runtime = shell.runtime.lock() => runtime,
+    };
+    let failure = lock(&shell.warm_failure).take();
     if runtime.provider(id, 1).is_none() {
         if !runtime.installed(id) {
             return Err(NOT_INSTALLED.into());
+        }
+        if let Some((_, error)) = failure.filter(|(model, _)| model == id) {
+            return Err(error);
         }
         report(app, Status::new(Phase::Recognizing, format!("Загружаю {}…", model.label)));
         runtime.start(id, operation.token(), &|_, _, _| {}).await.map_err(|e| e.to_string())?;
@@ -319,12 +343,16 @@ async fn first_run(
         return Ok(Status::new(Phase::Idle, "Текст не найден · буфер не изменён"));
     }
     // A cancel that raced with the answer still leaves the clipboard alone.
-    operation.check().map_err(|e| e.to_string())?;
-    let text = result.text.clone();
-    tauri::async_runtime::spawn_blocking(move || Clipboard::new().and_then(|mut c| c.set_text(&text)))
-        .await
-        .map_err(|_| "Буфер обмена недоступен".to_string())?
-        .map_err(|e| e.to_string())?;
+    let (publisher, text) = (operation.clone(), result.text.clone());
+    tauri::async_runtime::spawn_blocking(move || {
+        let mut written = Ok(());
+        publisher
+            .publish(&text, |text| written = Clipboard::new().and_then(|mut c| c.set_text(text)))
+            .map_err(|e| e.to_string())?;
+        written.map_err(|e| e.to_string())
+    })
+    .await
+    .map_err(|_| "Буфер обмена недоступен".to_string())??;
     Ok(Status::new(Phase::Idle, copied_message(&result.text, Duration::from_millis(run.elapsed_ms))))
 }
 

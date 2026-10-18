@@ -167,3 +167,10 @@ impl Keyboard for MacKeyboard {
         post(HOME, CGEventFlags::MaskShift, None)
     }
 }
+
+/// A blocking error dialog, for failures before the tray icon exists. The
+/// texts go in as arguments, so they need no AppleScript quoting.
+pub fn show_error(title: &str, message: &str) {
+    let script = "on run argv\ndisplay alert (item 1 of argv) message (item 2 of argv) as critical\nend run";
+    let _ = std::process::Command::new("/usr/bin/osascript").args(["-e", script, title, message]).status();
+}

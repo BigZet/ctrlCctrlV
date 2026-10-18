@@ -15,7 +15,7 @@ pub mod clipboard;
 mod sys;
 
 #[cfg(any(windows, target_os = "macos"))]
-pub use sys::{NativeKeyboard, open_permission_settings, permissions, request_permission};
+pub use sys::{NativeKeyboard, open_permission_settings, permissions, request_permission, show_error};
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum Error {

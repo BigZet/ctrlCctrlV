@@ -322,13 +322,14 @@ pub fn desktop_origin(physical: (i32, i32), scale: f64, points: bool) -> (i32, i
 }
 
 /// The capture monitor whose origin matches `origin` (rounding may differ by a
-/// pixel). With a single monitor on both sides it is that one.
-pub fn match_monitor(origin: (i32, i32), monitors: &[(u32, i32, i32)]) -> Option<u32> {
+/// pixel). With a single monitor on both sides (`desktop` counts the webview
+/// runtime's monitors) it is that one, wherever each side places it.
+pub fn match_monitor(origin: (i32, i32), monitors: &[(u32, i32, i32)], desktop: usize) -> Option<u32> {
     monitors
         .iter()
         .filter(|(_, x, y)| (x - origin.0).abs() <= 2 && (y - origin.1).abs() <= 2)
         .min_by_key(|(_, x, y)| (x - origin.0).abs() + (y - origin.1).abs())
-        .or(if monitors.len() == 1 { monitors.first() } else { None })
+        .or(if monitors.len() == 1 && desktop == 1 { monitors.first() } else { None })
         .map(|(id, _, _)| *id)
 }
 
@@ -340,12 +341,15 @@ mod tests {
     fn maps_monitors_by_origin() {
         let monitors = [(7, 0, 0), (9, 1728, -200)];
         // macOS: a Retina monitor at 3456x0 physical pixels is at 1728 points.
-        assert_eq!(match_monitor(desktop_origin((3456, -400), 2.0, true), &monitors), Some(9));
-        assert_eq!(match_monitor(desktop_origin((0, 0), 2.0, true), &monitors), Some(7));
+        assert_eq!(match_monitor(desktop_origin((3456, -400), 2.0, true), &monitors, 2), Some(9));
+        assert_eq!(match_monitor(desktop_origin((0, 0), 2.0, true), &monitors, 2), Some(7));
         // Windows keeps physical pixels.
-        assert_eq!(match_monitor(desktop_origin((1729, -199), 1.5, false), &monitors), Some(9));
-        assert_eq!(match_monitor((500, 500), &monitors), None);
-        assert_eq!(match_monitor((500, 500), &[(3, 0, 0)]), Some(3));
+        assert_eq!(match_monitor(desktop_origin((1729, -199), 1.5, false), &monitors, 2), Some(9));
+        assert_eq!(match_monitor((500, 500), &monitors, 2), None);
+        assert_eq!(match_monitor((500, 500), &[(3, 0, 0)], 1), Some(3));
+        // A second desktop monitor the capture library does not list gets no capture monitor.
+        assert_eq!(match_monitor((1920, 0), &[(3, 0, 0)], 2), None);
+        assert_eq!(match_monitor((0, 0), &[(3, 0, 0)], 2), Some(3));
     }
 
     #[test]

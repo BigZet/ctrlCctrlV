@@ -84,14 +84,19 @@ fn show(app: &AppHandle) -> Result<(), String> {
                 let _ = window.destroy();
             }
         }
+        // Recorded again only once every monitor has its window, so a failed
+        // build is retried on the next selection.
+        overlays.topology.clear();
         overlays.generation += 1;
         let capture: Vec<(u32, i32, i32)> =
             capture::monitors().map_err(|e| e.to_string())?.iter().map(|m| (m.id, m.x, m.y)).collect();
         for (index, monitor) in monitors.iter().enumerate() {
             let origin = (monitor.position().x, monitor.position().y);
-            let Some(id) =
-                match_monitor(desktop_origin(origin, monitor.scale_factor(), cfg!(target_os = "macos")), &capture)
-            else {
+            let Some(id) = match_monitor(
+                desktop_origin(origin, monitor.scale_factor(), cfg!(target_os = "macos")),
+                &capture,
+                monitors.len(),
+            ) else {
                 continue;
             };
             let label = format!("overlay-{}-{index}", overlays.generation);
@@ -101,7 +106,9 @@ fn show(app: &AppHandle) -> Result<(), String> {
             let bounds = (p.x as f64, p.y as f64, s.width as f64, s.height as f64);
             overlays.targets.push(Target { label, monitor: id, bounds });
         }
-        overlays.topology = layout;
+        if overlays.targets.len() == monitors.len() {
+            overlays.topology = layout;
+        }
     }
     if overlays.targets.is_empty() {
         return Err("Не удалось сопоставить мониторы для снимка".into());
@@ -215,10 +222,18 @@ pub async fn selection_finished(app: AppHandle, window: WebviewWindow, x: f64, y
     tauri::async_runtime::spawn(ocr::recognize(app.clone(), operation, monitor, region, append));
 }
 
+/// Ends a selection in progress: Esc or a right click in an overlay, the
+/// cancel shortcut, the tray menu or an overlay closed by the system.
+pub fn cancel_selection(app: &AppHandle) {
+    let shell = app.state::<Shell>();
+    if shell.advance(Phase::Selecting, Activity::Idle) {
+        shell.stop_warm_up();
+        hide_all(app);
+        report(app, Status::new(Phase::Idle, "Выделение отменено"));
+    }
+}
+
 #[tauri::command]
 pub async fn selection_cancelled(app: AppHandle) {
-    if app.state::<Shell>().advance(Phase::Selecting, Activity::Idle) {
-        hide_all(&app);
-        report(&app, Status::new(Phase::Idle, "Выделение отменено"));
-    }
+    cancel_selection(&app);
 }

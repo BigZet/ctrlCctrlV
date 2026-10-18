@@ -93,6 +93,11 @@ pub struct Shell {
     pub install: Mutex<Option<tokio_util::sync::CancellationToken>>,
     /// The text being typed or paused part way, with its position.
     pub typing: Mutex<Option<TypingJob>>,
+    /// Stops the local model loading in the background during a selection.
+    pub warming: Mutex<Option<tokio_util::sync::CancellationToken>>,
+    /// Why the last background load failed, by model, so recognition reports
+    /// it instead of loading the same model again.
+    pub warm_failure: Mutex<Option<(String, String)>>,
 }
 
 pub fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -121,6 +126,8 @@ impl Shell {
             deleted: Mutex::new(None),
             install: Mutex::new(None),
             typing: Mutex::new(None),
+            warming: Mutex::new(None),
+            warm_failure: Mutex::new(None),
         })
     }
 
@@ -158,6 +165,15 @@ impl Shell {
 
     fn finish(&self) {
         *lock(&self.activity) = Activity::Idle;
+    }
+
+    /// Cancels a background model load, which frees the runtime soon after,
+    /// and forgets a failed one so the next recognition tries again.
+    pub fn stop_warm_up(&self) {
+        if let Some(token) = lock(&self.warming).take() {
+            token.cancel();
+        }
+        *lock(&self.warm_failure) = None;
     }
 
     /// A display name for a model: the catalog label, or the identifier.
@@ -207,7 +223,7 @@ pub async fn dispatch(app: AppHandle, action: Action) {
 
 fn cancel(app: &AppHandle) {
     let shell = app.state::<Shell>();
-    let mut activity = lock(&shell.activity);
+    let activity = lock(&shell.activity);
     match &*activity {
         // A paused typing job ends too.
         Activity::Idle => {
@@ -215,13 +231,15 @@ fn cancel(app: &AppHandle) {
             typing::stop(app);
         }
         Activity::Selecting { .. } => {
-            *activity = Activity::Idle;
             drop(activity);
-            overlay::hide_all(app);
-            report(app, Status::new(Phase::Idle, "Выделение отменено"));
+            overlay::cancel_selection(app);
         }
         // The owners report the outcome and return to idle themselves.
-        Activity::Recognizing(operation) => operation.cancel(),
+        Activity::Recognizing(operation) => {
+            operation.cancel();
+            // Recognition may be waiting for the model loaded in the background.
+            shell.stop_warm_up();
+        }
         Activity::Typing(control) => control.stop(),
     }
 }
@@ -241,6 +259,7 @@ async fn quit(app: &AppHandle) {
     if let Some(token) = lock(&app.state::<Shell>().install).as_ref() {
         token.cancel();
     }
+    app.state::<Shell>().stop_warm_up();
     let _ = app.state::<Shell>().runtime.lock().await.stop().await;
     app.exit(0);
 }
@@ -318,7 +337,9 @@ pub fn run() {
     let shell = match Shell::new() {
         Ok(shell) => shell,
         Err(message) => {
+            // Release builds on Windows have no console, so stderr alone is silent.
             eprintln!("{message}");
+            ctrlcctrlv_platform::show_error("ctrlCctrlV не запустился", &message);
             std::process::exit(1);
         }
     };
@@ -368,12 +389,18 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
-            // Closing the main window hides it; the app lives in the tray.
-            if let WindowEvent::CloseRequested { api, .. } = event
-                && window.label() == "main"
-            {
+            let WindowEvent::CloseRequested { api, .. } = event else { return };
+            if window.label() == "main" {
+                // Closing the main window hides it; the app lives in the tray.
                 api.prevent_close();
                 let _ = window.hide();
+            } else if window.label().starts_with("overlay-") {
+                // Alt+F4 on an overlay cancels the selection; the windows are reused.
+                // Off the main thread: `overlay::show` holds the overlays
+                // while it waits for window calls made there.
+                api.prevent_close();
+                let app = window.app_handle().clone();
+                tauri::async_runtime::spawn(async move { overlay::cancel_selection(&app) });
             }
         })
         .build(tauri::generate_context!())
@@ -383,6 +410,7 @@ pub fn run() {
         RunEvent::Exit => {
             // Never leave the engine running after the app is gone.
             let shell = app.state::<Shell>();
+            shell.stop_warm_up();
             let _ = tauri::async_runtime::block_on(async { shell.runtime.lock().await.stop().await });
         }
         _ => {}
