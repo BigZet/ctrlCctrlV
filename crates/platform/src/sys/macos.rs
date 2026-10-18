@@ -146,6 +146,10 @@ impl Keyboard for MacKeyboard {
         frontmost_pid() == Some(target.pid)
     }
 
+    fn owned_by_this_app(&self, target: &WindowTarget) -> bool {
+        u32::try_from(target.pid).is_ok_and(|pid| pid == std::process::id())
+    }
+
     fn character(&self, ch: char) -> Result<()> {
         let mut units = [0u16; 2];
         post(0, CGEventFlags(0), Some(ch.encode_utf16(&mut units)))

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>ctrlCctrlV · печать</title>
+  <link rel="stylesheet" href="typing.css">
+</head>
+<body>
+  <div class="panel" id="panel" data-state="typing">
+    <header data-tauri-drag-region>
+      <span class="dot" data-tauri-drag-region></span>
+      <b id="title" data-tauri-drag-region>Печать</b>
+      <span class="muted" id="line" data-tauri-drag-region></span>
+    </header>
+    <div class="bar" data-tauri-drag-region><div id="fill"></div></div>
+    <div class="row">
+      <span class="muted" id="count" data-tauri-drag-region></span>
+      <span class="spacer" data-tauri-drag-region></span>
+      <button id="toggle" class="primary">Пауза</button>
+      <button id="stop">Стоп</button>
+    </div>
+    <div class="hint" id="hint" data-tauri-drag-region></div>
+  </div>
+  <script src="typing.js"></script>
+</body>
+</html>

@@ -1,6 +1,13 @@
 // The result window: the capture, the editable text and every model's answer.
 // The window stays open: more models can recognize the image again or check
 // the edited text, and each answer shows how it differs from the current text.
+/// `addition` on a new line after `text` (as `append_text` in src/model.rs).
+function appendText(text, addition) {
+  addition = addition.replace(/^\n+|\n+$/g, "");
+  if (!text || !addition) return text + addition;
+  return text + (text.endsWith("\n") ? "" : "\n") + addition;
+}
+
 const Result = {
   session: null,
   runs: new Map(),
@@ -45,6 +52,7 @@ const Result = {
     $("#r-models-hint button").addEventListener("click", () => App.show("models"));
     listen("ocr-session", ({ payload }) => this.open(payload));
     listen("ocr-run", ({ payload }) => this.update(payload));
+    listen("ocr-appended", ({ payload }) => this.appended(payload));
     this.setKind(this.kind);
     await this.loadChoices();
     if (snapshot.session) this.open(snapshot.session);
@@ -111,7 +119,7 @@ const Result = {
     this.runs.set(run.id, run);
     if (!known) this.session.runs.push(run);
     else this.session.runs[this.session.runs.findIndex((r) => r.id === run.id)] = run;
-    if (this.follow === run.id) {
+    if (this.follow === run.id && run.kind !== "append") {
       $("#r-text").value = run.text;
       this.textModel = run.model;
       this.refreshEditor();
@@ -128,6 +136,17 @@ const Result = {
     this.diffTimer = setTimeout(() => {
       for (const run of this.runs.values()) if (run.state === "done") this.renderRun(run);
     }, delay);
+  },
+
+  /// Text of one more region: it goes after the editor's text, edits kept,
+  /// and the whole result is copied.
+  async appended({ capture, text, image }) {
+    if (!this.session || capture !== this.session.capture) return;
+    this.session.image = image;
+    $("#r-image").src = image;
+    this.setText(appendText($("#r-text").value, text), this.textModel);
+    const ok = await call("use_text", { capture, text: $("#r-text").value, model: this.textModel });
+    if (ok !== undefined) toast("Текст добавлен в конец и скопирован");
   },
 
   // Rounds and run cards.
@@ -147,7 +166,7 @@ const Result = {
     const token = (this.tokens.get(run.id) || 0) + 1;
     this.tokens.set(run.id, token);
     const group = this.roundNode(run.round);
-    const kind = run.kind === "review" ? "проверка" : "распознавание";
+    const kind = { review: "проверка", append: "добавленная область" }[run.kind] || "распознавание";
     const where = run.provider === "local" ? "Локально" : run.provider === "openrouter" ? "Облако" : "История";
     const details = [kind, run.elapsedMs ? formatSeconds(run.elapsedMs) : null].filter(Boolean).join(" · ");
     const card = el("article", { class: `run ${run.state}`, "data-run": run.id },
@@ -163,6 +182,10 @@ const Result = {
     else if (run.state === "running") body.append(el("pre", { class: "stream" }, run.text));
     else if (run.state === "failed") body.append(el("div", { class: "error" }, run.error || "Ошибка"));
     else if (run.state === "cancelled") body.append(el("div", { class: "muted" }, "Остановлено"));
+    else if (run.kind === "append") {
+      body.append(el("div", { class: "muted small" }, run.text.trim() ? "Добавлено в конец текста" : "Текст не найден"));
+      if (run.text.trim()) body.append(el("pre", { class: "stream" }, run.text));
+    }
     else await this.renderChanges(run, body, card);
     if (this.tokens.get(run.id) !== token) return;
     const existing = $(`#r-runs [data-run="${run.id}"]`);
@@ -236,7 +259,7 @@ const Result = {
   },
 
   doneRuns() {
-    return [...this.runs.values()].filter((run) => run.state === "done" && run.text);
+    return [...this.runs.values()].filter((run) => run.state === "done" && run.kind !== "append" && run.text);
   },
 
   async openCompare() {
@@ -350,6 +373,7 @@ const Result = {
   },
 
   refreshRunButton() {
+    $("#r-append").disabled = this.busy || !this.session?.image;
     const button = $("#r-run");
     const count = this.selectedChoices().length;
     const image = Boolean(this.session?.image);
