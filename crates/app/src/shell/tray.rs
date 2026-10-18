@@ -12,6 +12,7 @@ fn menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let settings = app.state::<Shell>().settings();
     let item = |id: &str, label: String| MenuItem::with_id(app, id, label, true, None::<&str>);
     let capture = item("capture", format!("Распознать область\t{}", settings.capture_hotkey))?;
+    let append = item("captureAppend", "Добавить область к результату".into())?;
     // Opening the menu can move focus (to the taskbar on Windows), so typing
     // from it waits for the user to return to the target window.
     let delayed = item("typeDelayed", "Напечатать буфер через 3 с".into())?;
@@ -19,7 +20,7 @@ fn menu(app: &AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let window = item("showWindow", "Открыть окно".into())?;
     let quit = item("quit", "Выход".into())?;
     let separator = PredefinedMenuItem::separator(app)?;
-    Menu::with_items(app, &[&capture, &delayed, &cancel, &separator, &window, &quit])
+    Menu::with_items(app, &[&capture, &append, &delayed, &cancel, &separator, &window, &quit])
 }
 
 /// Shows changed hotkeys in the menu.
@@ -37,6 +38,7 @@ pub fn create(app: &AppHandle) -> tauri::Result<()> {
             |app, event| {
                 let action = match event.id().as_ref() {
                     "capture" => Action::Capture,
+                    "captureAppend" => Action::CaptureAppend,
                     "typeDelayed" => Action::TypeDelayed,
                     "cancel" => Action::Cancel,
                     "showWindow" => Action::ShowWindow,

@@ -1,10 +1,11 @@
 //! Portable shell logic: what the app is doing, the payloads sent to the web
 //! UI, and how desktop monitors map to capture monitors. Kept free of Tauri so
 //! the tests run on any host.
-use std::time::Duration;
+use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 use ctrlcctrlv_core::settings::Settings;
-use ctrlcctrlv_platform::typing::TypingSettings;
+use ctrlcctrlv_platform::typing::{TypingSettings, prepare};
 use serde::{Deserialize, Serialize};
 
 /// Event names shared with `ui/*.js`.
@@ -15,8 +16,10 @@ pub mod events {
     pub const SESSION: &str = "ocr-session";
     /// [`super::RunView`]: a model's answer for the capture, sent again while it streams.
     pub const RUN: &str = "ocr-run";
-    /// [`super::TypingProgress`].
-    pub const TYPING: &str = "typing-progress";
+    /// [`super::TypingView`]: the typing job's state and progress, for the panel and the main window.
+    pub const TYPING: &str = "typing";
+    /// [`super::Appended`]: text recognized in one more region, to add to the result.
+    pub const APPENDED: &str = "ocr-appended";
     /// Sent to the overlays right before they are shown, to clear the last selection.
     pub const OVERLAY_RESET: &str = "overlay-reset";
     /// [`super::InstallProgress`] of a model download.
@@ -74,6 +77,8 @@ impl ModelChoice {
 pub enum RunKind {
     Ocr,
     Review,
+    /// Recognition of one more region, whose text goes after the result.
+    Append,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -139,10 +144,156 @@ pub struct InstallProgress {
     pub error: Option<String>,
 }
 
+/// Where a typing job is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
-pub struct TypingProgress {
+#[serde(rename_all = "lowercase")]
+pub enum TypingState {
+    /// Waiting before the first keystroke so the user can focus the target window.
+    Countdown,
+    Typing,
+    /// Stopped part way, by the user or a focus change; can continue from `done`.
+    Paused,
+    Done,
+    Stopped,
+}
+
+impl TypingState {
+    pub fn finished(self) -> bool {
+        matches!(self, TypingState::Done | TypingState::Stopped)
+    }
+}
+
+/// What the typing panel shows.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TypingView {
+    pub id: u64,
+    pub state: TypingState,
     pub done: usize,
     pub total: usize,
+    /// The line the next character goes to, 1-based, and how many lines there are.
+    pub line: usize,
+    pub lines: usize,
+    pub message: String,
+    pub error: bool,
+    /// Seconds left while counting down.
+    pub countdown: u64,
+    /// The typing shortcut, which also continues a paused job.
+    pub hotkey: String,
+}
+
+/// Why a typing run ended, as the shell saw it.
+#[derive(Debug, Clone, PartialEq)]
+pub enum RunEnd {
+    Completed,
+    /// The user asked to stop for good.
+    Stopped,
+    /// The user paused, focus moved or a key was pressed: keep the position.
+    Interrupted {
+        message: String,
+        error: bool,
+    },
+}
+
+/// Text being typed, with the position to continue from. It survives a pause
+/// so the rest can be typed later, into the same window or another one.
+#[derive(Debug, Clone)]
+pub struct TypingJob {
+    pub id: u64,
+    /// The clipboard text as copied; pressing the typing shortcut again with
+    /// the same clipboard continues the job instead of starting over.
+    pub text: String,
+    pub chars: Arc<Vec<char>>,
+    /// Kept from the start, so the characters and their positions stay valid.
+    pub settings: TypingSettings,
+    pub position: usize,
+    pub state: TypingState,
+    pub message: String,
+    pub error: bool,
+    pub countdown: u64,
+    /// When a pressed modifier paused the job: the shortcut that follows is that same key press.
+    pub paused_by_key: Option<Instant>,
+}
+
+impl TypingJob {
+    pub fn new(id: u64, text: String, settings: TypingSettings) -> Self {
+        let chars = Arc::new(prepare(&text, &settings));
+        Self {
+            id,
+            text,
+            chars,
+            settings,
+            position: 0,
+            state: TypingState::Countdown,
+            message: String::new(),
+            error: false,
+            countdown: 0,
+            paused_by_key: None,
+        }
+    }
+
+    /// Whether the typing shortcut with `clipboard` continues this job.
+    pub fn continues_with(&self, clipboard: &str) -> bool {
+        self.state == TypingState::Paused && self.text == clipboard
+    }
+
+    pub fn end(&mut self, position: usize, end: RunEnd) {
+        self.position = position.min(self.chars.len());
+        self.countdown = 0;
+        self.paused_by_key = None;
+        (self.state, self.message, self.error) = match end {
+            RunEnd::Completed => (TypingState::Done, "Печать завершена".into(), false),
+            RunEnd::Stopped => (TypingState::Stopped, "Печать остановлена".into(), false),
+            RunEnd::Interrupted { .. } if self.position >= self.chars.len() => {
+                (TypingState::Done, "Печать завершена".into(), false)
+            }
+            RunEnd::Interrupted { message, error } => (TypingState::Paused, message, error),
+        };
+    }
+
+    /// History status of a job that ends here.
+    pub fn stored_status(&self) -> &'static str {
+        match self.state {
+            TypingState::Done => "completed",
+            _ => "cancelled",
+        }
+    }
+
+    pub fn view(&self, hotkey: &str) -> TypingView {
+        let lines = self.chars.iter().filter(|&&c| c == '\n').count() + 1;
+        let line = self.chars[..self.position].iter().filter(|&&c| c == '\n').count() + 1;
+        TypingView {
+            id: self.id,
+            state: self.state,
+            done: self.position,
+            total: self.chars.len(),
+            line: line.min(lines),
+            lines,
+            message: self.message.clone(),
+            error: self.error,
+            countdown: self.countdown,
+            hotkey: hotkey.to_string(),
+        }
+    }
+}
+
+/// Text recognized in one more region of the capture in the result window.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub struct Appended {
+    pub capture: u64,
+    pub text: String,
+    /// The capture now shows every region, one above the other.
+    pub image: String,
+}
+
+/// `addition` placed on a new line after `text`.
+pub fn append_text(text: &str, addition: &str) -> String {
+    let addition = addition.trim_matches('\n');
+    if text.is_empty() || addition.is_empty() {
+        return format!("{text}{addition}");
+    }
+    let separator = if text.ends_with('\n') { "" } else { "\n" };
+    format!("{text}{separator}{addition}")
 }
 
 pub fn typing_settings(settings: &Settings) -> TypingSettings {
@@ -211,6 +362,38 @@ mod tests {
         assert_eq!(typing.character_delay, Duration::ZERO);
         assert_eq!(typing.newline_delay, Duration::ZERO);
         assert_eq!(typing.spaces_per_tab, 8);
+    }
+
+    #[test]
+    fn typing_job_keeps_its_place_across_pauses() {
+        let settings = TypingSettings { spaces_per_tab: 2, ..TypingSettings::default() };
+        let mut job = TypingJob::new(1, "a\tb\r\ncd\n".into(), settings);
+        assert_eq!(job.chars.len(), 8);
+        let view = job.view("Ctrl+Alt+V");
+        assert_eq!((view.line, view.lines, view.total), (1, 3, 8));
+        job.end(5, RunEnd::Interrupted { message: "focus".into(), error: false });
+        assert_eq!(job.state, TypingState::Paused);
+        assert!(job.continues_with("a\tb\r\ncd\n"));
+        assert!(!job.continues_with("other"));
+        let view = job.view("Ctrl+Alt+V");
+        assert_eq!((view.done, view.line, view.message.as_str()), (5, 2, "focus"));
+        // An interruption after the last character is a finished job.
+        job.end(8, RunEnd::Interrupted { message: "focus".into(), error: false });
+        assert_eq!((job.state, job.stored_status()), (TypingState::Done, "completed"));
+        assert_eq!(job.view("").line, 3);
+        job.end(3, RunEnd::Stopped);
+        assert_eq!((job.state, job.stored_status()), (TypingState::Stopped, "cancelled"));
+        assert!(!job.continues_with("a\tb\r\ncd\n"));
+        let value = serde_json::to_value(job.view("K")).unwrap();
+        assert_eq!((value["state"].clone(), value["hotkey"].clone()), ("stopped".into(), "K".into()));
+    }
+
+    #[test]
+    fn appends_on_a_new_line() {
+        assert_eq!(append_text("a", "b"), "a\nb");
+        assert_eq!(append_text("a\n", "\nb\n"), "a\nb");
+        assert_eq!(append_text("", "b"), "b");
+        assert_eq!(append_text("a", ""), "a");
     }
 
     #[test]

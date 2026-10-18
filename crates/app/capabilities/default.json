@@ -1,7 +1,14 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Main window and selection overlays: app commands and app events",
-  "windows": ["main", "overlay-*"],
-  "permissions": ["core:event:default"]
+  "description": "Main window, selection overlays and the typing panel: app commands, app events and dragging the panel",
+  "windows": [
+    "main",
+    "overlay-*",
+    "typing"
+  ],
+  "permissions": [
+    "core:event:default",
+    "core:window:allow-start-dragging"
+  ]
 }

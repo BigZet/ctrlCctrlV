@@ -96,7 +96,14 @@ pub fn history_open(app: AppHandle, id: i64, created: String) -> Result<(), Stri
             elapsed_ms: 0,
         });
     }
-    let session = Capture { id: capture, png: None, entry: Some(reference), runs, rounds: rounds + 1 };
+    let session = Capture {
+        id: capture,
+        png: None,
+        entry: Some(reference),
+        runs,
+        rounds: rounds + 1,
+        text: Some(entry.text.clone()),
+    };
     let view: SessionView = session.view();
     *lock(&shell.capture) = Some(session);
     let _ = app.emit(events::SESSION, view);

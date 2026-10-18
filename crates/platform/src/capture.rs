@@ -37,6 +37,26 @@ pub fn encode_png(image: &RgbaImage) -> Result<Vec<u8>> {
     Ok(out)
 }
 
+/// White rows between stacked captures, so models see where one ends.
+const STACK_GAP: u32 = 12;
+
+/// One PNG of `top` above `bottom`, left-aligned on white, for a result put
+/// together from several regions: re-checks then see all of it at once.
+pub fn stack_png(top: &[u8], bottom: &[u8]) -> Result<Vec<u8>> {
+    let decode = |png: &[u8]| {
+        image::load_from_memory_with_format(png, image::ImageFormat::Png)
+            .map(|image| image.to_rgba8())
+            .map_err(|e| Error::Operation(format!("Не удалось прочитать снимок: {e}")))
+    };
+    let (top, bottom) = (decode(top)?, decode(bottom)?);
+    let width = top.width().max(bottom.width());
+    let height = top.height() + STACK_GAP + bottom.height();
+    let mut out = RgbaImage::from_pixel(width, height, image::Rgba([255, 255, 255, 255]));
+    image::imageops::replace(&mut out, &top, 0, 0);
+    image::imageops::replace(&mut out, &bottom, 0, i64::from(top.height() + STACK_GAP));
+    encode_png(&out)
+}
+
 #[cfg(any(windows, target_os = "macos"))]
 pub use native::*;
 
@@ -103,6 +123,17 @@ mod native {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn stacks_captures_on_white() {
+        let red = encode_png(&RgbaImage::from_pixel(4, 2, image::Rgba([255, 0, 0, 255]))).unwrap();
+        let blue = encode_png(&RgbaImage::from_pixel(6, 3, image::Rgba([0, 0, 255, 255]))).unwrap();
+        let stacked = image::load_from_memory(&stack_png(&red, &blue).unwrap()).unwrap().to_rgba8();
+        assert_eq!(stacked.dimensions(), (6, 2 + STACK_GAP + 3));
+        assert_eq!(stacked.get_pixel(0, 0).0, [255, 0, 0, 255]);
+        assert_eq!(stacked.get_pixel(5, 0).0, [255, 255, 255, 255]);
+        assert_eq!(stacked.get_pixel(5, 2 + STACK_GAP).0, [0, 0, 255, 255]);
+    }
 
     #[test]
     fn rounds_outward_and_clamps() {

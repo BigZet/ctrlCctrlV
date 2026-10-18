@@ -12,6 +12,8 @@ use tauri::AppHandle;
 #[serde(rename_all = "camelCase")]
 pub enum Action {
     Capture,
+    /// Recognize one more region and add its text to the result.
+    CaptureAppend,
     Type,
     /// Typing started from a menu or button: wait so the user can focus the target.
     TypeDelayed,

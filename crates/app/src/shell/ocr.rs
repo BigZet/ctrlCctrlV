@@ -12,14 +12,15 @@ use ctrlcctrlv_core::ocr::{OcrProvider, OcrResult, Request};
 use ctrlcctrlv_core::operation::Operation;
 use ctrlcctrlv_core::review::{self, REVIEW_PROMPT};
 use ctrlcctrlv_core::settings::Settings;
-use ctrlcctrlv_platform::capture::{Region, capture_region, encode_png};
+use ctrlcctrlv_platform::capture::{Region, capture_region, encode_png, stack_png};
 use ctrlcctrlv_platform::clipboard::Clipboard;
 use ctrlcctrlv_platform::{Permission, permissions, request_permission};
 use tauri::{AppHandle, Emitter, Manager};
 
 use super::{Activity, Capture, Shell, busy_message, changed, lock, report, show_main};
 use crate::model::{
-    ModelChoice, OPENROUTER_ENDPOINT, Phase, RunKind, RunState, RunView, Status, copied_message, events, split_choices,
+    Appended, ModelChoice, OPENROUTER_ENDPOINT, Phase, RunKind, RunState, RunView, Status, append_text, copied_message,
+    events, split_choices,
 };
 
 /// Long enough for the compositor to drop the hidden overlays from the screen.
@@ -113,7 +114,7 @@ async fn provider(
     let settings = shell.settings();
     if !choice.local() {
         // The protocol picked in settings applies to that model; others use JSON.
-        let mode = if kind == RunKind::Ocr && choice.model == settings.remote_model {
+        let mode = if kind != RunKind::Review && choice.model == settings.remote_model {
             settings.remote_mode()
         } else {
             PromptMode::Json
@@ -198,11 +199,11 @@ async fn execute(app: &AppHandle, operation: &Operation, png: &[u8], mut run: Ru
             RunKind::Review => {
                 Some(review::context(run.base.as_deref().unwrap_or_default(), "").map_err(|e| e.to_string())?)
             }
-            RunKind::Ocr => None,
+            RunKind::Ocr | RunKind::Append => None,
         };
         let request = match run.kind {
             RunKind::Review => Request { prompt: Some(REVIEW_PROMPT), context: context.as_ref() },
-            RunKind::Ocr => Request::default(),
+            RunKind::Ocr | RunKind::Append => Request::default(),
         };
         let streaming = run.clone();
         let partial = move |text: &str| {
@@ -238,7 +239,10 @@ async fn execute(app: &AppHandle, operation: &Operation, png: &[u8], mut run: Ru
             None
         }
     };
-    if let Some(result) = &result {
+    // An added region's text reaches history with the whole result, through `use_text`.
+    if let Some(result) = &result
+        && run.kind != RunKind::Append
+    {
         record(&shell, &run, result);
     }
     publish(app, &run);
@@ -272,10 +276,14 @@ fn record(shell: &Shell, run: &RunView, result: &OcrResult) {
     }
 }
 
-pub async fn recognize(app: AppHandle, operation: Operation, monitor: u32, region: Region) {
+pub async fn recognize(app: AppHandle, operation: Operation, monitor: u32, region: Region, append: bool) {
     let shell = app.state::<Shell>();
     report(&app, Status::new(Phase::Recognizing, "Распознаю…"));
-    let outcome = first_run(&app, &shell, &operation, monitor, region).await;
+    let outcome = if append {
+        append_run(&app, &shell, &operation, monitor, region).await
+    } else {
+        first_run(&app, &shell, &operation, monitor, region).await
+    };
     shell.finish();
     let status = match outcome {
         _ if operation.is_cancelled() => Status::new(Phase::Idle, "Распознавание отменено · буфер не изменён"),
@@ -292,18 +300,11 @@ async fn first_run(
     monitor: u32,
     region: Region,
 ) -> Result<Status, String> {
-    tokio::time::sleep(OVERLAY_GONE).await;
-    let png = tauri::async_runtime::spawn_blocking(move || {
-        capture_region(monitor, region).and_then(|image| encode_png(&image))
-    })
-    .await
-    .map_err(|_| "Не удалось сделать снимок экрана".to_string())?
-    .map_err(|e| e.to_string())?;
-    let png = Arc::new(png);
+    let png = Arc::new(snapshot(monitor, region).await?);
     let settings = shell.settings();
     let id = next_capture();
     let run = new_run(shell, id, 1, RunKind::Ocr, &primary(&settings), None);
-    let capture = Capture { id, png: Some(png.clone()), entry: None, runs: vec![run.clone()], rounds: 1 };
+    let capture = Capture { id, png: Some(png.clone()), entry: None, runs: vec![run.clone()], rounds: 1, text: None };
     let view = capture.view();
     *lock(&shell.capture) = Some(capture);
     let _ = app.emit(events::SESSION, view);
@@ -325,6 +326,65 @@ async fn first_run(
         .map_err(|_| "Буфер обмена недоступен".to_string())?
         .map_err(|e| e.to_string())?;
     Ok(Status::new(Phase::Idle, copied_message(&result.text, Duration::from_millis(run.elapsed_ms))))
+}
+
+async fn snapshot(monitor: u32, region: Region) -> Result<Vec<u8>, String> {
+    tokio::time::sleep(OVERLAY_GONE).await;
+    tauri::async_runtime::spawn_blocking(move || capture_region(monitor, region).and_then(|image| encode_png(&image)))
+        .await
+        .map_err(|_| "Не удалось сделать снимок экрана".to_string())?
+        .map_err(|e| e.to_string())
+}
+
+/// Recognizes one more region of what the result window shows (code longer
+/// than the screen) and adds its text after the result. The capture's image
+/// becomes both regions one above the other, so re-checks see everything.
+async fn append_run(
+    app: &AppHandle,
+    shell: &Shell,
+    operation: &Operation,
+    monitor: u32,
+    region: Region,
+) -> Result<Status, String> {
+    const CLOSED: &str = "Снимок в окне результата уже закрыт · текст не добавлен";
+    let png = snapshot(monitor, region).await?;
+    let settings = shell.settings();
+    let run = {
+        let mut slot = lock(&shell.capture);
+        let current = slot.as_mut().filter(|c| c.png.is_some()).ok_or(CLOSED)?;
+        current.rounds += 1;
+        let run = new_run(shell, current.id, current.rounds, RunKind::Append, &primary(&settings), None);
+        current.runs.push(run.clone());
+        run
+    };
+    let _ = app.emit(events::RUN, &run);
+    if settings.show_preview {
+        show_main(app, false);
+    }
+    let (run, result) = execute(app, operation, &png, run).await;
+    let Some(result) = result else {
+        return Err(run.error.unwrap_or_else(|| "Распознавание не удалось".into()));
+    };
+    if result.text.trim().is_empty() {
+        return Ok(Status::new(Phase::Idle, "Текст не найден · результат не изменён"));
+    }
+    operation.check().map_err(|e| e.to_string())?;
+    let previous =
+        lock(&shell.capture).as_ref().filter(|c| c.id == run.capture).and_then(|c| c.png.clone()).ok_or(CLOSED)?;
+    let stacked = tauri::async_runtime::spawn_blocking(move || stack_png(&previous, &png))
+        .await
+        .map_err(|_| "Не удалось склеить снимки".to_string())?
+        .map_err(|e| e.to_string())?;
+    let appended = {
+        let mut slot = lock(&shell.capture);
+        let current = slot.as_mut().filter(|c| c.id == run.capture).ok_or(CLOSED)?;
+        current.text = Some(append_text(&current.view().text, &result.text));
+        current.png = Some(Arc::new(stacked));
+        Appended { capture: current.id, text: result.text.clone(), image: current.view().image.unwrap_or_default() }
+    };
+    // The result window adds the text to what is in its editor and copies the whole.
+    let _ = app.emit(events::APPENDED, appended);
+    Ok(Status::new(Phase::Idle, format!("Добавлено к результату: {} симв.", result.text.chars().count())))
 }
 
 /// Runs more models on the capture in the result window: cloud ones at once,
@@ -403,7 +463,10 @@ pub fn recheck(
 pub fn use_text(app: AppHandle, capture: u64, text: String, model: String) -> Result<(), String> {
     super::copy_text(text.clone())?;
     let shell = app.state::<Shell>();
-    let slot = lock(&shell.capture);
+    let mut slot = lock(&shell.capture);
+    if let Some(current) = slot.as_mut().filter(|c| c.id == capture) {
+        current.text = Some(text.clone());
+    }
     if let (Some(history), Some(entry)) =
         (&shell.history, slot.as_ref().filter(|c| c.id == capture).and_then(|c| c.entry.as_ref()))
     {

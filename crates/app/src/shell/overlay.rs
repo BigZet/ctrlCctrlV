@@ -36,7 +36,9 @@ fn topology(monitors: &[Monitor]) -> Vec<(i32, i32, u32, u32, u64)> {
 }
 
 /// Starts a selection, unless OCR is not ready or another operation runs.
-pub async fn begin(app: &AppHandle) {
+/// With `append` the region's text goes after the result in the result
+/// window; without a capture there it is an ordinary capture.
+pub async fn begin(app: &AppHandle, append: bool) {
     let shell = app.state::<Shell>();
     if shell.phase() != Phase::Idle {
         return busy(app);
@@ -45,12 +47,18 @@ pub async fn begin(app: &AppHandle) {
         report(app, Status::error(Phase::Idle, message));
         return show_main(app, false);
     }
-    if !shell.begin(Activity::Selecting) {
+    let append = append && lock(&shell.capture).as_ref().is_some_and(|capture| capture.png.is_some());
+    if !shell.begin(Activity::Selecting { append }) {
         return busy(app);
     }
     match show(app) {
         Ok(()) => {
-            report(app, Status::new(Phase::Selecting, "Выделите область · Esc — отмена"));
+            let message = if append {
+                "Выделите область, чтобы добавить её к результату · Esc — отмена"
+            } else {
+                "Выделите область · Esc — отмена"
+            };
+            report(app, Status::new(Phase::Selecting, message));
             // Load the local model while the user is still selecting.
             ocr::warm_up(app);
         }
@@ -103,8 +111,14 @@ fn show(app: &AppHandle) -> Result<(), String> {
     let mut focus = None;
     for target in &overlays.targets {
         let Some(window) = app.get_webview_window(&target.label) else { continue };
-        window.show().map_err(failed)?;
         let (x, y, width, height) = target.bounds;
+        // Covers the monitor again if a scale change resized the window since.
+        let covers = window.outer_position().is_ok_and(|p| p.x as f64 == x && p.y as f64 == y)
+            && window.outer_size().is_ok_and(|s| s.width as f64 == width && s.height as f64 == height);
+        if !cfg!(target_os = "macos") && !covers {
+            fit(&window, (x as i32, y as i32, width as u32, height as u32)).map_err(failed)?;
+        }
+        window.show().map_err(failed)?;
         let under_cursor = cursor.is_some_and(|c| c.x >= x && c.y >= y && c.x < x + width && c.y < y + height);
         if focus.is_none() || under_cursor {
             focus = Some(window);
@@ -139,10 +153,17 @@ fn create(app: &AppHandle, label: &str, monitor: &Monitor) -> tauri::Result<Webv
         window.set_size(LogicalSize::new(size.width as f64 / scale, size.height as f64 / scale))?;
         window.set_position(LogicalPosition::new(position.x as f64 / scale, position.y as f64 / scale))?;
     } else {
-        window.set_size(PhysicalSize::new(size.width, size.height))?;
-        window.set_position(PhysicalPosition::new(position.x, position.y))?;
+        fit(&window, (position.x, position.y, size.width, size.height))?;
     }
     Ok(window)
+}
+
+/// Windows: position first, then size. A window moved onto a monitor with
+/// another scale gets WM_DPICHANGED and is rescaled, so a size set before the
+/// move ends up covering only part of that monitor.
+fn fit(window: &WebviewWindow, (x, y, width, height): (i32, i32, u32, u32)) -> tauri::Result<()> {
+    window.set_position(PhysicalPosition::new(x, y))?;
+    window.set_size(PhysicalSize::new(width, height))
 }
 
 /// Above the menu bar and over full-screen apps such as a VDI client.
@@ -181,6 +202,7 @@ pub async fn selection_finished(app: AppHandle, window: WebviewWindow, x: f64, y
     let monitor = lock(&OVERLAYS).targets.iter().find(|t| t.label == window.label()).map(|t| t.monitor);
     let shell = app.state::<Shell>();
     let operation = Operation::new();
+    let append = matches!(*lock(&shell.activity), Activity::Selecting { append: true });
     if !shell.advance(Phase::Selecting, Activity::Recognizing(operation.clone())) {
         return;
     }
@@ -190,7 +212,7 @@ pub async fn selection_finished(app: AppHandle, window: WebviewWindow, x: f64, y
         return report(&app, Status::error(Phase::Idle, "Монитор отключён. Выделите область заново."));
     };
     let region = Region { x, y, width, height };
-    tauri::async_runtime::spawn(ocr::recognize(app.clone(), operation, monitor, region));
+    tauri::async_runtime::spawn(ocr::recognize(app.clone(), operation, monitor, region, append));
 }
 
 #[tauri::command]

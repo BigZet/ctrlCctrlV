@@ -12,7 +12,7 @@ mod native {
 
     use ctrlcctrlv_platform::capture::{Region, capture_region, encode_png, monitors};
     use ctrlcctrlv_platform::clipboard::Clipboard;
-    use ctrlcctrlv_platform::typing::{CancelToken, TypingSettings, type_text};
+    use ctrlcctrlv_platform::typing::{CancelToken, TypingSettings, prepare, type_chars};
     use ctrlcctrlv_platform::{NativeKeyboard, permissions};
 
     pub fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -46,7 +46,8 @@ mod native {
             let text = "Привет, ctrlCctrlV 🙂\n\tif x:\n\t\treturn 1\n";
             let settings = TypingSettings { autoindent: true, spaces_per_tab: 4, ..Default::default() };
             let started = Instant::now();
-            type_text(&NativeKeyboard, text, &settings, &CancelToken::new(), |_, _| {}, None)?;
+            let chars = prepare(text, &settings);
+            type_chars(&NativeKeyboard, &chars, 0, &settings, &CancelToken::new(), |_, _| {}, None).1?;
             println!("typed {} chars in {:?}", text.chars().count(), started.elapsed());
         }
         Ok(())

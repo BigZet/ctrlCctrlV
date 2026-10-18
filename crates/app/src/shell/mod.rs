@@ -5,6 +5,7 @@ mod hotkeys;
 mod library;
 mod ocr;
 mod overlay;
+mod panel;
 mod preferences;
 mod tray;
 mod typing;
@@ -20,27 +21,29 @@ use ctrlcctrlv_core::review::{self, Change};
 use ctrlcctrlv_core::runtime::{LocalRuntime, Session};
 use ctrlcctrlv_core::settings::{Settings, data_directory};
 use ctrlcctrlv_core::ui_state::UiState;
-use ctrlcctrlv_platform::typing::CancelToken;
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, RunEvent, WindowEvent};
 
-use crate::model::{Phase, RunView, SessionView, Status, events};
+use crate::model::{Phase, RunKind, RunView, SessionView, Status, TypingJob, events};
 
 pub use hotkeys::Action;
 
 /// What owns the app right now, with the handle that stops it.
 enum Activity {
     Idle,
-    Selecting,
+    /// `append` adds the region's text to the capture in the result window.
+    Selecting {
+        append: bool,
+    },
     Recognizing(Operation),
-    Typing(CancelToken),
+    Typing(typing::Control),
 }
 
 impl Activity {
     fn phase(&self) -> Phase {
         match self {
             Activity::Idle => Phase::Idle,
-            Activity::Selecting => Phase::Selecting,
+            Activity::Selecting { .. } => Phase::Selecting,
             Activity::Recognizing(_) => Phase::Recognizing,
             Activity::Typing(_) => Phase::Typing,
         }
@@ -55,6 +58,8 @@ pub struct Capture {
     pub entry: Option<EntryRef>,
     pub runs: Vec<RunView>,
     pub rounds: u32,
+    /// The text the user settled on (copied, or extended by another region).
+    pub text: Option<String>,
 }
 
 impl Capture {
@@ -62,7 +67,13 @@ impl Capture {
         let image = self.png.as_ref().map(|png| {
             format!("data:image/png;base64,{}", base64::engine::general_purpose::STANDARD.encode(png.as_slice()))
         });
-        let text = self.runs.iter().rev().find(|run| !run.text.is_empty()).map(|run| run.text.clone());
+        let text = self.text.clone().or_else(|| {
+            self.runs
+                .iter()
+                .rev()
+                .find(|run| run.kind != RunKind::Append && !run.text.is_empty())
+                .map(|run| run.text.clone())
+        });
         SessionView { capture: self.id, image, text: text.unwrap_or_default(), runs: self.runs.clone() }
     }
 }
@@ -80,6 +91,8 @@ pub struct Shell {
     /// The last deleted history entry and whether it was pinned, for undo.
     pub deleted: Mutex<Option<(Entry, bool)>>,
     pub install: Mutex<Option<tokio_util::sync::CancellationToken>>,
+    /// The text being typed or paused part way, with its position.
+    pub typing: Mutex<Option<TypingJob>>,
 }
 
 pub fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -107,6 +120,7 @@ impl Shell {
             capture: Mutex::new(None),
             deleted: Mutex::new(None),
             install: Mutex::new(None),
+            typing: Mutex::new(None),
         })
     }
 
@@ -174,16 +188,17 @@ fn busy(app: &AppHandle) {
 
 fn busy_message(phase: Phase) -> &'static str {
     match phase {
-        Phase::Typing => "Идёт печать · остановите её сочетанием отмены",
+        Phase::Typing => "Идёт печать · поставьте её на паузу или остановите",
         _ => "Сначала завершите или отмените текущую операцию",
     }
 }
 
 pub async fn dispatch(app: AppHandle, action: Action) {
     match action {
-        Action::Capture => overlay::begin(&app).await,
-        Action::Type => typing::start(&app, None),
-        Action::TypeDelayed => typing::start(&app, Some(typing::MENU_DELAY)),
+        Action::Capture => overlay::begin(&app, false).await,
+        Action::CaptureAppend => overlay::begin(&app, true).await,
+        Action::Type => typing::start(&app, typing::Trigger::Hotkey),
+        Action::TypeDelayed => typing::start(&app, typing::Trigger::Menu),
         Action::Cancel => cancel(&app),
         Action::ShowWindow => show_main(&app, true),
         Action::Quit => quit(&app).await,
@@ -194,8 +209,12 @@ fn cancel(app: &AppHandle) {
     let shell = app.state::<Shell>();
     let mut activity = lock(&shell.activity);
     match &*activity {
-        Activity::Idle => {}
-        Activity::Selecting => {
+        // A paused typing job ends too.
+        Activity::Idle => {
+            drop(activity);
+            typing::stop(app);
+        }
+        Activity::Selecting { .. } => {
             *activity = Activity::Idle;
             drop(activity);
             overlay::hide_all(app);
@@ -203,7 +222,7 @@ fn cancel(app: &AppHandle) {
         }
         // The owners report the outcome and return to idle themselves.
         Activity::Recognizing(operation) => operation.cancel(),
-        Activity::Typing(token) => token.cancel(),
+        Activity::Typing(control) => control.stop(),
     }
 }
 
@@ -315,6 +334,8 @@ pub fn run() {
             ocr::use_text,
             overlay::selection_finished,
             overlay::selection_cancelled,
+            typing::typing_state,
+            typing::typing_control,
             history::history_list,
             history::history_open,
             history::history_pin,
