@@ -4,6 +4,8 @@ mod macos;
 mod windows;
 
 #[cfg(target_os = "macos")]
-pub use macos::{MacKeyboard as NativeKeyboard, open_permission_settings, permissions, request_permission};
+pub use macos::{MacKeyboard as NativeKeyboard, open_permission_settings, permissions, request_permission, show_error};
 #[cfg(windows)]
-pub use windows::{WindowsKeyboard as NativeKeyboard, open_permission_settings, permissions, request_permission};
+pub use windows::{
+    WindowsKeyboard as NativeKeyboard, open_permission_settings, permissions, request_permission, show_error,
+};

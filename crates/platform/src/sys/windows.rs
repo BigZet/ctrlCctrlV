@@ -135,3 +135,14 @@ impl Keyboard for WindowsKeyboard {
         ])
     }
 }
+
+/// A blocking error dialog, for failures before the tray icon exists.
+pub fn show_error(title: &str, message: &str) {
+    use windows::Win32::UI::WindowsAndMessaging::{MB_ICONERROR, MB_OK, MessageBoxW};
+    use windows::core::PCWSTR;
+    let wide = |text: &str| text.encode_utf16().chain(Some(0)).collect::<Vec<u16>>();
+    let (title, message) = (wide(title), wide(message));
+    unsafe {
+        let _ = MessageBoxW(None, PCWSTR(message.as_ptr()), PCWSTR(title.as_ptr()), MB_OK | MB_ICONERROR);
+    }
+}
