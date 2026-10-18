@@ -111,8 +111,14 @@ fn show(app: &AppHandle) -> Result<(), String> {
     let mut focus = None;
     for target in &overlays.targets {
         let Some(window) = app.get_webview_window(&target.label) else { continue };
-        window.show().map_err(failed)?;
         let (x, y, width, height) = target.bounds;
+        // Covers the monitor again if a scale change resized the window since.
+        let covers = window.outer_position().is_ok_and(|p| p.x as f64 == x && p.y as f64 == y)
+            && window.outer_size().is_ok_and(|s| s.width as f64 == width && s.height as f64 == height);
+        if !cfg!(target_os = "macos") && !covers {
+            fit(&window, (x as i32, y as i32, width as u32, height as u32)).map_err(failed)?;
+        }
+        window.show().map_err(failed)?;
         let under_cursor = cursor.is_some_and(|c| c.x >= x && c.y >= y && c.x < x + width && c.y < y + height);
         if focus.is_none() || under_cursor {
             focus = Some(window);
@@ -147,10 +153,17 @@ fn create(app: &AppHandle, label: &str, monitor: &Monitor) -> tauri::Result<Webv
         window.set_size(LogicalSize::new(size.width as f64 / scale, size.height as f64 / scale))?;
         window.set_position(LogicalPosition::new(position.x as f64 / scale, position.y as f64 / scale))?;
     } else {
-        window.set_size(PhysicalSize::new(size.width, size.height))?;
-        window.set_position(PhysicalPosition::new(position.x, position.y))?;
+        fit(&window, (position.x, position.y, size.width, size.height))?;
     }
     Ok(window)
+}
+
+/// Windows: position first, then size. A window moved onto a monitor with
+/// another scale gets WM_DPICHANGED and is rescaled, so a size set before the
+/// move ends up covering only part of that monitor.
+fn fit(window: &WebviewWindow, (x, y, width, height): (i32, i32, u32, u32)) -> tauri::Result<()> {
+    window.set_position(PhysicalPosition::new(x, y))?;
+    window.set_size(PhysicalSize::new(width, height))
 }
 
 /// Above the menu bar and over full-screen apps such as a VDI client.
