@@ -95,12 +95,12 @@ pub fn install(app: &AppHandle, settings: &Settings) -> Result<(), String> {
     let registered = hotkeys.register(&system_bindings(settings)).map_err(|e| e.to_string());
     // Kept even when registration failed, so changed settings can retry.
     HOTKEYS.with(|slot| *slot.borrow_mut() = Some(hotkeys));
-    let app = app.clone();
+    let handle = app.clone();
     GlobalHotKeyEvent::set_event_handler(Some(move |event: GlobalHotKeyEvent| {
         let action = HOTKEYS.with(|slot| slot.borrow().as_ref().and_then(|hotkeys| hotkeys.action(&event)));
         if let Some(action) = action {
             // Leave the event loop at once; actions call back into it.
-            tauri::async_runtime::spawn(super::dispatch(app.clone(), action));
+            tauri::async_runtime::spawn(super::dispatch(handle.clone(), action));
         }
     }));
     registered.and_then(|()| apply_raw(app, settings))
