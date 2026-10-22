@@ -37,13 +37,24 @@ const SettingsPage = {
         this.hotkey("capture_hotkey", "Распознать область"),
         this.hotkey("typing_hotkey", "Напечатать буфер"),
         this.hotkey("cancel_hotkey", "Остановить"),
+        this.select("hotkey_mode", "Регистрация", [
+          ["system", "Системная"],
+          ["rawinput", "Прямое чтение клавиатуры (Citrix, Hyper-V, RDP)"],
+        ], "Второй вариант работает, когда окно VDI перехватывает сочетания; они доходят и до сессии"),
       ]),
       this.group("Печать", [
         this.select("typing_method", "Способ ввода", [
           ["unicode", "Символы Unicode"],
           ["layout", "Клавиши раскладки (VDI, RDP)"],
         ], "Для удалённых рабочих столов: русские буквы иначе приходят как ?"),
+        this.select("layout_switch", "Переключение раскладки", [
+          ["sync", "Вместе с раскладкой компьютера"],
+          ["hotkeys", "Сочетанием внутри сессии"],
+        ], "Второй вариант — если VDI не повторяет вашу раскладку"),
+        this.hotkey("latin_layout_hotkey", "Сочетание для английской"),
+        this.hotkey("cyrillic_layout_hotkey", "Сочетание для русской"),
         this.number("layout_delay", "Пауза после смены раскладки, мс", 0, 2000, 1000, "Только для клавиш раскладки"),
+        this.check("delete_autoclose", "Удалять автозакрытие скобок и кавычек", "Delete после ( [ { и кавычек, если редактор сам ставит парные"),
         this.number("character_delay", "Задержка между символами, мс", 1, 200, 1000),
         this.number("newline_delay", "Задержка после строки, мс", 0, 2000, 1000),
         this.number("spaces_per_tab", "Пробелов вместо Tab", 0, 8, 1, "0 — печатать Tab"),

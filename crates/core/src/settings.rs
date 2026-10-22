@@ -47,6 +47,16 @@ pub struct Settings {
     pub typing_method: String,
     /// Seconds to wait after switching the keyboard layout.
     pub layout_delay: f64,
+    /// `sync`: ask the window to switch its layout; `hotkeys`: press the
+    /// per-language shortcuts the remote session has (VDI without layout sync).
+    pub layout_switch: String,
+    pub latin_layout_hotkey: String,
+    pub cyrillic_layout_hotkey: String,
+    /// Press Delete after an opening bracket or quote the editor pairs by itself.
+    pub delete_autoclose: bool,
+    /// `system`: `RegisterHotKey`; `rawinput`: read the keyboard directly, which
+    /// also works while a Citrix, Hyper-V or RDP window swallows the keys.
+    pub hotkey_mode: String,
     /// Keys this version does not know, kept so that saving does not erase
     /// settings written by a newer version.
     #[serde(flatten, skip_serializing_if = "Map::is_empty")]
@@ -82,6 +92,11 @@ impl Default for Settings {
             max_tokens: 4096,
             typing_method: "unicode".into(),
             layout_delay: 0.150,
+            layout_switch: "sync".into(),
+            latin_layout_hotkey: "ctrl+shift+1".into(),
+            cyrillic_layout_hotkey: "ctrl+shift+2".into(),
+            delete_autoclose: false,
+            hotkey_mode: "system".into(),
             extra: Map::new(),
         }
     }
@@ -140,6 +155,11 @@ impl Settings {
             "typing_hotkey" => self.typing_hotkey = text(value)?,
             "cancel_hotkey" => self.cancel_hotkey = text(value)?,
             "typing_method" => self.typing_method = text(value)?,
+            "layout_switch" => self.layout_switch = text(value)?,
+            "latin_layout_hotkey" => self.latin_layout_hotkey = text(value)?,
+            "cyrillic_layout_hotkey" => self.cyrillic_layout_hotkey = text(value)?,
+            "hotkey_mode" => self.hotkey_mode = text(value)?,
+            "delete_autoclose" => self.delete_autoclose = value.as_bool()?,
             "show_preview" => self.show_preview = value.as_bool()?,
             "autoindent" => self.autoindent = value.as_bool()?,
             "character_delay" => self.character_delay = value.as_f64()?,
@@ -198,6 +218,15 @@ impl Settings {
         }
         if !matches!(self.typing_method.as_str(), "unicode" | "layout") {
             return fail("Неизвестный способ ввода");
+        }
+        if !matches!(self.layout_switch.as_str(), "sync" | "hotkeys") {
+            return fail("Неизвестный способ переключения раскладки");
+        }
+        if Hotkey::parse(&self.latin_layout_hotkey)? == Hotkey::parse(&self.cyrillic_layout_hotkey)? {
+            return fail("Сочетания раскладок должны различаться");
+        }
+        if !matches!(self.hotkey_mode.as_str(), "system" | "rawinput") {
+            return fail("Неизвестный способ регистрации горячих клавиш");
         }
         if !(0..=8).contains(&self.spaces_per_tab) || !(1..=120).contains(&self.idle_minutes) {
             return fail("Некорректный профиль ввода или время простоя");

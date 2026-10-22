@@ -6,13 +6,14 @@ use windows::Win32::UI::Input::KeyboardAndMouse::{
     GetAsyncKeyState, GetKeyState, GetKeyboardLayout, GetKeyboardLayoutList, HKL, INPUT, INPUT_0, INPUT_KEYBOARD,
     KEYBD_EVENT_FLAGS, KEYBDINPUT, KEYEVENTF_EXTENDEDKEY, KEYEVENTF_KEYUP, KEYEVENTF_SCANCODE, KEYEVENTF_UNICODE,
     MAPVK_VK_TO_VSC, MAPVK_VK_TO_VSC_EX, MapVirtualKeyExW, MapVirtualKeyW, SendInput, VIRTUAL_KEY, VK_CAPITAL,
-    VK_CONTROL, VK_HOME, VK_LWIN, VK_MENU, VK_RETURN, VK_RWIN, VK_SHIFT, VK_TAB, VkKeyScanExW,
+    VK_CONTROL, VK_DELETE, VK_ESCAPE, VK_HOME, VK_LWIN, VK_MENU, VK_RETURN, VK_RWIN, VK_SHIFT, VK_TAB, VkKeyScanExW,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
     GetForegroundWindow, GetWindowThreadProcessId, PostMessageW, WM_INPUTLANGCHANGEREQUEST,
 };
 
-use crate::typing::Keyboard;
+use crate::hotkey::{Key, Shortcut};
+use crate::typing::{Keyboard, Script};
 use crate::{Error, Permission, Permissions, Result};
 
 /// These operations have no macOS-style privacy grant on Windows. `SendInput`
@@ -92,6 +93,24 @@ fn scan_input(vk: VIRTUAL_KEY, scan: u32, up: bool) -> INPUT {
         flags |= KEYEVENTF_KEYUP;
     }
     key_input(vk, scan as u16 & 0xFF, flags)
+}
+
+/// The virtual key a shortcut ends with.
+pub(crate) fn shortcut_key(key: Key) -> VIRTUAL_KEY {
+    match key {
+        Key::Escape => VK_ESCAPE,
+        Key::Char(c) => VIRTUAL_KEY(c.to_ascii_uppercase() as u16),
+    }
+}
+
+/// The modifier keys of a shortcut, in press order.
+pub(crate) fn shortcut_modifiers(shortcut: &Shortcut) -> Vec<VIRTUAL_KEY> {
+    let m = shortcut.modifiers;
+    [(m.ctrl, VK_CONTROL), (m.alt, VK_MENU), (m.shift, VK_SHIFT), (m.cmd, VK_LWIN)]
+        .into_iter()
+        .filter(|(on, _)| *on)
+        .map(|(_, vk)| vk)
+        .collect()
 }
 
 fn foreground_layout() -> Option<HKL> {
@@ -185,6 +204,29 @@ impl Keyboard for WindowsKeyboard {
         let hwnd = unsafe { GetForegroundWindow() };
         unsafe { PostMessageW(Some(hwnd), WM_INPUTLANGCHANGEREQUEST, WPARAM(0), LPARAM(layout)) }
             .map_err(|e| Error::Operation(format!("Не удалось переключить раскладку: {e}")))
+    }
+
+    fn layout_script(&self, layout: isize) -> Option<Script> {
+        // The low word of an HKL is its language id; its low byte the primary language.
+        match (layout as u16) & 0xFF {
+            0x09 => Some(Script::Latin),
+            0x19 => Some(Script::Cyrillic),
+            _ => None,
+        }
+    }
+
+    fn shortcut(&self, shortcut: &Shortcut) -> Result<()> {
+        let modifiers = shortcut_modifiers(shortcut);
+        let vk = shortcut_key(shortcut.key);
+        let mut events: Vec<INPUT> = modifiers.iter().map(|&m| key(m, false, false)).collect();
+        events.push(key(vk, false, false));
+        events.push(key(vk, false, true));
+        events.extend(modifiers.iter().rev().map(|&m| key(m, false, true)));
+        send(&events)
+    }
+
+    fn delete(&self) -> Result<()> {
+        press(VK_DELETE, true)
     }
 
     fn layout_character(&self, ch: char, layout: isize) -> Result<()> {

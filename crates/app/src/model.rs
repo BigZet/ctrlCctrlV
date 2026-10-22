@@ -5,7 +5,8 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use ctrlcctrlv_core::settings::Settings;
-use ctrlcctrlv_platform::typing::{TypingMethod, TypingSettings, prepare};
+use ctrlcctrlv_platform::hotkey::parse_shortcut;
+use ctrlcctrlv_platform::typing::{LayoutSwitch, TypingMethod, TypingSettings, prepare};
 use serde::{Deserialize, Serialize};
 
 /// Event names shared with `ui/*.js`.
@@ -304,7 +305,16 @@ pub fn typing_settings(settings: &Settings) -> TypingSettings {
         autoindent: settings.autoindent,
         spaces_per_tab: settings.spaces_per_tab.clamp(0, 8) as u8,
         method: if settings.typing_method == "layout" { TypingMethod::Layout } else { TypingMethod::Unicode },
+        layout_switch: match (
+            settings.layout_switch.as_str(),
+            parse_shortcut(&settings.latin_layout_hotkey),
+            parse_shortcut(&settings.cyrillic_layout_hotkey),
+        ) {
+            ("hotkeys", Ok(latin), Ok(cyrillic)) => LayoutSwitch::Hotkeys { latin, cyrillic },
+            _ => LayoutSwitch::Sync,
+        },
         layout_delay: delay(settings.layout_delay),
+        delete_autoclose: settings.delete_autoclose,
     }
 }
 
@@ -367,6 +377,17 @@ mod tests {
         let typing = typing_settings(&layout);
         assert_eq!(typing.method, TypingMethod::Layout);
         assert_eq!(typing.layout_delay, Duration::from_millis(300));
+        assert_eq!(typing.layout_switch, LayoutSwitch::Sync);
+        let hotkeys = Settings { layout_switch: "hotkeys".into(), delete_autoclose: true, ..Settings::default() };
+        let typing = typing_settings(&hotkeys);
+        assert!(typing.delete_autoclose);
+        assert_eq!(
+            typing.layout_switch,
+            LayoutSwitch::Hotkeys {
+                latin: parse_shortcut("ctrl+shift+1").unwrap(),
+                cyrillic: parse_shortcut("ctrl+shift+2").unwrap()
+            }
+        );
         let broken =
             Settings { character_delay: f64::NAN, newline_delay: -1.0, spaces_per_tab: 99, ..Settings::default() };
         let typing = typing_settings(&broken);

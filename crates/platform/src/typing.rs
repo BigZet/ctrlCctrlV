@@ -6,6 +6,7 @@
 use std::sync::{Arc, Condvar, Mutex};
 use std::time::{Duration, Instant};
 
+use crate::hotkey::Shortcut;
 use crate::{Error, Result};
 
 pub const FOCUS_CHANGED: &str = "Пауза: активное приложение или окно изменилось";
@@ -13,8 +14,28 @@ const STOPPED: &str = "Печать остановлена";
 pub const MODIFIER_PRESSED: &str = "Пауза: нажата клавиша-модификатор";
 pub const OWN_WINDOW: &str = "Активно окно ctrlCctrlV · переключитесь в окно, куда печатать";
 const LAYOUT_REFUSED: &str = "Окно не переключило раскладку клавиатуры";
+const NO_LAYOUT_SHORTCUT: &str = "Для этой раскладки нет сочетания переключения: доступны латиница и кириллица";
 /// How long the focused window has to apply a requested layout switch.
 const LAYOUT_SWITCH_TIMEOUT: Duration = Duration::from_millis(500);
+
+/// How the window gets a layout that types the next character.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum LayoutSwitch {
+    /// Ask the window to switch (`WM_INPUTLANGCHANGEREQUEST`); a remote session
+    /// follows only when its client synchronizes the layout.
+    #[default]
+    Sync,
+    /// Press the shortcut the remote session assigns to each language, so the
+    /// remote switches itself. The local layout stays as it is.
+    Hotkeys { latin: Shortcut, cyrillic: Shortcut },
+}
+
+/// Which of the per-language shortcuts switches to `layout`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Script {
+    Latin,
+    Cyrillic,
+}
 
 /// How characters reach the focused window.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -38,8 +59,12 @@ pub struct TypingSettings {
     /// Type this many spaces for a tab; 0 sends the Tab key.
     pub spaces_per_tab: u8,
     pub method: TypingMethod,
+    pub layout_switch: LayoutSwitch,
     /// Pause after switching the layout, so a remote session can follow it.
     pub layout_delay: Duration,
+    /// Press Delete after an opening bracket or quote, removing the closing
+    /// one an editor inserts by itself.
+    pub delete_autoclose: bool,
 }
 
 impl Default for TypingSettings {
@@ -50,7 +75,9 @@ impl Default for TypingSettings {
             autoindent: false,
             spaces_per_tab: 0,
             method: TypingMethod::Unicode,
+            layout_switch: LayoutSwitch::Sync,
             layout_delay: Duration::from_millis(150),
+            delete_autoclose: false,
         }
     }
 }
@@ -83,6 +110,18 @@ pub trait Keyboard {
     /// Ask the focused window to switch to `layout`; it applies it asynchronously.
     fn switch_layout(&self, _layout: isize) -> Result<()> {
         Err(Error::Operation(LAYOUT_REFUSED.into()))
+    }
+    /// The script `layout` types, when it is one with a switching shortcut.
+    fn layout_script(&self, _layout: isize) -> Option<Script> {
+        None
+    }
+    /// Press and release a shortcut, as real keys.
+    fn shortcut(&self, _shortcut: &Shortcut) -> Result<()> {
+        Ok(())
+    }
+    /// The forward-delete key.
+    fn delete(&self) -> Result<()> {
+        Ok(())
     }
     /// Press the keys that type `ch` in `layout`.
     fn layout_character(&self, ch: char, _layout: isize) -> Result<()> {
@@ -154,7 +193,7 @@ pub fn type_chars<K: Keyboard>(
 ) -> (usize, Result<()>) {
     let mut state = RunState { position: start.min(chars.len()), target: None, original: None, current: None };
     let result = run(keyboard, chars, &mut state, settings, cancel, &mut progress, expected);
-    state.restore(keyboard);
+    state.restore(keyboard, settings);
     (state.position, result)
 }
 
@@ -169,12 +208,71 @@ struct RunState<T> {
 
 impl<T> RunState<T> {
     /// Give the window back the layout it had, unless focus has left it.
-    fn restore<K: Keyboard<Target = T>>(&self, keyboard: &K) {
+    fn restore<K: Keyboard<Target = T>>(&self, keyboard: &K, settings: &TypingSettings) {
+        if settings.layout_switch != LayoutSwitch::Sync {
+            // The remote session switched; which layout it had is unknown.
+            return;
+        }
         if let (Some(target), Some(original), Some(current)) = (&self.target, self.original, self.current)
             && original != current
             && keyboard.still_focused(target)
         {
             let _ = keyboard.switch_layout(original);
+        }
+    }
+}
+
+/// Which typed opening brackets and quotes an editor pairs by itself, by the
+/// rules VS Code and CodeMirror share: brackets always, quotes only outside
+/// strings and comments and not right after a word character, and no quote
+/// after a backslash. Tracks one line; a newline resets it.
+#[derive(Debug, Default)]
+struct AutoClose {
+    /// The quote that opened the string the cursor is in.
+    string: Option<char>,
+    comment: bool,
+    escaped: bool,
+    /// The previous character on the line, for `//`.
+    previous: Option<char>,
+}
+
+impl AutoClose {
+    /// Whether typing `ch` makes the editor insert a closing character.
+    /// `before` is the character typed before `ch`, on this line or not.
+    fn opens(&mut self, ch: char, before: Option<&char>) -> bool {
+        let escaped = std::mem::replace(&mut self.escaped, false);
+        let previous = self.previous.replace(ch);
+        if matches!(ch, '(' | '[' | '{') {
+            return true;
+        }
+        if self.comment {
+            return false;
+        }
+        if let Some(quote) = self.string {
+            if ch == '\\' && !escaped {
+                self.escaped = true;
+            } else if ch == quote && !escaped {
+                self.string = None;
+            }
+            return false;
+        }
+        match ch {
+            '"' | '\'' | '`' => {
+                if before.is_some_and(|c| c.is_alphanumeric() || *c == '_') {
+                    return false;
+                }
+                self.string = Some(ch);
+                true
+            }
+            '#' => {
+                self.comment = true;
+                false
+            }
+            '/' if previous == Some('/') => {
+                self.comment = true;
+                false
+            }
+            _ => false,
         }
     }
 }
@@ -223,24 +321,41 @@ fn run<K: Keyboard>(
         Ok(())
     };
     if settings.method == TypingMethod::Layout {
+        // With shortcuts the remote layout is unknown until the first switch.
         state.original = keyboard.layout();
-        state.current = state.original;
+        state.current = if settings.layout_switch == LayoutSwitch::Sync { state.original } else { None };
     }
 
     let character = |ch: char, state: &mut RunState<K::Target>| -> Result<()> {
-        let Some(layout) = state.current.and_then(|current| keyboard.layout_with(ch, current)) else {
+        if settings.method != TypingMethod::Layout {
+            return keyboard.character(ch);
+        }
+        let preferred = state.current.or(state.original).unwrap_or_default();
+        let Some(layout) = keyboard.layout_with(ch, preferred) else {
             // No installed layout has it (an emoji): only Unicode input can type it.
             return keyboard.character(ch);
         };
         if state.current != Some(layout) {
-            keyboard.switch_layout(layout)?;
-            let deadline = Instant::now() + LAYOUT_SWITCH_TIMEOUT;
-            while keyboard.layout() != Some(layout) {
-                check()?;
-                if Instant::now() >= deadline {
-                    return Err(Error::Operation(LAYOUT_REFUSED.into()));
+            match settings.layout_switch {
+                LayoutSwitch::Sync => {
+                    keyboard.switch_layout(layout)?;
+                    let deadline = Instant::now() + LAYOUT_SWITCH_TIMEOUT;
+                    while keyboard.layout() != Some(layout) {
+                        check()?;
+                        if Instant::now() >= deadline {
+                            return Err(Error::Operation(LAYOUT_REFUSED.into()));
+                        }
+                        cancel.wait(Duration::from_millis(10));
+                    }
                 }
-                cancel.wait(Duration::from_millis(10));
+                LayoutSwitch::Hotkeys { latin, cyrillic } => {
+                    let shortcut = match keyboard.layout_script(layout) {
+                        Some(Script::Latin) => latin,
+                        Some(Script::Cyrillic) => cyrillic,
+                        None => return Err(Error::Operation(NO_LAYOUT_SHORTCUT.into())),
+                    };
+                    keyboard.shortcut(&shortcut)?;
+                }
             }
             state.current = Some(layout);
             cancel.wait(settings.layout_delay);
@@ -249,6 +364,7 @@ fn run<K: Keyboard>(
         keyboard.layout_character(ch, layout)
     };
 
+    let mut autoclose = AutoClose::default();
     // A run that stopped right after a newline resumes by selecting the new
     // line's automatic indentation, as the newline itself would have.
     if settings.autoindent && state.position > 0 && state.position < chars.len() && chars[state.position - 1] == '\n' {
@@ -274,7 +390,17 @@ fn run<K: Keyboard>(
                 }
             }
             '\t' => keyboard.tab()?,
-            _ => character(ch, state)?,
+            _ => {
+                character(ch, state)?;
+                if settings.delete_autoclose && autoclose.opens(ch, chars[..index].last()) {
+                    cancel.wait(settings.character_delay);
+                    check()?;
+                    keyboard.delete()?;
+                }
+            }
+        }
+        if ch == '\n' {
+            autoclose = AutoClose::default();
         }
         state.position = index + 1;
         progress(state.position, chars.len());
@@ -296,6 +422,8 @@ mod tests {
         Indent,
         Switch(isize),
         Key(char, isize),
+        Shortcut(Shortcut),
+        Delete,
     }
 
     const LATIN: isize = 1;
@@ -375,6 +503,21 @@ mod tests {
             self.events.borrow_mut().push(Event::Key(ch, layout));
             Ok(())
         }
+        fn layout_script(&self, layout: isize) -> Option<Script> {
+            match layout {
+                LATIN => Some(Script::Latin),
+                CYRILLIC => Some(Script::Cyrillic),
+                _ => None,
+            }
+        }
+        fn shortcut(&self, shortcut: &Shortcut) -> Result<()> {
+            self.events.borrow_mut().push(Event::Shortcut(*shortcut));
+            Ok(())
+        }
+        fn delete(&self) -> Result<()> {
+            self.events.borrow_mut().push(Event::Delete);
+            Ok(())
+        }
         fn enter(&self) -> Result<()> {
             self.events.borrow_mut().push(Event::Enter);
             Ok(())
@@ -452,6 +595,55 @@ mod tests {
         let err = type_text(&fake, "aЖ", &settings, &CancelToken::new(), |_, _| {}, None).unwrap_err();
         assert_eq!(err, Error::Operation(LAYOUT_REFUSED.into()));
         assert_eq!(fake.events(), [Event::Key('a', LATIN), Event::Switch(CYRILLIC)]);
+    }
+
+    #[test]
+    fn layout_shortcuts_switch_the_remote_without_touching_the_local_layout() {
+        use crate::hotkey::parse_shortcut;
+        let fake = Fake::new();
+        let (latin, cyrillic) = (parse_shortcut("ctrl+shift+1").unwrap(), parse_shortcut("ctrl+shift+2").unwrap());
+        let settings = TypingSettings {
+            method: TypingMethod::Layout,
+            layout_switch: LayoutSwitch::Hotkeys { latin, cyrillic },
+            layout_delay: Duration::ZERO,
+            ..fast()
+        };
+        // The remote layout is unknown, so even Latin text starts with its shortcut.
+        type_text(&fake, "a=Я", &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
+        use Event::*;
+        let events = [Shortcut(latin), Key('a', LATIN), Key('=', LATIN), Shortcut(cyrillic), Key('Я', CYRILLIC)];
+        assert_eq!(fake.events(), events);
+        assert_eq!(fake.layout.get(), LATIN);
+    }
+
+    #[test]
+    fn deletes_the_closing_characters_an_editor_adds() {
+        let fake = Fake::new();
+        let settings = TypingSettings { delete_autoclose: true, ..fast() };
+        type_text(&fake, "f(\"a\")", &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
+        use Event::*;
+        let events = [Text('f'), Text('('), Delete, Text('"'), Delete, Text('a'), Text('"'), Text(')')];
+        assert_eq!(fake.events(), events);
+    }
+
+    #[test]
+    fn autoclose_follows_strings_comments_and_words() {
+        let mut auto = AutoClose::default();
+        let mut line = |text: &str| -> Vec<bool> {
+            auto = AutoClose::default();
+            let chars: Vec<char> = text.chars().collect();
+            (0..chars.len()).map(|i| auto.opens(chars[i], chars[..i].last())).collect()
+        };
+        // An apostrophe inside a word and a quote inside a string are not paired.
+        assert_eq!(line("don't"), [false, false, false, false, false]);
+        assert_eq!(line("'a\"'"), [true, false, false, false]);
+        // Escapes do not end the string; brackets pair even inside strings.
+        assert_eq!(line("'\\'(' "), [true, false, false, true, false, false]);
+        assert_eq!(line("\"\"\""), [true, false, true]);
+        // Comments pair brackets but not quotes.
+        assert_eq!(line("# it's ("), [false, false, false, false, false, false, false, true]);
+        assert_eq!(line("// a'"), [false, false, false, false, false]);
+        assert_eq!(line("a/'"), [false, false, true]);
     }
 
     #[test]

@@ -80,14 +80,16 @@ pub async fn settings_save(app: AppHandle, settings: Settings) -> Result<(), Str
         let _ = runtime.stop().await;
         runtime.acceleration = settings.acceleration();
     }
-    let hotkeys_changed = (&previous.capture_hotkey, &previous.typing_hotkey, &previous.cancel_hotkey)
-        != (&settings.capture_hotkey, &settings.typing_hotkey, &settings.cancel_hotkey);
+    let hotkeys_changed =
+        (&previous.capture_hotkey, &previous.typing_hotkey, &previous.cancel_hotkey, &previous.hotkey_mode)
+            != (&settings.capture_hotkey, &settings.typing_hotkey, &settings.cancel_hotkey, &settings.hotkey_mode);
     let result = if hotkeys_changed {
         // Hotkeys belong to the event-loop thread.
         let (sender, receiver) = tokio::sync::oneshot::channel();
         let next = settings.clone();
+        let handle = app.clone();
         app.run_on_main_thread(move || {
-            let _ = sender.send(hotkeys::reload(&next));
+            let _ = sender.send(hotkeys::reload(&handle, &next));
         })
         .map_err(|e| e.to_string())?;
         receiver.await.unwrap_or_else(|_| Err("Не удалось применить горячие клавиши".into()))

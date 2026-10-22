@@ -60,6 +60,8 @@ pub fn parse_shortcut(value: &str) -> Result<Shortcut> {
     Ok(Shortcut { modifiers, key })
 }
 
+#[cfg(windows)]
+pub use crate::sys::rawinput::RawHotkeys;
 #[cfg(any(windows, target_os = "macos"))]
 pub use native::Hotkeys;
 
