@@ -1,7 +1,7 @@
 name: Publish Rust desktop release
 
 # Builds the Tauri app from a version tag and publishes it as a GitHub release:
-# `git tag v0.2.0 && git push origin v0.2.0`. The tag must equal the workspace
+# `git tag v0.4.0 && git push origin v0.4.0`. The tag must equal the workspace
 # version in Cargo.toml and docs/releases/<tag>.md must hold the notes.
 
 on:
@@ -45,13 +45,12 @@ jobs:
       matrix:
         include:
           - os: windows-2022
-            # Windows 11 ships WebView2, so the plain executable runs as is.
-            bundle: --no-bundle
-            asset: ctrlCctrlV-${{ needs.check.outputs.version }}-windows-x64.exe
+            # The NSIS installer (per user, upgrades in place) and the plain
+            # executable; Windows 11 ships WebView2, the installer fetches it otherwise.
+            bundle: --bundles nsis
           - os: macos-15
-            # An .app bundle gives macOS privacy prompts a stable identity.
-            bundle: --bundles app
-            asset: ctrlCctrlV-${{ needs.check.outputs.version }}-macos-arm64.zip
+            # A DMG with the .app bundle, which gives macOS privacy prompts a stable identity.
+            bundle: --bundles dmg
     runs-on: ${{ matrix.os }}
     timeout-minutes: 40
     env:
@@ -72,25 +71,31 @@ jobs:
       - name: Build the app
         working-directory: crates/app
         run: npx --yes @tauri-apps/cli@2.12.3 build --ci ${{ matrix.bundle }}
-      - name: Name the Windows asset
+      - name: Name the Windows assets
         if: runner.os == 'Windows'
         shell: bash
+        env:
+          VERSION: ${{ needs.check.outputs.version }}
         run: |
           mkdir release-assets
-          cp target/release/ctrlcctrlv.exe "release-assets/${{ matrix.asset }}"
-      - name: Pack the macOS bundle
+          cp target/release/bundle/nsis/*-setup.exe "release-assets/ctrlCctrlV-$VERSION-windows-x64-setup.exe"
+          cp target/release/ctrlcctrlv.exe "release-assets/ctrlCctrlV-$VERSION-windows-x64.exe"
+      - name: Name the macOS asset
         if: runner.os == 'macOS'
-        # Artifacts drop file modes; a zip made by ditto keeps the bundle runnable.
         shell: bash
+        env:
+          VERSION: ${{ needs.check.outputs.version }}
         run: |
           mkdir release-assets
-          ditto -c -k --keepParent target/release/bundle/macos/ctrlCctrlV.app "release-assets/${{ matrix.asset }}"
-      - name: Write the checksum
+          cp target/release/bundle/dmg/*.dmg "release-assets/ctrlCctrlV-$VERSION-macos-arm64.dmg"
+      - name: Write the checksums
         shell: bash
         working-directory: release-assets
         run: |
-          if command -v sha256sum > /dev/null; then sha256sum "${{ matrix.asset }}"; else shasum -a 256 "${{ matrix.asset }}"; fi > "${{ matrix.asset }}.sha256"
-          cat "${{ matrix.asset }}.sha256"
+          for asset in *; do
+            if command -v sha256sum > /dev/null; then sha256sum "$asset"; else shasum -a 256 "$asset"; fi > "$asset.sha256"
+            cat "$asset.sha256"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: release-${{ runner.os }}
@@ -124,7 +129,8 @@ jobs:
           import hashlib, os, shutil
           from pathlib import Path
           version = os.environ['RELEASE_VERSION']
-          binaries = [f'ctrlCctrlV-{version}-windows-x64.exe', f'ctrlCctrlV-{version}-macos-arm64.zip']
+          binaries = [f'ctrlCctrlV-{version}-windows-x64-setup.exe', f'ctrlCctrlV-{version}-windows-x64.exe',
+                      f'ctrlCctrlV-{version}-macos-arm64.dmg']
           files = {p.name: p for p in Path('downloaded').rglob('*') if p.is_file()}
           assert set(files) == {name for b in binaries for name in (b, b + '.sha256')}, sorted(files)
           target = Path('release-assets')

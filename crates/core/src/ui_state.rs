@@ -123,6 +123,15 @@ impl UiState {
         self.set("review_models", json!(models))
     }
 
+    /// Whether the first-run setup was completed or skipped.
+    pub fn setup_done(&self) -> bool {
+        self.values.get("setup_done").and_then(Value::as_bool).unwrap_or(false)
+    }
+
+    pub fn set_setup_done(&mut self) -> Result<()> {
+        self.set("setup_done", json!(true))
+    }
+
     fn set(&mut self, key: &str, value: Value) -> Result<()> {
         let mut values = self.values.clone();
         values.insert(key.into(), value);

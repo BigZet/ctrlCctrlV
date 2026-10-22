@@ -11,4 +11,4 @@
 
 1. Обновите `version` в `[workspace.package]` корневого `Cargo.toml` и добавьте `docs/releases/v<версия>.md`.
 2. Создайте тег `v<версия>` на коммите в `main` и отправьте его: `git tag v0.2.0 && git push origin v0.2.0`.
-3. Workflow **Publish Rust desktop release** сам проверяет тег и версию, собирает `ctrlCctrlV-<версия>-windows-x64.exe` и `ctrlCctrlV-<версия>-macos-arm64.zip`, сверяет SHA256, загружает draft и публикует его как pre-release. Пока Rust-версия предварительная, «latest» остаётся за Python-выпуском.
+3. Workflow **Publish Rust desktop release** сам проверяет тег и версию, собирает установщик `ctrlCctrlV-<версия>-windows-x64-setup.exe` (NSIS, для текущего пользователя, обновляет установленную версию), переносимый `ctrlCctrlV-<версия>-windows-x64.exe` и `ctrlCctrlV-<версия>-macos-arm64.dmg`, сверяет SHA256, загружает draft и публикует его как pre-release. Пока Rust-версия предварительная, «latest» остаётся за Python-выпуском.

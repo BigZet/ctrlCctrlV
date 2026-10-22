@@ -80,14 +80,16 @@ pub async fn settings_save(app: AppHandle, settings: Settings) -> Result<(), Str
         let _ = runtime.stop().await;
         runtime.acceleration = settings.acceleration();
     }
-    let hotkeys_changed = (&previous.capture_hotkey, &previous.typing_hotkey, &previous.cancel_hotkey)
-        != (&settings.capture_hotkey, &settings.typing_hotkey, &settings.cancel_hotkey);
+    let hotkeys_changed =
+        (&previous.capture_hotkey, &previous.typing_hotkey, &previous.cancel_hotkey, &previous.hotkey_mode)
+            != (&settings.capture_hotkey, &settings.typing_hotkey, &settings.cancel_hotkey, &settings.hotkey_mode);
     let result = if hotkeys_changed {
         // Hotkeys belong to the event-loop thread.
         let (sender, receiver) = tokio::sync::oneshot::channel();
         let next = settings.clone();
+        let handle = app.clone();
         app.run_on_main_thread(move || {
-            let _ = sender.send(hotkeys::reload(&next));
+            let _ = sender.send(hotkeys::reload(&handle, &next));
         })
         .map_err(|e| e.to_string())?;
         receiver.await.unwrap_or_else(|_| Err("Не удалось применить горячие клавиши".into()))
@@ -114,4 +116,10 @@ pub fn api_key_save(app: AppHandle, key: String) -> Result<(), String> {
     let result = Credentials::system().and_then(|c| c.write(key)).map_err(|e| e.to_string());
     changed(&app);
     result
+}
+
+/// Marks the first-run setup as completed or skipped.
+#[tauri::command]
+pub fn setup_done(app: AppHandle) -> Result<(), String> {
+    lock(&app.state::<Shell>().ui).set_setup_done().map_err(|e| e.to_string())
 }
