@@ -5,6 +5,7 @@ const SettingsPage = {
   init() {
     $("#s-save").addEventListener("click", () => this.save());
     $("#s-reset").addEventListener("click", () => this.render());
+    $("#s-wizard").addEventListener("click", () => App.show("setup"));
     $("#s-form").addEventListener("submit", (event) => { event.preventDefault(); this.save(); });
   },
 
@@ -94,8 +95,8 @@ const SettingsPage = {
       el("input", { name, type: "checkbox", checked: this.settings[name] }));
   },
 
-  hotkey(name, text) {
-    const input = el("input", { name, value: this.settings[name], readonly: true, title: "Нажмите и введите новое сочетание" });
+  hotkey(name, text, settings = this.settings) {
+    const input = el("input", { name, value: settings[name], readonly: true, title: "Нажмите и введите новое сочетание" });
     input.addEventListener("focus", () => input.classList.add("recording"));
     input.addEventListener("blur", () => input.classList.remove("recording"));
     input.addEventListener("keydown", (event) => {

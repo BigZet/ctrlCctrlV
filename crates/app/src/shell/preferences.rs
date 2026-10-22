@@ -117,3 +117,9 @@ pub fn api_key_save(app: AppHandle, key: String) -> Result<(), String> {
     changed(&app);
     result
 }
+
+/// Marks the first-run setup as completed or skipped.
+#[tauri::command]
+pub fn setup_done(app: AppHandle) -> Result<(), String> {
+    lock(&app.state::<Shell>().ui).set_setup_done().map_err(|e| e.to_string())
+}

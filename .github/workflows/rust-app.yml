@@ -18,13 +18,17 @@ jobs:
       matrix:
         include:
           - os: windows-2022
-            # Windows 11 ships WebView2, so the plain executable runs as is.
-            bundle: --no-bundle
-            artifact: target/release/ctrlcctrlv.exe
+            # The NSIS installer plus the plain executable (Windows 11 ships WebView2).
+            bundle: --bundles nsis
+            artifact: |
+              target/release/ctrlcctrlv.exe
+              target/release/bundle/nsis/*-setup.exe
           - os: macos-15
             # An .app bundle gives macOS privacy prompts a stable identity.
-            bundle: --bundles app
-            artifact: target/release/bundle/macos/ctrlCctrlV.zip
+            bundle: --bundles app,dmg
+            artifact: |
+              target/release/bundle/macos/ctrlCctrlV.zip
+              target/release/bundle/dmg/*.dmg
     runs-on: ${{ matrix.os }}
     timeout-minutes: 40
     env:
