@@ -43,6 +43,10 @@ pub struct Settings {
     pub spaces_per_tab: i64,
     pub idle_minutes: i64,
     pub max_tokens: i64,
+    /// `unicode`, or `layout` to type with the keys of a keyboard layout (VDI and remote desktops).
+    pub typing_method: String,
+    /// Seconds to wait after switching the keyboard layout.
+    pub layout_delay: f64,
     /// Keys this version does not know, kept so that saving does not erase
     /// settings written by a newer version.
     #[serde(flatten, skip_serializing_if = "Map::is_empty")]
@@ -76,6 +80,8 @@ impl Default for Settings {
             spaces_per_tab: 0,
             idle_minutes: 15,
             max_tokens: 4096,
+            typing_method: "unicode".into(),
+            layout_delay: 0.150,
             extra: Map::new(),
         }
     }
@@ -133,10 +139,12 @@ impl Settings {
             "capture_hotkey" => self.capture_hotkey = text(value)?,
             "typing_hotkey" => self.typing_hotkey = text(value)?,
             "cancel_hotkey" => self.cancel_hotkey = text(value)?,
+            "typing_method" => self.typing_method = text(value)?,
             "show_preview" => self.show_preview = value.as_bool()?,
             "autoindent" => self.autoindent = value.as_bool()?,
             "character_delay" => self.character_delay = value.as_f64()?,
             "newline_delay" => self.newline_delay = value.as_f64()?,
+            "layout_delay" => self.layout_delay = value.as_f64()?,
             "spaces_per_tab" => self.spaces_per_tab = integer(&value)?,
             "idle_minutes" => self.idle_minutes = integer(&value)?,
             "max_tokens" => self.max_tokens = integer(&value)?,
@@ -182,8 +190,14 @@ impl Settings {
         if !matches!(self.remote_mode.as_str(), "json" | "transcription") {
             return fail("Неизвестный протокол модели");
         }
-        if !(0.001..=0.2).contains(&self.character_delay) || !(0.0..=2.0).contains(&self.newline_delay) {
+        if !(0.001..=0.2).contains(&self.character_delay)
+            || !(0.0..=2.0).contains(&self.newline_delay)
+            || !(0.0..=2.0).contains(&self.layout_delay)
+        {
             return fail("Некорректная задержка ввода");
+        }
+        if !matches!(self.typing_method.as_str(), "unicode" | "layout") {
+            return fail("Неизвестный способ ввода");
         }
         if !(0..=8).contains(&self.spaces_per_tab) || !(1..=120).contains(&self.idle_minutes) {
             return fail("Некорректный профиль ввода или время простоя");

@@ -5,7 +5,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use ctrlcctrlv_core::settings::Settings;
-use ctrlcctrlv_platform::typing::{TypingSettings, prepare};
+use ctrlcctrlv_platform::typing::{TypingMethod, TypingSettings, prepare};
 use serde::{Deserialize, Serialize};
 
 /// Event names shared with `ui/*.js`.
@@ -303,6 +303,8 @@ pub fn typing_settings(settings: &Settings) -> TypingSettings {
         newline_delay: delay(settings.newline_delay),
         autoindent: settings.autoindent,
         spaces_per_tab: settings.spaces_per_tab.clamp(0, 8) as u8,
+        method: if settings.typing_method == "layout" { TypingMethod::Layout } else { TypingMethod::Unicode },
+        layout_delay: delay(settings.layout_delay),
     }
 }
 
@@ -360,6 +362,11 @@ mod tests {
         assert_eq!(typing.character_delay, Duration::from_millis(8));
         assert_eq!(typing.newline_delay, Duration::from_millis(60));
         assert_eq!(typing.spaces_per_tab, 4);
+        assert_eq!(typing.method, TypingMethod::Unicode);
+        let layout = Settings { typing_method: "layout".into(), layout_delay: 0.3, ..Settings::default() };
+        let typing = typing_settings(&layout);
+        assert_eq!(typing.method, TypingMethod::Layout);
+        assert_eq!(typing.layout_delay, Duration::from_millis(300));
         let broken =
             Settings { character_delay: f64::NAN, newline_delay: -1.0, spaces_per_tab: 99, ..Settings::default() };
         let typing = typing_settings(&broken);

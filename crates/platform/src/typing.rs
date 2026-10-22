@@ -12,6 +12,21 @@ pub const FOCUS_CHANGED: &str = "Пауза: активное приложени
 const STOPPED: &str = "Печать остановлена";
 pub const MODIFIER_PRESSED: &str = "Пауза: нажата клавиша-модификатор";
 pub const OWN_WINDOW: &str = "Активно окно ctrlCctrlV · переключитесь в окно, куда печатать";
+const LAYOUT_REFUSED: &str = "Окно не переключило раскладку клавиатуры";
+/// How long the focused window has to apply a requested layout switch.
+const LAYOUT_SWITCH_TIMEOUT: Duration = Duration::from_millis(500);
+
+/// How characters reach the focused window.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum TypingMethod {
+    /// Each character as a Unicode code point, independent of the keyboard layout.
+    #[default]
+    Unicode,
+    /// The physical keys that type each character in an installed keyboard
+    /// layout, switching the window's layout when needed. Remote desktop and
+    /// VDI clients forward only real keys and turn Unicode input into `?`.
+    Layout,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TypingSettings {
@@ -22,6 +37,9 @@ pub struct TypingSettings {
     pub autoindent: bool,
     /// Type this many spaces for a tab; 0 sends the Tab key.
     pub spaces_per_tab: u8,
+    pub method: TypingMethod,
+    /// Pause after switching the layout, so a remote session can follow it.
+    pub layout_delay: Duration,
 }
 
 impl Default for TypingSettings {
@@ -31,6 +49,8 @@ impl Default for TypingSettings {
             newline_delay: Duration::from_millis(60),
             autoindent: false,
             spaces_per_tab: 0,
+            method: TypingMethod::Unicode,
+            layout_delay: Duration::from_millis(150),
         }
     }
 }
@@ -38,7 +58,7 @@ impl Default for TypingSettings {
 /// Native keystroke emulation. Implementations post events to the focused window.
 pub trait Keyboard {
     /// Identity of the focused window, compared to detect a focus change.
-    type Target: PartialEq;
+    type Target: PartialEq + Clone;
 
     fn accessibility_granted(&self) -> bool;
     fn modifiers_pressed(&self) -> bool;
@@ -51,6 +71,23 @@ pub trait Keyboard {
         false
     }
     fn character(&self, ch: char) -> Result<()>;
+    /// The keyboard layout of the focused window, as an opaque id. `None` where
+    /// typing with layout keys is not supported.
+    fn layout(&self) -> Option<isize> {
+        None
+    }
+    /// An installed layout that types `ch` with its keys, `current` first.
+    fn layout_with(&self, _ch: char, _current: isize) -> Option<isize> {
+        None
+    }
+    /// Ask the focused window to switch to `layout`; it applies it asynchronously.
+    fn switch_layout(&self, _layout: isize) -> Result<()> {
+        Err(Error::Operation(LAYOUT_REFUSED.into()))
+    }
+    /// Press the keys that type `ch` in `layout`.
+    fn layout_character(&self, ch: char, _layout: isize) -> Result<()> {
+        self.character(ch)
+    }
     fn enter(&self) -> Result<()>;
     fn tab(&self) -> Result<()>;
     fn select_indentation(&self) -> Result<()>;
@@ -115,15 +152,37 @@ pub fn type_chars<K: Keyboard>(
     mut progress: impl FnMut(usize, usize),
     expected: Option<&K::Target>,
 ) -> (usize, Result<()>) {
-    let mut position = start.min(chars.len());
-    let result = run(keyboard, chars, &mut position, settings, cancel, &mut progress, expected);
-    (position, result)
+    let mut state = RunState { position: start.min(chars.len()), target: None, original: None, current: None };
+    let result = run(keyboard, chars, &mut state, settings, cancel, &mut progress, expected);
+    state.restore(keyboard);
+    (state.position, result)
+}
+
+/// Where a run is, with the window it types into and that window's layout
+/// when the run started and now.
+struct RunState<T> {
+    position: usize,
+    target: Option<T>,
+    original: Option<isize>,
+    current: Option<isize>,
+}
+
+impl<T> RunState<T> {
+    /// Give the window back the layout it had, unless focus has left it.
+    fn restore<K: Keyboard<Target = T>>(&self, keyboard: &K) {
+        if let (Some(target), Some(original), Some(current)) = (&self.target, self.original, self.current)
+            && original != current
+            && keyboard.still_focused(target)
+        {
+            let _ = keyboard.switch_layout(original);
+        }
+    }
 }
 
 fn run<K: Keyboard>(
     keyboard: &K,
     chars: &[char],
-    position: &mut usize,
+    state: &mut RunState<K::Target>,
     settings: &TypingSettings,
     cancel: &CancelToken,
     progress: &mut impl FnMut(usize, usize),
@@ -149,6 +208,7 @@ fn run<K: Keyboard>(
     if keyboard.owned_by_this_app(&target) {
         return Err(Error::Cancelled(OWN_WINDOW.into()));
     }
+    state.target = Some(target.clone());
 
     let check = || -> Result<()> {
         if cancel.is_cancelled() {
@@ -162,20 +222,46 @@ fn run<K: Keyboard>(
         }
         Ok(())
     };
+    if settings.method == TypingMethod::Layout {
+        state.original = keyboard.layout();
+        state.current = state.original;
+    }
+
+    let character = |ch: char, state: &mut RunState<K::Target>| -> Result<()> {
+        let Some(layout) = state.current.and_then(|current| keyboard.layout_with(ch, current)) else {
+            // No installed layout has it (an emoji): only Unicode input can type it.
+            return keyboard.character(ch);
+        };
+        if state.current != Some(layout) {
+            keyboard.switch_layout(layout)?;
+            let deadline = Instant::now() + LAYOUT_SWITCH_TIMEOUT;
+            while keyboard.layout() != Some(layout) {
+                check()?;
+                if Instant::now() >= deadline {
+                    return Err(Error::Operation(LAYOUT_REFUSED.into()));
+                }
+                cancel.wait(Duration::from_millis(10));
+            }
+            state.current = Some(layout);
+            cancel.wait(settings.layout_delay);
+            check()?;
+        }
+        keyboard.layout_character(ch, layout)
+    };
 
     // A run that stopped right after a newline resumes by selecting the new
     // line's automatic indentation, as the newline itself would have.
-    if settings.autoindent && *position > 0 && *position < chars.len() && chars[*position - 1] == '\n' {
+    if settings.autoindent && state.position > 0 && state.position < chars.len() && chars[state.position - 1] == '\n' {
         check()?;
         keyboard.select_indentation()?;
     }
-    while let Some(&ch) = chars.get(*position) {
-        let index = *position;
+    while let Some(&ch) = chars.get(state.position) {
+        let index = state.position;
         check()?;
         match ch {
             '\n' => {
                 keyboard.enter()?;
-                *position = index + 1;
+                state.position = index + 1;
                 cancel.wait(settings.newline_delay);
                 check()?;
                 // A mouse click can switch windows inside the same application
@@ -188,10 +274,10 @@ fn run<K: Keyboard>(
                 }
             }
             '\t' => keyboard.tab()?,
-            _ => keyboard.character(ch)?,
+            _ => character(ch, state)?,
         }
-        *position = index + 1;
-        progress(*position, chars.len());
+        state.position = index + 1;
+        progress(state.position, chars.len());
         cancel.wait(settings.character_delay);
     }
     check()
@@ -208,18 +294,33 @@ mod tests {
         Enter,
         Tab,
         Indent,
+        Switch(isize),
+        Key(char, isize),
     }
+
+    const LATIN: isize = 1;
+    const CYRILLIC: isize = 2;
 
     struct Fake {
         events: RefCell<Vec<Event>>,
         pid: Cell<u32>,
+        layout: Cell<isize>,
+        /// Whether the window applies a requested layout.
+        switches: bool,
         full_checks: Cell<usize>,
         on_character: Option<Box<dyn Fn()>>,
     }
 
     impl Fake {
         fn new() -> Self {
-            Self { events: RefCell::default(), pid: Cell::new(100), full_checks: Cell::new(0), on_character: None }
+            Self {
+                events: RefCell::default(),
+                pid: Cell::new(100),
+                layout: Cell::new(LATIN),
+                switches: true,
+                full_checks: Cell::new(0),
+                on_character: None,
+            }
         }
         fn events(&self) -> Vec<Event> {
             self.events.borrow().clone()
@@ -249,6 +350,29 @@ mod tests {
             if let Some(hook) = &self.on_character {
                 hook();
             }
+            Ok(())
+        }
+        fn layout(&self) -> Option<isize> {
+            Some(self.layout.get())
+        }
+        fn layout_with(&self, ch: char, current: isize) -> Option<isize> {
+            // Digits and punctuation are in both layouts.
+            let has = |layout| match ch {
+                'а'..='я' | 'А'..='Я' | 'ё' | 'Ё' => layout == CYRILLIC,
+                'a'..='z' | 'A'..='Z' => layout == LATIN,
+                _ => ch.is_ascii(),
+            };
+            [current, LATIN, CYRILLIC].into_iter().find(|&layout| has(layout))
+        }
+        fn switch_layout(&self, layout: isize) -> Result<()> {
+            self.events.borrow_mut().push(Event::Switch(layout));
+            if self.switches {
+                self.layout.set(layout);
+            }
+            Ok(())
+        }
+        fn layout_character(&self, ch: char, layout: isize) -> Result<()> {
+            self.events.borrow_mut().push(Event::Key(ch, layout));
             Ok(())
         }
         fn enter(&self) -> Result<()> {
@@ -291,6 +415,50 @@ mod tests {
         type_text(&fake, "Ж\r\n\t🙂\n", &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
         use Event::*;
         assert_eq!(fake.events(), [Text('Ж'), Enter, Indent, Text(' '), Text(' '), Text('🙂'), Enter]);
+    }
+
+    #[test]
+    fn layout_keys_switch_layouts_and_restore_the_original() {
+        let fake = Fake::new();
+        let settings = TypingSettings { method: TypingMethod::Layout, layout_delay: Duration::ZERO, ..fast() };
+        type_text(&fake, "Да, ok 1🙂", &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
+        use Event::*;
+        let events = [
+            Switch(CYRILLIC),
+            Key('Д', CYRILLIC),
+            Key('а', CYRILLIC),
+            Key(',', CYRILLIC),
+            Key(' ', CYRILLIC),
+            Switch(LATIN),
+            Key('o', LATIN),
+            Key('k', LATIN),
+            Key(' ', LATIN),
+            Key('1', LATIN),
+            Text('🙂'),
+        ];
+        assert_eq!(fake.events(), events);
+        assert_eq!(fake.layout.get(), LATIN);
+
+        let fake = Fake::new();
+        type_text(&fake, "Я", &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
+        assert_eq!(fake.events(), [Switch(CYRILLIC), Key('Я', CYRILLIC), Switch(LATIN)]);
+        assert_eq!(fake.layout.get(), LATIN);
+    }
+
+    #[test]
+    fn layout_keys_stop_when_the_window_keeps_its_layout() {
+        let fake = Fake { switches: false, ..Fake::new() };
+        let settings = TypingSettings { method: TypingMethod::Layout, ..fast() };
+        let err = type_text(&fake, "aЖ", &settings, &CancelToken::new(), |_, _| {}, None).unwrap_err();
+        assert_eq!(err, Error::Operation(LAYOUT_REFUSED.into()));
+        assert_eq!(fake.events(), [Event::Key('a', LATIN), Event::Switch(CYRILLIC)]);
+    }
+
+    #[test]
+    fn unicode_method_ignores_layouts() {
+        let fake = Fake::new();
+        type_text(&fake, "Жa", &fast(), &CancelToken::new(), |_, _| {}, None).unwrap();
+        assert_eq!(fake.events(), [Event::Text('Ж'), Event::Text('a')]);
     }
 
     #[test]

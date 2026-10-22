@@ -1,13 +1,16 @@
 //! Win32 keystrokes (`SendInput`) and the foreground window.
 use std::mem::size_of;
 
-use windows::Win32::Foundation::HWND;
+use windows::Win32::Foundation::{HWND, LPARAM, WPARAM};
 use windows::Win32::UI::Input::KeyboardAndMouse::{
-    GetAsyncKeyState, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBD_EVENT_FLAGS, KEYBDINPUT, KEYEVENTF_EXTENDEDKEY,
-    KEYEVENTF_KEYUP, KEYEVENTF_UNICODE, SendInput, VIRTUAL_KEY, VK_CONTROL, VK_HOME, VK_LWIN, VK_MENU, VK_RETURN,
-    VK_RWIN, VK_SHIFT, VK_TAB,
+    GetAsyncKeyState, GetKeyState, GetKeyboardLayout, GetKeyboardLayoutList, HKL, INPUT, INPUT_0, INPUT_KEYBOARD,
+    KEYBD_EVENT_FLAGS, KEYBDINPUT, KEYEVENTF_EXTENDEDKEY, KEYEVENTF_KEYUP, KEYEVENTF_SCANCODE, KEYEVENTF_UNICODE,
+    MAPVK_VK_TO_VSC, MAPVK_VK_TO_VSC_EX, MapVirtualKeyExW, MapVirtualKeyW, SendInput, VIRTUAL_KEY, VK_CAPITAL,
+    VK_CONTROL, VK_HOME, VK_LWIN, VK_MENU, VK_RETURN, VK_RWIN, VK_SHIFT, VK_TAB, VkKeyScanExW,
 };
-use windows::Win32::UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowThreadProcessId};
+use windows::Win32::UI::WindowsAndMessaging::{
+    GetForegroundWindow, GetWindowThreadProcessId, PostMessageW, WM_INPUTLANGCHANGEREQUEST,
+};
 
 use crate::typing::Keyboard;
 use crate::{Error, Permission, Permissions, Result};
@@ -64,9 +67,53 @@ fn send(events: &[INPUT]) -> Result<()> {
     Ok(())
 }
 
+/// A virtual key with its scan code, as a real keyboard sends it: remote
+/// desktop and VDI clients forward the scan code and drop events without one.
+fn key(vk: VIRTUAL_KEY, extended: bool, up: bool) -> INPUT {
+    let scan = unsafe { MapVirtualKeyW(vk.0 as u32, MAPVK_VK_TO_VSC) } as u16;
+    let mut flags = if extended { KEYEVENTF_EXTENDEDKEY } else { KEYBD_EVENT_FLAGS(0) };
+    if up {
+        flags |= KEYEVENTF_KEYUP;
+    }
+    key_input(vk, scan, flags)
+}
+
 fn press(vk: VIRTUAL_KEY, extended: bool) -> Result<()> {
-    let flags = if extended { KEYEVENTF_EXTENDEDKEY } else { KEYBD_EVENT_FLAGS(0) };
-    send(&[key_input(vk, 0, flags), key_input(vk, 0, flags | KEYEVENTF_KEYUP)])
+    send(&[key(vk, extended, false), key(vk, extended, true)])
+}
+
+/// A key typed by its scan code (`MAPVK_VK_TO_VSC_EX`, `0xE0..` when extended).
+fn scan_input(vk: VIRTUAL_KEY, scan: u32, up: bool) -> INPUT {
+    let mut flags = KEYEVENTF_SCANCODE;
+    if scan & 0xFF00 == 0xE000 {
+        flags |= KEYEVENTF_EXTENDEDKEY;
+    }
+    if up {
+        flags |= KEYEVENTF_KEYUP;
+    }
+    key_input(vk, scan as u16 & 0xFF, flags)
+}
+
+fn foreground_layout() -> Option<HKL> {
+    let hwnd = unsafe { GetForegroundWindow() };
+    if hwnd.is_invalid() {
+        return None;
+    }
+    let thread = unsafe { GetWindowThreadProcessId(hwnd, None) };
+    (thread != 0).then(|| unsafe { GetKeyboardLayout(thread) })
+}
+
+/// The virtual key and Shift/Ctrl/Alt state (bits 1/2/4) typing `ch` in `layout`.
+fn layout_key(ch: char, layout: HKL) -> Option<(VIRTUAL_KEY, u8)> {
+    let unit = u16::try_from(ch as u32).ok()?;
+    let found = unsafe { VkKeyScanExW(unit, layout) };
+    let [vk, state] = found.to_le_bytes();
+    // Ctrl without Alt makes control characters, not text; other bits are
+    // layout-specific (Kana and similar) modifiers.
+    if found == -1 || vk == 0xFF || state & !0b111 != 0 || state & 0b110 == 0b010 {
+        return None;
+    }
+    Some((VIRTUAL_KEY(vk as u16), state))
 }
 
 impl Keyboard for WindowsKeyboard {
@@ -118,6 +165,53 @@ impl Keyboard for WindowsKeyboard {
         send(&events)
     }
 
+    fn layout(&self) -> Option<isize> {
+        foreground_layout().map(|hkl| hkl.0 as isize)
+    }
+
+    fn layout_with(&self, ch: char, current: isize) -> Option<isize> {
+        let current = HKL(current as _);
+        if layout_key(ch, current).is_some() {
+            return Some(current.0 as isize);
+        }
+        let count = unsafe { GetKeyboardLayoutList(None) }.max(0) as usize;
+        let mut layouts = vec![HKL::default(); count];
+        let count = unsafe { GetKeyboardLayoutList(Some(&mut layouts)) }.max(0) as usize;
+        layouts.truncate(count);
+        layouts.into_iter().find(|&hkl| layout_key(ch, hkl).is_some()).map(|hkl| hkl.0 as isize)
+    }
+
+    fn switch_layout(&self, layout: isize) -> Result<()> {
+        let hwnd = unsafe { GetForegroundWindow() };
+        unsafe { PostMessageW(Some(hwnd), WM_INPUTLANGCHANGEREQUEST, WPARAM(0), LPARAM(layout)) }
+            .map_err(|e| Error::Operation(format!("Не удалось переключить раскладку: {e}")))
+    }
+
+    fn layout_character(&self, ch: char, layout: isize) -> Result<()> {
+        let hkl = HKL(layout as _);
+        let Some((vk, mut state)) = layout_key(ch, hkl) else {
+            return self.character(ch);
+        };
+        // Caps Lock inverts Shift for letters.
+        if ch.is_alphabetic() && unsafe { GetKeyState(VK_CAPITAL.0 as i32) } & 1 != 0 {
+            state ^= 1;
+        }
+        let modifiers: Vec<VIRTUAL_KEY> = [(1, VK_SHIFT), (2, VK_CONTROL), (4, VK_MENU)]
+            .into_iter()
+            .filter(|(bit, _)| state & bit != 0)
+            .map(|(_, vk)| vk)
+            .collect();
+        let scan = unsafe { MapVirtualKeyExW(vk.0 as u32, MAPVK_VK_TO_VSC_EX, Some(hkl)) };
+        if scan == 0 {
+            return self.character(ch);
+        }
+        let mut events: Vec<INPUT> = modifiers.iter().map(|&m| key(m, false, false)).collect();
+        events.push(scan_input(vk, scan, false));
+        events.push(scan_input(vk, scan, true));
+        events.extend(modifiers.iter().rev().map(|&m| key(m, false, true)));
+        send(&events)
+    }
+
     fn enter(&self) -> Result<()> {
         press(VK_RETURN, false)
     }
@@ -128,10 +222,10 @@ impl Keyboard for WindowsKeyboard {
 
     fn select_indentation(&self) -> Result<()> {
         send(&[
-            key_input(VK_SHIFT, 0, KEYBD_EVENT_FLAGS(0)),
-            key_input(VK_HOME, 0, KEYEVENTF_EXTENDEDKEY),
-            key_input(VK_HOME, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP),
-            key_input(VK_SHIFT, 0, KEYEVENTF_KEYUP),
+            key(VK_SHIFT, false, false),
+            key(VK_HOME, true, false),
+            key(VK_HOME, true, true),
+            key(VK_SHIFT, false, true),
         ])
     }
 }

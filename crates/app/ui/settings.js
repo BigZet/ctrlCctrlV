@@ -39,6 +39,11 @@ const SettingsPage = {
         this.hotkey("cancel_hotkey", "Остановить"),
       ]),
       this.group("Печать", [
+        this.select("typing_method", "Способ ввода", [
+          ["unicode", "Символы Unicode"],
+          ["layout", "Клавиши раскладки (VDI, RDP)"],
+        ], "Для удалённых рабочих столов: русские буквы иначе приходят как ?"),
+        this.number("layout_delay", "Пауза после смены раскладки, мс", 0, 2000, 1000, "Только для клавиш раскладки"),
         this.number("character_delay", "Задержка между символами, мс", 1, 200, 1000),
         this.number("newline_delay", "Задержка после строки, мс", 0, 2000, 1000),
         this.number("spaces_per_tab", "Пробелов вместо Tab", 0, 8, 1, "0 — печатать Tab"),
