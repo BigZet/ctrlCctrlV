@@ -6,7 +6,7 @@ use std::time::{Duration, Instant};
 
 use ctrlcctrlv_core::settings::Settings;
 use ctrlcctrlv_platform::hotkey::parse_shortcut;
-use ctrlcctrlv_platform::typing::{LayoutSwitch, TypingMethod, TypingSettings, prepare};
+use ctrlcctrlv_platform::typing::{LayoutSwitch, SpecialCharacters, TypingMethod, TypingSettings, prepare};
 use serde::{Deserialize, Serialize};
 
 /// Event names shared with `ui/*.js`.
@@ -238,6 +238,15 @@ impl TypingJob {
         self.state == TypingState::Paused && self.text == clipboard
     }
 
+    /// A preflight failure has not typed anything: allow fixing its settings
+    /// and retrying the same clipboard. Never change positions in a partial job.
+    pub fn refresh_unstarted_settings(&mut self, settings: TypingSettings) {
+        if self.position == 0 && self.settings != settings {
+            self.chars = Arc::new(prepare(&self.text, &settings));
+            self.settings = settings;
+        }
+    }
+
     pub fn end(&mut self, position: usize, end: RunEnd) {
         self.position = position.min(self.chars.len());
         self.countdown = 0;
@@ -305,6 +314,11 @@ pub fn typing_settings(settings: &Settings) -> TypingSettings {
         autoindent: settings.autoindent,
         spaces_per_tab: settings.spaces_per_tab.clamp(0, 8) as u8,
         method: if settings.typing_method == "layout" { TypingMethod::Layout } else { TypingMethod::Unicode },
+        special_characters: if settings.special_characters == "compatible" {
+            SpecialCharacters::Compatible
+        } else {
+            SpecialCharacters::Hex
+        },
         layout_switch: match (
             settings.layout_switch.as_str(),
             parse_shortcut(&settings.latin_layout_hotkey),
@@ -373,11 +387,14 @@ mod tests {
         assert_eq!(typing.newline_delay, Duration::from_millis(60));
         assert_eq!(typing.spaces_per_tab, 4);
         assert_eq!(typing.method, TypingMethod::Unicode);
+        assert_eq!(typing.special_characters, SpecialCharacters::Hex);
         let layout = Settings { typing_method: "layout".into(), layout_delay: 0.3, ..Settings::default() };
         let typing = typing_settings(&layout);
         assert_eq!(typing.method, TypingMethod::Layout);
         assert_eq!(typing.layout_delay, Duration::from_millis(300));
         assert_eq!(typing.layout_switch, LayoutSwitch::Sync);
+        let compatible = Settings { special_characters: "compatible".into(), ..layout };
+        assert_eq!(typing_settings(&compatible).special_characters, SpecialCharacters::Compatible);
         let hotkeys = Settings { layout_switch: "hotkeys".into(), delete_autoclose: true, ..Settings::default() };
         let typing = typing_settings(&hotkeys);
         assert!(typing.delete_autoclose);
@@ -394,6 +411,20 @@ mod tests {
         assert_eq!(typing.character_delay, Duration::ZERO);
         assert_eq!(typing.newline_delay, Duration::ZERO);
         assert_eq!(typing.spaces_per_tab, 8);
+    }
+
+    #[test]
+    fn preflight_retry_accepts_new_mode_but_partial_jobs_keep_their_characters() {
+        let exact = TypingSettings { method: TypingMethod::Layout, ..TypingSettings::default() };
+        let compatible = TypingSettings { special_characters: SpecialCharacters::Compatible, ..exact };
+        let mut job = TypingJob::new(1, "а…б".into(), exact);
+        job.end(0, RunEnd::Interrupted { message: "unsupported".into(), error: true });
+        job.refresh_unstarted_settings(compatible);
+        assert_eq!(*job.chars, ['а', '.', '.', '.', 'б']);
+        job.position = 2;
+        job.refresh_unstarted_settings(exact);
+        assert_eq!(job.settings, compatible);
+        assert_eq!(*job.chars, ['а', '.', '.', '.', 'б']);
     }
 
     #[test]

@@ -58,3 +58,7 @@ and continues a paused one while the clipboard still holds its text. A focus
 change or a pressed key pauses instead of stopping; "continue" types the rest
 into the window focused at that moment (after a 3 s countdown when that is
 ctrlCctrlV's own window). The cancel hotkey and "Стоп" end the job.
+
+Windows VDI: settings offer exact Alt+Unicode Hex input or explicit compatible
+substitutions for symbols outside keyboard layouts. Setup, limits and the
+acceptance sample: [VDI typing](../../docs/VDI_TYPING.md).

@@ -8,7 +8,10 @@ import sys
 def data_directory() -> Path:
     if sys.platform == "darwin":
         return Path.home() / "Library/Application Support/ctrlCctrlV"
-    return Path(os.environ.get("LOCALAPPDATA", Path.home() / ".local/share")) / "ctrlCctrlV"
+    return (
+        Path(os.environ.get("LOCALAPPDATA", Path.home() / ".local/share"))
+        / "ctrlCctrlV"
+    )
 
 
 @dataclass
@@ -25,7 +28,9 @@ class Settings:
     review_remote_model: str = "qwen/qwen3-vl-8b-instruct"
     capture_hotkey: str = "ctrl+alt+4" if sys.platform == "win32" else "ctrl+alt+cmd+4"
     typing_hotkey: str = "ctrl+alt+v" if sys.platform == "win32" else "ctrl+alt+cmd+v"
-    cancel_hotkey: str = "ctrl+alt+esc" if sys.platform == "win32" else "ctrl+alt+cmd+esc"
+    cancel_hotkey: str = (
+        "ctrl+alt+esc" if sys.platform == "win32" else "ctrl+alt+cmd+esc"
+    )
     character_delay: float = 0.008
     newline_delay: float = 0.060
     autoindent: bool = False
@@ -34,6 +39,7 @@ class Settings:
     max_tokens: int = 4096
     # Read by the Rust app: "layout" types with the keys of a keyboard layout (VDI).
     typing_method: str = "unicode"
+    special_characters: str = "hex"
     layout_delay: float = 0.150
     layout_switch: str = "sync"
     latin_layout_hotkey: str = "ctrl+shift+1"
@@ -63,9 +69,26 @@ class Settings:
         for name in ("show_preview", "autoindent", "delete_autoclose"):
             if type(getattr(self, name)) is not bool:
                 raise ValueError("Некорректная настройка: " + name)
-        for name in ("provider", "review_provider", "capture_format", "acceleration", "local_model", "remote_model", "remote_mode", "review_local_model",
-                     "review_remote_model", "capture_hotkey", "typing_hotkey", "cancel_hotkey", "typing_method",
-                     "layout_switch", "latin_layout_hotkey", "cyrillic_layout_hotkey", "hotkey_mode"):
+        for name in (
+            "provider",
+            "review_provider",
+            "capture_format",
+            "acceleration",
+            "local_model",
+            "remote_model",
+            "remote_mode",
+            "review_local_model",
+            "review_remote_model",
+            "capture_hotkey",
+            "typing_hotkey",
+            "cancel_hotkey",
+            "typing_method",
+            "layout_switch",
+            "latin_layout_hotkey",
+            "cyrillic_layout_hotkey",
+            "hotkey_mode",
+            "special_characters",
+        ):
             if not isinstance(getattr(self, name), str):
                 raise ValueError("Некорректная настройка: " + name)
         for name in ("spaces_per_tab", "idle_minutes", "max_tokens"):
@@ -75,17 +98,30 @@ class Settings:
             if type(getattr(self, name)) not in (int, float):
                 raise ValueError("Некорректная настройка: " + name)
         from .catalog import MODELS
+
         MODELS = models if models is not None else MODELS
         if self.local_model not in MODELS:
             raise ValueError("Неизвестная локальная модель OCR")
         if not self.remote_model.strip():
             raise ValueError("Укажите облачную модель OCR")
-        if self.review_local_model not in MODELS or MODELS[self.review_local_model].mode != "json":
-            raise ValueError("Для проверки выберите vision-модель с текстовыми инструкциями")
-        if not isinstance(self.review_remote_model, str) or not self.review_remote_model.strip():
+        if (
+            self.review_local_model not in MODELS
+            or MODELS[self.review_local_model].mode != "json"
+        ):
+            raise ValueError(
+                "Для проверки выберите vision-модель с текстовыми инструкциями"
+            )
+        if (
+            not isinstance(self.review_remote_model, str)
+            or not self.review_remote_model.strip()
+        ):
             raise ValueError("Укажите облачную модель проверки")
         from .hotkeys import parse_hotkey
-        keys = [parse_hotkey(value) for value in (self.capture_hotkey, self.typing_hotkey, self.cancel_hotkey)]
+
+        keys = [
+            parse_hotkey(value)
+            for value in (self.capture_hotkey, self.typing_hotkey, self.cancel_hotkey)
+        ]
         if len(set(keys)) != 3:
             raise ValueError("Горячие клавиши должны различаться")
         if self.provider not in {"local", "openrouter"}:
@@ -98,13 +134,26 @@ class Settings:
             raise ValueError("Выберите GPU или CPU для локальной модели")
         if self.remote_mode not in {"json", "transcription"}:
             raise ValueError("Неизвестный протокол модели")
-        if not 0.001 <= self.character_delay <= 0.2 or not 0 <= self.newline_delay <= 2 or not 0 <= self.layout_delay <= 2:
+        if (
+            not 0.001 <= self.character_delay <= 0.2
+            or not 0 <= self.newline_delay <= 2
+            or not 0 <= self.layout_delay <= 2
+        ):
             raise ValueError("Некорректная задержка ввода")
         if self.typing_method not in {"unicode", "layout"}:
             raise ValueError("Неизвестный способ ввода")
-        if self.layout_switch not in {"sync", "hotkeys"} or self.hotkey_mode not in {"system", "rawinput"}:
-            raise ValueError("Неизвестный способ переключения раскладки или регистрации горячих клавиш")
-        if parse_hotkey(self.latin_layout_hotkey) == parse_hotkey(self.cyrillic_layout_hotkey):
+        if self.special_characters not in {"hex", "compatible"}:
+            raise ValueError("Неизвестный режим символов вне раскладки")
+        if self.layout_switch not in {"sync", "hotkeys"} or self.hotkey_mode not in {
+            "system",
+            "rawinput",
+        }:
+            raise ValueError(
+                "Неизвестный способ переключения раскладки или регистрации горячих клавиш"
+            )
+        if parse_hotkey(self.latin_layout_hotkey) == parse_hotkey(
+            self.cyrillic_layout_hotkey
+        ):
             raise ValueError("Сочетания раскладок должны различаться")
         if not 0 <= self.spaces_per_tab <= 8 or not 1 <= self.idle_minutes <= 120:
             raise ValueError("Некорректный профиль ввода или время простоя")
@@ -127,10 +176,12 @@ class Credentials:
 
     def read(self):
         import keyring
+
         return keyring.get_password(self.service, "api-key") or ""
 
     def write(self, value):
         import keyring
+
         if value:
             keyring.set_password(self.service, "api-key", value)
         elif self.read():

@@ -132,7 +132,44 @@ fn layout_key(ch: char, layout: HKL) -> Option<(VIRTUAL_KEY, u8)> {
     if found == -1 || vk == 0xFF || state & !0b111 != 0 || state & 0b110 == 0b010 {
         return None;
     }
+    if unsafe { MapVirtualKeyExW(vk as u32, MAPVK_VK_TO_VSC_EX, Some(layout)) } == 0 {
+        return None;
+    }
     Some((VIRTUAL_KEY(vk as u16), state))
+}
+
+/// Alt+keypad-plus, then four hex digits. Fixed physical scan codes ensure
+/// the client cannot reinterpret A..F using its own (possibly Russian) layout.
+/// The caller selects Latin in the remote session before sending this batch.
+fn hex_events(ch: char) -> Result<Vec<INPUT>> {
+    if ch as u32 > 0xFFFF || ch.is_control() {
+        return Err(Error::Operation(format!("Alt+Unicode Hex не поддерживает U+{:04X}", ch as u32)));
+    }
+    let mut events = vec![scan_input(VIRTUAL_KEY(0), 0x38, false)]; // left Alt
+    for scan in std::iter::once(0x4E).chain(format!("{:04X}", ch as u32).bytes().map(|digit| match digit {
+        b'0' => 0x52,
+        b'1' => 0x4F,
+        b'2' => 0x50,
+        b'3' => 0x51,
+        b'4' => 0x4B,
+        b'5' => 0x4C,
+        b'6' => 0x4D,
+        b'7' => 0x47,
+        b'8' => 0x48,
+        b'9' => 0x49,
+        b'A' => 0x1E,
+        b'B' => 0x30,
+        b'C' => 0x2E,
+        b'D' => 0x20,
+        b'E' => 0x12,
+        b'F' => 0x21,
+        _ => unreachable!(),
+    })) {
+        events.push(scan_input(VIRTUAL_KEY(0), scan, false));
+        events.push(scan_input(VIRTUAL_KEY(0), scan, true));
+    }
+    events.push(scan_input(VIRTUAL_KEY(0), 0x38, true));
+    Ok(events)
 }
 
 impl Keyboard for WindowsKeyboard {
@@ -232,7 +269,7 @@ impl Keyboard for WindowsKeyboard {
     fn layout_character(&self, ch: char, layout: isize) -> Result<()> {
         let hkl = HKL(layout as _);
         let Some((vk, mut state)) = layout_key(ch, hkl) else {
-            return self.character(ch);
+            return Err(Error::Operation(format!("Раскладка не поддерживает U+{:04X}", ch as u32)));
         };
         // Caps Lock inverts Shift for letters.
         if ch.is_alphabetic() && unsafe { GetKeyState(VK_CAPITAL.0 as i32) } & 1 != 0 {
@@ -245,13 +282,21 @@ impl Keyboard for WindowsKeyboard {
             .collect();
         let scan = unsafe { MapVirtualKeyExW(vk.0 as u32, MAPVK_VK_TO_VSC_EX, Some(hkl)) };
         if scan == 0 {
-            return self.character(ch);
+            return Err(Error::Operation(format!("Нет физической клавиши для U+{:04X}", ch as u32)));
         }
         let mut events: Vec<INPUT> = modifiers.iter().map(|&m| key(m, false, false)).collect();
         events.push(scan_input(vk, scan, false));
         events.push(scan_input(vk, scan, true));
         events.extend(modifiers.iter().rev().map(|&m| key(m, false, true)));
         send(&events)
+    }
+
+    fn supports_hex_character(&self, ch: char) -> bool {
+        ch as u32 <= 0xFFFF && !ch.is_control()
+    }
+
+    fn hex_character(&self, ch: char) -> Result<()> {
+        send(&hex_events(ch)?)
     }
 
     fn enter(&self) -> Result<()> {
@@ -280,5 +325,36 @@ pub fn show_error(title: &str, message: &str) {
     let (title, message) = (wide(title), wide(message));
     unsafe {
         let _ = MessageBoxW(None, PCWSTR(message.as_ptr()), PCWSTR(title.as_ptr()), MB_OK | MB_ICONERROR);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn hex_uses_only_physical_keys_with_balanced_alt_and_keypad_plus() {
+        for (ch, digits) in
+            [('—', [0x50, 0x52, 0x4F, 0x4B]), ('×', [0x52, 0x52, 0x20, 0x47]), ('–', [0x50, 0x52, 0x4F, 0x51])]
+        {
+            let events = hex_events(ch).unwrap();
+            let keys: Vec<_> = events.iter().map(|e| unsafe { e.Anonymous.ki }).collect();
+            assert_eq!(keys.len(), 12);
+            assert!(keys.iter().all(|k| k.wVk == VIRTUAL_KEY(0)
+                && k.dwFlags.contains(KEYEVENTF_SCANCODE)
+                && !k.dwFlags.contains(KEYEVENTF_UNICODE)
+                && !k.dwFlags.contains(KEYEVENTF_EXTENDEDKEY)));
+            let down: Vec<_> = keys.iter().filter(|k| !k.dwFlags.contains(KEYEVENTF_KEYUP)).map(|k| k.wScan).collect();
+            assert_eq!(down, [vec![0x38, 0x4E], digits.to_vec()].concat());
+            assert_eq!(keys.last().unwrap().wScan, 0x38);
+            assert!(keys.last().unwrap().dwFlags.contains(KEYEVENTF_KEYUP));
+            for pair in keys[1..11].as_chunks::<2>().0 {
+                assert_eq!(pair[0].wScan, pair[1].wScan);
+                assert!(!pair[0].dwFlags.contains(KEYEVENTF_KEYUP));
+                assert!(pair[1].dwFlags.contains(KEYEVENTF_KEYUP));
+            }
+        }
+        assert!(hex_events('🙂').is_err());
+        assert!(hex_events('\0').is_err());
     }
 }
