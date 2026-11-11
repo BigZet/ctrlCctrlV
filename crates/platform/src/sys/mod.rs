@@ -1,6 +1,8 @@
 #[cfg(target_os = "macos")]
 mod macos;
 #[cfg(windows)]
+pub(crate) mod rawinput;
+#[cfg(windows)]
 mod windows;
 
 #[cfg(target_os = "macos")]

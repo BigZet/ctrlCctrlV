@@ -17,6 +17,7 @@ use crate::{Error, Permission, Permissions, Result};
 const RETURN: CGKeyCode = 36;
 const TAB: CGKeyCode = 48;
 const HOME: CGKeyCode = 115;
+const FORWARD_DELETE: CGKeyCode = 117;
 
 pub fn permissions() -> Permissions {
     Permissions { accessibility: unsafe { AXIsProcessTrusted() }, screen_capture: CGPreflightScreenCaptureAccess() }
@@ -165,6 +166,10 @@ impl Keyboard for MacKeyboard {
 
     fn select_indentation(&self) -> Result<()> {
         post(HOME, CGEventFlags::MaskShift, None)
+    }
+
+    fn delete(&self) -> Result<()> {
+        post(FORWARD_DELETE, CGEventFlags(0), None)
     }
 }
 

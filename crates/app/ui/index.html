@@ -134,10 +134,21 @@
       </div>
     </section>
 
+    <section class="page" id="page-setup">
+      <header class="page-head">
+        <h1>Первичная настройка</h1>
+        <span class="spacer"></span>
+        <button id="w-skip" class="ghost">Пропустить</button>
+        <button id="w-done" class="primary">Готово</button>
+      </header>
+      <form id="w-form" class="settings wizard" autocomplete="off"></form>
+    </section>
+
     <section class="page" id="page-settings">
       <header class="page-head">
         <h1>Настройки</h1>
         <span class="spacer"></span>
+        <button id="s-wizard" class="ghost">Мастер настройки</button>
         <button id="s-reset" class="ghost">Отменить изменения</button>
         <button id="s-save" class="primary">Сохранить</button>
       </header>
@@ -151,5 +162,6 @@
   <script src="models.js"></script>
   <script src="history.js"></script>
   <script src="settings.js"></script>
+  <script src="setup.js"></script>
 </body>
 </html>

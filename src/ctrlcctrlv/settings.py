@@ -32,6 +32,14 @@ class Settings:
     spaces_per_tab: int = 0
     idle_minutes: int = 15
     max_tokens: int = 4096
+    # Read by the Rust app: "layout" types with the keys of a keyboard layout (VDI).
+    typing_method: str = "unicode"
+    layout_delay: float = 0.150
+    layout_switch: str = "sync"
+    latin_layout_hotkey: str = "ctrl+shift+1"
+    cyrillic_layout_hotkey: str = "ctrl+shift+2"
+    delete_autoclose: bool = False
+    hotkey_mode: str = "system"
 
     @classmethod
     def load(cls, directory: Path, models=None):
@@ -52,17 +60,18 @@ class Settings:
             return cls()
 
     def validate(self, models=None):
-        for name in ("show_preview", "autoindent"):
+        for name in ("show_preview", "autoindent", "delete_autoclose"):
             if type(getattr(self, name)) is not bool:
                 raise ValueError("Некорректная настройка: " + name)
         for name in ("provider", "review_provider", "capture_format", "acceleration", "local_model", "remote_model", "remote_mode", "review_local_model",
-                     "review_remote_model", "capture_hotkey", "typing_hotkey", "cancel_hotkey"):
+                     "review_remote_model", "capture_hotkey", "typing_hotkey", "cancel_hotkey", "typing_method",
+                     "layout_switch", "latin_layout_hotkey", "cyrillic_layout_hotkey", "hotkey_mode"):
             if not isinstance(getattr(self, name), str):
                 raise ValueError("Некорректная настройка: " + name)
         for name in ("spaces_per_tab", "idle_minutes", "max_tokens"):
             if type(getattr(self, name)) is not int:
                 raise ValueError("Некорректная настройка: " + name)
-        for name in ("character_delay", "newline_delay"):
+        for name in ("character_delay", "newline_delay", "layout_delay"):
             if type(getattr(self, name)) not in (int, float):
                 raise ValueError("Некорректная настройка: " + name)
         from .catalog import MODELS
@@ -89,8 +98,14 @@ class Settings:
             raise ValueError("Выберите GPU или CPU для локальной модели")
         if self.remote_mode not in {"json", "transcription"}:
             raise ValueError("Неизвестный протокол модели")
-        if not 0.001 <= self.character_delay <= 0.2 or not 0 <= self.newline_delay <= 2:
+        if not 0.001 <= self.character_delay <= 0.2 or not 0 <= self.newline_delay <= 2 or not 0 <= self.layout_delay <= 2:
             raise ValueError("Некорректная задержка ввода")
+        if self.typing_method not in {"unicode", "layout"}:
+            raise ValueError("Неизвестный способ ввода")
+        if self.layout_switch not in {"sync", "hotkeys"} or self.hotkey_mode not in {"system", "rawinput"}:
+            raise ValueError("Неизвестный способ переключения раскладки или регистрации горячих клавиш")
+        if parse_hotkey(self.latin_layout_hotkey) == parse_hotkey(self.cyrillic_layout_hotkey):
+            raise ValueError("Сочетания раскладок должны различаться")
         if not 0 <= self.spaces_per_tab <= 8 or not 1 <= self.idle_minutes <= 120:
             raise ValueError("Некорректный профиль ввода или время простоя")
         if not 128 <= self.max_tokens <= 8192:

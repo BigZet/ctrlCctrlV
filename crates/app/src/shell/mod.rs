@@ -269,6 +269,8 @@ struct Snapshot {
     status: Status,
     session: Option<SessionView>,
     hotkeys: [String; 3],
+    /// False until the first-run setup was completed or skipped.
+    setup_done: bool,
 }
 
 #[tauri::command]
@@ -280,6 +282,7 @@ fn snapshot(app: AppHandle) -> Snapshot {
         status: lock(&shell.status).clone(),
         session,
         hotkeys: [s.capture_hotkey.clone(), s.typing_hotkey.clone(), s.cancel_hotkey.clone()],
+        setup_done: lock(&shell.ui).setup_done(),
     }
 }
 
@@ -374,6 +377,7 @@ pub fn run() {
             preferences::settings_save,
             preferences::review_models_set,
             preferences::api_key_save,
+            preferences::setup_done,
         ])
         .setup(|app| {
             #[cfg(target_os = "macos")]
@@ -385,6 +389,10 @@ pub fn run() {
             if let Err(message) = hotkeys::install(&handle, &settings) {
                 report(&handle, Status::error(Phase::Idle, message));
                 show_main(&handle, false);
+            }
+            // The first launch opens the setup wizard instead of hiding in the tray.
+            if !lock(&handle.state::<Shell>().ui).setup_done() {
+                show_main(&handle, true);
             }
             Ok(())
         })
