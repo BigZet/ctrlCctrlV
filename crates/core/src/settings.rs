@@ -45,6 +45,9 @@ pub struct Settings {
     pub max_tokens: i64,
     /// `unicode`, or `layout` to type with the keys of a keyboard layout (VDI and remote desktops).
     pub typing_method: String,
+    /// `hex`: exact BMP characters via Alt+hex; `compatible`: explicit text substitutions.
+    #[serde(default = "default_special_characters")]
+    pub special_characters: String,
     /// Seconds to wait after switching the keyboard layout.
     pub layout_delay: f64,
     /// `sync`: ask the window to switch its layout; `hotkeys`: press the
@@ -91,6 +94,7 @@ impl Default for Settings {
             idle_minutes: 15,
             max_tokens: 4096,
             typing_method: "unicode".into(),
+            special_characters: default_special_characters(),
             layout_delay: 0.150,
             layout_switch: "sync".into(),
             latin_layout_hotkey: "ctrl+shift+1".into(),
@@ -155,6 +159,7 @@ impl Settings {
             "typing_hotkey" => self.typing_hotkey = text(value)?,
             "cancel_hotkey" => self.cancel_hotkey = text(value)?,
             "typing_method" => self.typing_method = text(value)?,
+            "special_characters" => self.special_characters = text(value)?,
             "layout_switch" => self.layout_switch = text(value)?,
             "latin_layout_hotkey" => self.latin_layout_hotkey = text(value)?,
             "cyrillic_layout_hotkey" => self.cyrillic_layout_hotkey = text(value)?,
@@ -219,6 +224,9 @@ impl Settings {
         if !matches!(self.typing_method.as_str(), "unicode" | "layout") {
             return fail("Неизвестный способ ввода");
         }
+        if !matches!(self.special_characters.as_str(), "hex" | "compatible") {
+            return fail("Неизвестный режим символов вне раскладки");
+        }
         if !matches!(self.layout_switch.as_str(), "sync" | "hotkeys") {
             return fail("Неизвестный способ переключения раскладки");
         }
@@ -263,4 +271,8 @@ impl Settings {
     pub fn remote_mode(&self) -> PromptMode {
         if self.remote_mode == "transcription" { PromptMode::Transcription } else { PromptMode::Json }
     }
+}
+
+fn default_special_characters() -> String {
+    "hex".into()
 }

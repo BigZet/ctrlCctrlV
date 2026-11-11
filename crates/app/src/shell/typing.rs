@@ -110,7 +110,9 @@ fn launch(app: &AppHandle, trigger: Trigger) {
     if !shell.begin(Activity::Typing(control.clone())) {
         return busy(app);
     }
+    let settings = typing_settings(&shell.settings());
     let started = lock(&shell.typing).as_mut().map(|job| {
+        job.refresh_unstarted_settings(settings);
         job.state = if delay.is_some() { TypingState::Countdown } else { TypingState::Typing };
         (job.chars.clone(), job.position, job.settings)
     });

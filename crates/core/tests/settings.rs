@@ -90,12 +90,38 @@ fn invalid_field_types_and_values_fall_back_to_defaults() {
         ("review_local_model", "\"lightonocr-3-0.8b\""),
         ("max_tokens", "100000"),
         ("idle_minutes", "0"),
+        ("special_characters", "true"),
+        ("special_characters", "\"unknown\""),
     ];
     for (name, value) in cases {
         let directory = tempfile::tempdir().unwrap();
         std::fs::write(directory.path().join("settings.json"), format!("{{\"{name}\": {value}}}")).unwrap();
         assert_eq!(Settings::load(directory.path(), &models()), Settings::default(), "{name}={value}");
     }
+}
+
+#[test]
+fn vdi_special_character_modes_roundtrip_and_old_profiles_keep_their_values() {
+    let directory = tempfile::tempdir().unwrap();
+    std::fs::write(
+        directory.path().join("settings.json"),
+        r#"{"typing_method":"layout","layout_switch":"hotkeys","character_delay":0.02}"#,
+    )
+    .unwrap();
+    let old = Settings::load(directory.path(), &models());
+    assert_eq!(old.special_characters, "hex");
+    assert_eq!(old.typing_method, "layout");
+    assert_eq!(old.layout_switch, "hotkeys");
+    assert_eq!(old.character_delay, 0.02);
+    for mode in ["hex", "compatible"] {
+        let settings = Settings { special_characters: mode.into(), ..old.clone() };
+        settings.save(directory.path(), &models()).unwrap();
+        assert_eq!(Settings::load(directory.path(), &models()), settings);
+    }
+    // The IPC payload from an older UI may lack this newly added field too.
+    let mut value = serde_json::to_value(&old).unwrap();
+    value.as_object_mut().unwrap().remove("special_characters");
+    assert_eq!(serde_json::from_value::<Settings>(value).unwrap(), old);
 }
 
 #[test]

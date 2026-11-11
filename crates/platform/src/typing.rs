@@ -49,6 +49,16 @@ pub enum TypingMethod {
     Layout,
 }
 
+/// Handling of characters that cannot be typed by an installed layout.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SpecialCharacters {
+    /// Windows Alt + keypad plus + hex digits (requires EnableHexNumpad in the session).
+    #[default]
+    Hex,
+    /// Explicit, lossy substitutions in `prepare`; never fall back to Unicode events.
+    Compatible,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TypingSettings {
     pub character_delay: Duration,
@@ -59,6 +69,7 @@ pub struct TypingSettings {
     /// Type this many spaces for a tab; 0 sends the Tab key.
     pub spaces_per_tab: u8,
     pub method: TypingMethod,
+    pub special_characters: SpecialCharacters,
     pub layout_switch: LayoutSwitch,
     /// Pause after switching the layout, so a remote session can follow it.
     pub layout_delay: Duration,
@@ -75,6 +86,7 @@ impl Default for TypingSettings {
             autoindent: false,
             spaces_per_tab: 0,
             method: TypingMethod::Unicode,
+            special_characters: SpecialCharacters::Hex,
             layout_switch: LayoutSwitch::Sync,
             layout_delay: Duration::from_millis(150),
             delete_autoclose: false,
@@ -125,7 +137,14 @@ pub trait Keyboard {
     }
     /// Press the keys that type `ch` in `layout`.
     fn layout_character(&self, ch: char, _layout: isize) -> Result<()> {
-        self.character(ch)
+        Err(unsupported_character(ch))
+    }
+    fn supports_hex_character(&self, _ch: char) -> bool {
+        false
+    }
+    /// Physical Alt+numpad sequence, not a Unicode packet. Latin layout is selected first.
+    fn hex_character(&self, ch: char) -> Result<()> {
+        Err(unsupported_character(ch))
     }
     fn enter(&self) -> Result<()>;
     fn tab(&self) -> Result<()>;
@@ -168,12 +187,37 @@ impl CancelToken {
 /// `spaces_per_tab` is set, tabs expanded so every typed space has its own
 /// position to resume from.
 pub fn prepare(text: &str, settings: &TypingSettings) -> Vec<char> {
-    let text = text.replace("\r\n", "\n").replace('\r', "\n");
+    let mut text = text.replace("\r\n", "\n").replace('\r', "\n");
+    if settings.method == TypingMethod::Layout && settings.special_characters == SpecialCharacters::Compatible {
+        text = text.chars().map(|ch| compatible_character(ch).map_or_else(|| ch.to_string(), str::to_owned)).collect();
+    }
     if settings.spaces_per_tab == 0 {
         return text.chars().collect();
     }
     let tab = " ".repeat(settings.spaces_per_tab as usize);
     text.replace('\t', &tab).chars().collect()
+}
+
+fn compatible_character(ch: char) -> Option<&'static str> {
+    Some(match ch {
+        '—' | '–' | '−' | '‑' | '‐' => "-",
+        '×' => "x",
+        '÷' => "/",
+        '«' | '»' | '“' | '”' | '„' => "\"",
+        '‘' | '’' | '‚' => "'",
+        '…' => "...",
+        '\u{00A0}' | '\u{202F}' | '\u{2007}' | '\u{2009}' => " ",
+        '•' => "*",
+        '№' => "No",
+        _ => return None,
+    })
+}
+
+fn unsupported_character(ch: char) -> Error {
+    Error::Operation(format!(
+        "Символ U+{:04X} нельзя ввести выбранным способом VDI. Выберите другой режим символов вне раскладки или измените текст.",
+        ch as u32
+    ))
 }
 
 /// Type `chars[start..]` into the focused window. Returns the position reached
@@ -324,17 +368,25 @@ fn run<K: Keyboard>(
         // With shortcuts the remote layout is unknown until the first switch.
         state.original = keyboard.layout();
         state.current = if settings.layout_switch == LayoutSwitch::Sync { state.original } else { None };
+        // Validate the remaining text before sending even the first key. Cache
+        // unique characters so large documents do not repeat native layout queries.
+        let mut seen = std::collections::HashSet::new();
+        for &ch in &chars[state.position..] {
+            check()?;
+            if matches!(ch, '\n' | '\t') || !seen.insert(ch) {
+                continue;
+            }
+            if keyboard.layout_with(ch, state.original.unwrap_or_default()).is_none()
+                && (settings.special_characters != SpecialCharacters::Hex
+                    || !keyboard.supports_hex_character(ch)
+                    || keyboard.layout_with('a', state.original.unwrap_or_default()).is_none())
+            {
+                return Err(unsupported_character(ch));
+            }
+        }
     }
 
-    let character = |ch: char, state: &mut RunState<K::Target>| -> Result<()> {
-        if settings.method != TypingMethod::Layout {
-            return keyboard.character(ch);
-        }
-        let preferred = state.current.or(state.original).unwrap_or_default();
-        let Some(layout) = keyboard.layout_with(ch, preferred) else {
-            // No installed layout has it (an emoji): only Unicode input can type it.
-            return keyboard.character(ch);
-        };
+    let select_layout = |layout: isize, state: &mut RunState<K::Target>| -> Result<()> {
         if state.current != Some(layout) {
             match settings.layout_switch {
                 LayoutSwitch::Sync => {
@@ -361,7 +413,25 @@ fn run<K: Keyboard>(
             cancel.wait(settings.layout_delay);
             check()?;
         }
-        keyboard.layout_character(ch, layout)
+        Ok(())
+    };
+    let character = |ch: char, state: &mut RunState<K::Target>| -> Result<()> {
+        if settings.method != TypingMethod::Layout {
+            return keyboard.character(ch);
+        }
+        let preferred = state.current.or(state.original).unwrap_or_default();
+        if let Some(layout) = keyboard.layout_with(ch, preferred) {
+            select_layout(layout, state)?;
+            return keyboard.layout_character(ch, layout);
+        }
+        if settings.special_characters == SpecialCharacters::Hex && keyboard.supports_hex_character(ch) {
+            // A..F must reach the remote session as Latin letters, even when
+            // the previous word was Russian and the local client stayed Russian.
+            let latin = keyboard.layout_with('a', preferred).ok_or_else(|| unsupported_character(ch))?;
+            select_layout(latin, state)?;
+            return keyboard.hex_character(ch);
+        }
+        Err(unsupported_character(ch))
     };
 
     let mut autoclose = AutoClose::default();
@@ -424,6 +494,7 @@ mod tests {
         Key(char, isize),
         Shortcut(Shortcut),
         Delete,
+        Hex(char),
     }
 
     const LATIN: isize = 1;
@@ -518,6 +589,13 @@ mod tests {
             self.events.borrow_mut().push(Event::Delete);
             Ok(())
         }
+        fn supports_hex_character(&self, ch: char) -> bool {
+            ch as u32 <= 0xFFFF && !ch.is_control()
+        }
+        fn hex_character(&self, ch: char) -> Result<()> {
+            self.events.borrow_mut().push(Event::Hex(ch));
+            Ok(())
+        }
         fn enter(&self) -> Result<()> {
             self.events.borrow_mut().push(Event::Enter);
             Ok(())
@@ -564,7 +642,7 @@ mod tests {
     fn layout_keys_switch_layouts_and_restore_the_original() {
         let fake = Fake::new();
         let settings = TypingSettings { method: TypingMethod::Layout, layout_delay: Duration::ZERO, ..fast() };
-        type_text(&fake, "Да, ok 1🙂", &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
+        type_text(&fake, "Да, ok 1—", &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
         use Event::*;
         let events = [
             Switch(CYRILLIC),
@@ -577,7 +655,7 @@ mod tests {
             Key('k', LATIN),
             Key(' ', LATIN),
             Key('1', LATIN),
-            Text('🙂'),
+            Hex('—'),
         ];
         assert_eq!(fake.events(), events);
         assert_eq!(fake.layout.get(), LATIN);
@@ -651,6 +729,122 @@ mod tests {
         let fake = Fake::new();
         type_text(&fake, "Жa", &fast(), &CancelToken::new(), |_, _| {}, None).unwrap();
         assert_eq!(fake.events(), [Event::Text('Ж'), Event::Text('a')]);
+    }
+
+    fn remote_settings() -> TypingSettings {
+        TypingSettings {
+            method: TypingMethod::Layout,
+            layout_switch: LayoutSwitch::Hotkeys {
+                latin: crate::hotkey::parse_shortcut("ctrl+shift+1").unwrap(),
+                cyrillic: crate::hotkey::parse_shortcut("ctrl+shift+2").unwrap(),
+            },
+            layout_delay: Duration::ZERO,
+            character_delay: Duration::ZERO,
+            ..fast()
+        }
+    }
+
+    fn output(events: &[Event]) -> String {
+        events
+            .iter()
+            .filter_map(|event| match event {
+                Event::Key(ch, _) | Event::Text(ch) | Event::Hex(ch) => Some(*ch),
+                Event::Enter => Some('\n'),
+                Event::Tab => Some('\t'),
+                _ => None,
+            })
+            .collect()
+    }
+
+    #[test]
+    fn exact_remote_symbols_switch_to_latin_and_never_send_unicode_packets() {
+        let fake = Fake::new();
+        let settings = remote_settings();
+        type_text(&fake, "Здесь — 6×V100; с. 289–294.", &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
+        let events = fake.events();
+        assert_eq!(output(&events), "Здесь — 6×V100; с. 289–294.");
+        assert!(!events.iter().any(|e| matches!(e, Event::Text(_))));
+        for ch in ['—', '×', '–'] {
+            assert!(events.contains(&Event::Hex(ch)));
+        }
+        let emdash = events.iter().position(|e| *e == Event::Hex('—')).unwrap();
+        let LayoutSwitch::Hotkeys { latin, .. } = settings.layout_switch else { unreachable!() };
+        assert_eq!(events[emdash - 1], Event::Shortcut(latin));
+    }
+
+    #[test]
+    fn full_report_fixture_in_both_character_and_layout_switch_modes() {
+        let text = include_str!("../tests/fixtures/vdi-report.txt").replace("\r\n", "\n");
+        for special_characters in [SpecialCharacters::Hex, SpecialCharacters::Compatible] {
+            let expected = if special_characters == SpecialCharacters::Hex {
+                text.clone()
+            } else {
+                text.replace(['—', '–'], "-").replace('×', "x")
+            };
+            for layout_switch in [remote_settings().layout_switch, LayoutSwitch::Sync] {
+                let fake = Fake::new();
+                let settings = TypingSettings { layout_switch, special_characters, ..remote_settings() };
+                type_text(&fake, &text, &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
+                assert_eq!(output(&fake.events()), expected);
+                assert!(!fake.events().iter().any(|e| matches!(e, Event::Text(_))));
+                if special_characters == SpecialCharacters::Compatible {
+                    assert!(!fake.events().iter().any(|e| matches!(e, Event::Hex(_))));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn compatible_mode_changes_only_layout_typing_and_expands_positions() {
+        let settings = TypingSettings { special_characters: SpecialCharacters::Compatible, ..remote_settings() };
+        let text = "Здесь — «6×V100»; 289–294…\u{00A0}№1";
+        let chars = prepare(text, &settings);
+        assert_eq!(chars.iter().collect::<String>(), "Здесь - \"6xV100\"; 289-294... No1");
+        let fake = Fake::new();
+        let (position, result) = type_chars(&fake, &chars, 0, &settings, &CancelToken::new(), |_, _| {}, None);
+        result.unwrap();
+        assert_eq!(position, chars.len());
+        assert_eq!(output(&fake.events()), chars.iter().collect::<String>());
+        assert!(!fake.events().iter().any(|e| matches!(e, Event::Text(_) | Event::Hex(_))));
+        let unicode = TypingSettings { method: TypingMethod::Unicode, ..settings };
+        assert_eq!(prepare(text, &unicode).iter().collect::<String>(), text);
+    }
+
+    #[test]
+    fn unsupported_symbols_fail_before_any_input_instead_of_corrupting_text() {
+        for (mode, text) in [(SpecialCharacters::Hex, "Текст 🙂"), (SpecialCharacters::Compatible, "Текст Ω")]
+        {
+            let fake = Fake::new();
+            let settings = TypingSettings { special_characters: mode, ..remote_settings() };
+            let err = type_text(&fake, text, &settings, &CancelToken::new(), |_, _| {}, None).unwrap_err();
+            assert!(matches!(err, Error::Operation(ref m) if m.contains("U+")));
+            assert!(fake.events().is_empty());
+        }
+    }
+
+    #[test]
+    fn compatible_expansion_resumes_at_the_next_actual_character() {
+        let fake = Fake::new();
+        let settings = TypingSettings { special_characters: SpecialCharacters::Compatible, ..remote_settings() };
+        let chars = prepare("а…б", &settings);
+        let cancel = CancelToken::new();
+        let (position, result) = type_chars(
+            &fake,
+            &chars,
+            0,
+            &settings,
+            &cancel,
+            |done, _| {
+                if done == 2 {
+                    cancel.cancel();
+                }
+            },
+            None,
+        );
+        assert!(result.is_err());
+        assert_eq!(position, 2);
+        type_chars(&fake, &chars, position, &settings, &CancelToken::new(), |_, _| {}, None).1.unwrap();
+        assert_eq!(output(&fake.events()), "а...б");
     }
 
     #[test]
