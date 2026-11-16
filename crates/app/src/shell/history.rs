@@ -2,7 +2,12 @@
 //! delete with undo, and opening an entry with all its model runs.
 use ctrlcctrlv_core::history::{EntryRef, MAX_VISIBLE};
 use serde::Serialize;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter, Manager};
+
+static NEXT_DELETION: AtomicU64 = AtomicU64::new(1);
+const UNDO_LIFETIME: Duration = Duration::from_secs(30);
 
 use super::{Capture, Shell, lock};
 use crate::model::{RunKind, RunState, RunView, SessionView, events};
@@ -76,6 +81,8 @@ pub fn history_open(app: AppHandle, id: i64, created: String) -> Result<(), Stri
             base: None,
             error: None,
             elapsed_ms: run.elapsed_ms.unwrap_or(0).max(0) as u64,
+            format: "text".into(),
+            warning: None,
         })
         .collect();
     let rounds = runs.len() as u32;
@@ -94,6 +101,8 @@ pub fn history_open(app: AppHandle, id: i64, created: String) -> Result<(), Stri
             base: None,
             error: None,
             elapsed_ms: 0,
+            format: "text".into(),
+            warning: None,
         });
     }
     let session = Capture {
@@ -124,13 +133,13 @@ pub fn history_pin(app: AppHandle, id: i64, created: String, pinned: bool) -> Re
 }
 
 #[tauri::command]
-pub fn history_delete(app: AppHandle, id: i64, created: String) -> Result<(), String> {
+pub fn history_delete(app: AppHandle, id: i64, created: String) -> Result<u64, String> {
     let shell = app.state::<Shell>();
     let history = history(&shell)?;
-    let Some(entry) = history.delete(id, Some(&created)).map_err(|e| e.to_string())? else {
+    let Some(deleted) = history.delete_with_runs(id, Some(&created)).map_err(|e| e.to_string())? else {
         return Err("Запись уже удалена".into());
     };
-    let reference = entry.reference();
+    let reference = deleted.entry.reference();
     let mut ui = lock(&shell.ui);
     let mut pins = ui.history_pins();
     let pinned = pins.contains(&reference);
@@ -138,23 +147,43 @@ pub fn history_delete(app: AppHandle, id: i64, created: String) -> Result<(), St
         pins.retain(|pin| *pin != reference);
         let _ = ui.set_history_pins(&pins);
     }
-    *lock(&shell.deleted) = Some((entry, pinned));
-    Ok(())
+    let token = NEXT_DELETION.fetch_add(1, Ordering::Relaxed);
+    *lock(&shell.deleted) = Some((deleted, pinned, Instant::now(), token));
+    drop(ui);
+    tauri::async_runtime::spawn(async move {
+        tokio::time::sleep(UNDO_LIFETIME).await;
+        let shell = app.state::<Shell>();
+        let mut pending = lock(&shell.deleted);
+        if pending.as_ref().is_some_and(|(_, _, _, id)| *id == token) {
+            *pending = None;
+        }
+    });
+    Ok(token)
 }
 
 #[tauri::command]
-pub fn history_undo(app: AppHandle) -> Result<(), String> {
+pub fn history_undo(app: AppHandle, deletion: u64) -> Result<(), String> {
     let shell = app.state::<Shell>();
     let history = history(&shell)?;
-    let Some((entry, pinned)) = lock(&shell.deleted).take() else {
+    let mut pending = lock(&shell.deleted);
+    if pending.as_ref().is_some_and(|(_, _, at, _)| at.elapsed() >= UNDO_LIFETIME) {
+        *pending = None;
+    }
+    let Some((deleted, pinned, _, token)) = pending.as_ref() else {
         return Err("Нечего восстанавливать".into());
     };
-    let restored = history.restore(&entry).map_err(|e| e.to_string())?;
+    if *token != deletion {
+        return Err("Это удаление уже недоступно для отмены".into());
+    }
+    let pinned = *pinned;
+    let restored = history.restore_with_runs(deleted).map_err(|e| e.to_string())?;
+    *pending = None;
+    drop(pending);
     if pinned {
         let mut ui = lock(&shell.ui);
         let mut pins = ui.history_pins();
         pins.insert(0, restored.reference());
-        let _ = ui.set_history_pins(&pins);
+        ui.set_history_pins(&pins).map_err(|_| "Запись восстановлена, но закрепление не сохранено".to_string())?;
     }
     Ok(())
 }

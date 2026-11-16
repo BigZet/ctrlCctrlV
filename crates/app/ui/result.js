@@ -168,7 +168,7 @@ const Result = {
     const group = this.roundNode(run.round);
     const kind = { review: "проверка", append: "добавленная область" }[run.kind] || "распознавание";
     const where = run.provider === "local" ? "Локально" : run.provider === "openrouter" ? "Облако" : "История";
-    const details = [kind, run.elapsedMs ? formatSeconds(run.elapsedMs) : null].filter(Boolean).join(" · ");
+    const details = [kind, run.elapsedMs ? `запрос модели ${formatSeconds(run.elapsedMs)}` : null].filter(Boolean).join(" · ");
     const card = el("article", { class: `run ${run.state}`, "data-run": run.id },
       el("header", {},
         el("span", { class: "dot" }),
@@ -178,6 +178,7 @@ const Result = {
         el("span", { class: "muted small" }, details)));
     const body = el("div", { class: "body" });
     card.append(body);
+    if (run.warning) body.append(el("div", { class: "muted small" }, run.warning));
     if (run.state === "waiting") body.append(el("span", { class: "muted" }, "Ждёт своей очереди"));
     else if (run.state === "running") body.append(el("pre", { class: "stream" }, run.text));
     else if (run.state === "failed") body.append(el("div", { class: "error" }, run.error || "Ошибка"));

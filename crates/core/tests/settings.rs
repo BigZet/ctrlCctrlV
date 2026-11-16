@@ -38,6 +38,27 @@ fn broken_configuration_recovers_defaults() {
 }
 
 #[test]
+fn invalid_file_is_never_silently_overwritten_and_recovery_keeps_exact_bytes() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("settings.json");
+    let original = b"{broken user profile";
+    std::fs::write(&path, original).unwrap();
+    let settings = Settings::load(directory.path(), &models());
+    assert!(Settings::needs_recovery(directory.path(), &models()));
+    assert!(settings.save(directory.path(), &models()).is_err());
+    assert_eq!(std::fs::read(&path).unwrap(), original);
+    settings.save_recovering(directory.path(), &models()).unwrap();
+    assert!(!Settings::needs_recovery(directory.path(), &models()));
+    let backups: Vec<_> = std::fs::read_dir(directory.path())
+        .unwrap()
+        .flatten()
+        .filter(|f| f.file_name().to_string_lossy().starts_with("settings-recovery-"))
+        .collect();
+    assert_eq!(backups.len(), 1);
+    assert_eq!(std::fs::read(backups[0].path()).unwrap(), original);
+}
+
+#[test]
 fn older_settings_enable_preview_and_inherit_review_provider() {
     let directory = tempfile::tempdir().unwrap();
     std::fs::write(directory.path().join("settings.json"), r#"{"provider":"openrouter"}"#).unwrap();

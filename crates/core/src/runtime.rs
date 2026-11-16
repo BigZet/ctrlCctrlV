@@ -363,12 +363,15 @@ impl LocalRuntime {
             return Err(Error::cancelled());
         }
         let process = command.spawn().map_err(|_| spawn_error())?;
+        self.process = Some(process);
         #[cfg(windows)]
         {
-            // The engine dies with the app, even if the app crashes.
-            self.job = job::Job::kill_on_close().and_then(|job| job.assign(&process).map(|_| job)).ok();
+            // Keep ownership before attaching: any error is handled by start's
+            // stop path, never silently run an unprotected engine.
+            let job = job::Job::kill_on_close().map_err(|_| spawn_error())?;
+            job.assign(self.process.as_ref().unwrap()).map_err(|_| spawn_error())?;
+            self.job = Some(job);
         }
-        self.process = Some(process);
         progress("Загрузка модели в память…", 0, 1);
         let endpoint = format!("http://127.0.0.1:{port}");
         self.wait_healthy(&endpoint, &key, cancel).await?;

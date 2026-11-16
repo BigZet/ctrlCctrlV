@@ -14,7 +14,9 @@ def fake_installed(monkeypatch):
     monkeypatch.setattr(LocalRuntime, "installed", lambda self, model: True)
     # Python cannot import the fake GGUF path passed as -m, so this portable
     # owned child exits nonzero without loading a model or user source code.
-    monkeypatch.setattr(LocalRuntime, "binary", property(lambda self: Path(sys.executable)))
+    monkeypatch.setattr(
+        LocalRuntime, "binary", property(lambda self: Path(sys.executable))
+    )
     monkeypatch.setattr(LocalRuntime, "preflight", lambda *args: None)
 
 
@@ -35,17 +37,34 @@ def test_spawn_failure_removes_key_and_restricts_its_permissions(tmp_path, monke
     key.parent.mkdir()
     key.write_text("old")
     key.chmod(0o644)
+
     def failed_spawn(*args, **kwargs):
         if os.name != "nt":
             assert key.stat().st_mode & 0o777 == 0o600
         assert key.read_text() != "old"
         raise OSError("Cannot spawn")
+
     monkeypatch.setattr(subprocess, "Popen", failed_spawn)
     runtime = LocalRuntime(tmp_path)
     with pytest.raises(OperationError, match="Не удалось запустить"):
         runtime.start("lightonocr-3-0.8b", threading.Event(), lambda *args: None)
     assert not key.exists()
     assert runtime.process is None
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows job attachment")
+def test_job_attachment_failure_stops_owned_child(tmp_path, monkeypatch):
+    fake_installed(monkeypatch)
+    monkeypatch.setattr(
+        "ctrlcctrlv.process_job.ProcessJob.attach",
+        lambda *args: (_ for _ in ()).throw(PermissionError("job unavailable")),
+    )
+    runtime = LocalRuntime(tmp_path)
+    with pytest.raises(OperationError):
+        runtime.start("lightonocr-3-0.8b", threading.Event(), lambda *args: None)
+    assert runtime.process is None
+    assert runtime._job is None
+    assert not (tmp_path / "runtime/session-key").exists()
 
 
 def test_pre_cancelled_start_preserves_existing_model(tmp_path):
@@ -63,11 +82,17 @@ def test_pre_cancelled_start_preserves_existing_model(tmp_path):
 def test_cancel_between_key_creation_and_spawn_leaves_no_key(tmp_path, monkeypatch):
     fake_installed(monkeypatch)
     cancel = threading.Event()
+
     def key_created(*args):
         cancel.set()
         return "test-key"
+
     monkeypatch.setattr("ctrlcctrlv.runtime.secrets.token_urlsafe", key_created)
-    monkeypatch.setattr(subprocess, "Popen", lambda *args, **kwargs: pytest.fail("Cancelled preparation must not spawn"))
+    monkeypatch.setattr(
+        subprocess,
+        "Popen",
+        lambda *args, **kwargs: pytest.fail("Cancelled preparation must not spawn"),
+    )
     runtime = LocalRuntime(tmp_path)
     with pytest.raises(Cancelled):
         runtime.start("lightonocr-3-0.8b", cancel, lambda *args: None)
@@ -123,8 +148,10 @@ def test_locked_model_files_are_reported_instead_of_fake_success(tmp_path, monke
     runtime = LocalRuntime(tmp_path)
     directory = tmp_path / "models/lightonocr-3-0.8b"
     directory.mkdir(parents=True)
+
     def locked(*args, **kwargs):
         raise PermissionError("mapped file")
+
     monkeypatch.setattr("ctrlcctrlv.runtime.shutil.rmtree", locked)
     with pytest.raises(OperationError, match="Не удалось удалить"):
         runtime.delete("lightonocr-3-0.8b")

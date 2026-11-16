@@ -21,6 +21,7 @@ const SettingsPage = {
     const view = await call("settings_get");
     if (!view) return;
     this.settings = view.settings;
+    this.needsRecovery = view.needsRecovery;
     this.render();
   },
 
@@ -146,7 +147,9 @@ const SettingsPage = {
   async save() {
     const settings = this.collect();
     try {
-      await invoke("settings_save", { settings });
+      if (this.needsRecovery && !window.confirm("Настройки повреждены. Сохранить исходный файл отдельно и записать показанные настройки?")) return;
+      await invoke("settings_save", { settings, recover: Boolean(this.needsRecovery) });
+      this.needsRecovery = false;
       this.settings = settings;
       toast("Настройки сохранены");
     } catch (error) {

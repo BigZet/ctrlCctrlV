@@ -88,11 +88,13 @@ const History = {
   },
 
   async remove(args) {
-    if ((await call("history_delete", args)) === undefined) return;
+    const deletion = await call("history_delete", args);
+    if (deletion === undefined) return;
     this.selected = null;
     this.load();
-    toast("Запись удалена", { action: "Вернуть", onAction: async () => {
-      if ((await call("history_undo")) !== undefined) this.load();
+    toast("Запись и ответы удалены", { action: "Вернуть", timeout: 30000, onAction: async () => {
+      await call("history_undo", { deletion });
+      this.load();
     } });
   },
 };

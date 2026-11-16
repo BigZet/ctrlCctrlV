@@ -39,6 +39,27 @@ pub enum Phase {
     Selecting,
     Recognizing,
     Typing,
+    Maintenance,
+}
+
+/// Monotonic, testable idle policy. Runtime ownership is enforced by the shell.
+pub struct IdlePolicy {
+    last_active: Instant,
+}
+
+impl Default for IdlePolicy {
+    fn default() -> Self {
+        Self { last_active: Instant::now() }
+    }
+}
+
+impl IdlePolicy {
+    pub fn touch(&mut self, now: Instant) {
+        self.last_active = now;
+    }
+    pub fn expired(&self, now: Instant, minutes: i64) -> bool {
+        now.saturating_duration_since(self.last_active) >= Duration::from_secs(minutes.clamp(1, 120) as u64 * 60)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -112,6 +133,9 @@ pub struct RunView {
     pub base: Option<String>,
     pub error: Option<String>,
     pub elapsed_ms: u64,
+    /// Frozen capture format; elapsed_ms continues to mean inference time.
+    pub format: String,
+    pub warning: Option<String>,
 }
 
 /// The capture shown in the result window.
@@ -199,7 +223,7 @@ pub enum RunEnd {
 /// Text being typed, with the position to continue from. It survives a pause
 /// so the rest can be typed later, into the same window or another one.
 #[derive(Debug, Clone)]
-pub struct TypingJob {
+pub struct TypingJob<T = ()> {
     pub id: u64,
     /// The clipboard text as copied; pressing the typing shortcut again with
     /// the same clipboard continues the job instead of starting over.
@@ -208,6 +232,7 @@ pub struct TypingJob {
     /// Kept from the start, so the characters and their positions stay valid.
     pub settings: TypingSettings,
     pub position: usize,
+    pub cursor: ctrlcctrlv_platform::typing::TypingCursor<T>,
     pub state: TypingState,
     pub message: String,
     pub error: bool,
@@ -216,7 +241,7 @@ pub struct TypingJob {
     pub paused_by_key: Option<Instant>,
 }
 
-impl TypingJob {
+impl<T> TypingJob<T> {
     pub fn new(id: u64, text: String, settings: TypingSettings) -> Self {
         let chars = Arc::new(prepare(&text, &settings));
         Self {
@@ -225,6 +250,7 @@ impl TypingJob {
             chars,
             settings,
             position: 0,
+            cursor: Default::default(),
             state: TypingState::Countdown,
             message: String::new(),
             error: false,
@@ -254,7 +280,7 @@ impl TypingJob {
         (self.state, self.message, self.error) = match end {
             RunEnd::Completed => (TypingState::Done, "Печать завершена".into(), false),
             RunEnd::Stopped => (TypingState::Stopped, "Печать остановлена".into(), false),
-            RunEnd::Interrupted { .. } if self.position >= self.chars.len() => {
+            RunEnd::Interrupted { .. } if self.position >= self.chars.len() && !self.cursor.has_pending_action() => {
                 (TypingState::Done, "Печать завершена".into(), false)
             }
             RunEnd::Interrupted { message, error } => (TypingState::Paused, message, error),
@@ -364,6 +390,18 @@ mod tests {
     use super::*;
 
     #[test]
+    fn idle_deadline_respects_activity_and_changed_settings() {
+        let now = Instant::now();
+        let mut idle = IdlePolicy::default();
+        idle.touch(now);
+        assert!(!idle.expired(now + Duration::from_secs(59), 1));
+        assert!(idle.expired(now + Duration::from_secs(60), 1));
+        assert!(!idle.expired(now + Duration::from_secs(60), 2));
+        idle.touch(now + Duration::from_secs(60));
+        assert!(!idle.expired(now + Duration::from_secs(61), 1));
+    }
+
+    #[test]
     fn maps_monitors_by_origin() {
         let monitors = [(7, 0, 0), (9, 1728, -200)];
         // macOS: a Retina monitor at 3456x0 physical pixels is at 1728 points.
@@ -417,7 +455,7 @@ mod tests {
     fn preflight_retry_accepts_new_mode_but_partial_jobs_keep_their_characters() {
         let exact = TypingSettings { method: TypingMethod::Layout, ..TypingSettings::default() };
         let compatible = TypingSettings { special_characters: SpecialCharacters::Compatible, ..exact };
-        let mut job = TypingJob::new(1, "а…б".into(), exact);
+        let mut job = TypingJob::<()>::new(1, "а…б".into(), exact);
         job.end(0, RunEnd::Interrupted { message: "unsupported".into(), error: true });
         job.refresh_unstarted_settings(compatible);
         assert_eq!(*job.chars, ['а', '.', '.', '.', 'б']);
@@ -430,7 +468,7 @@ mod tests {
     #[test]
     fn typing_job_keeps_its_place_across_pauses() {
         let settings = TypingSettings { spaces_per_tab: 2, ..TypingSettings::default() };
-        let mut job = TypingJob::new(1, "a\tb\r\ncd\n".into(), settings);
+        let mut job = TypingJob::<()>::new(1, "a\tb\r\ncd\n".into(), settings);
         assert_eq!(job.chars.len(), 8);
         let view = job.view("Ctrl+Alt+V");
         assert_eq!((view.line, view.lines, view.total), (1, 3, 8));
@@ -492,6 +530,8 @@ mod tests {
             base: None,
             error: None,
             elapsed_ms: 5,
+            format: "text".into(),
+            warning: None,
         };
         let value = serde_json::to_value(run).unwrap();
         assert_eq!((value["elapsedMs"].clone(), value["kind"].clone()), (5.into(), "review".into()));

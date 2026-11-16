@@ -1,4 +1,5 @@
 """One recent history deletion, held only in this process's memory."""
+
 from collections.abc import Callable
 import time
 
@@ -10,10 +11,12 @@ class HistoryUndo:
         self._clock = clock
         self._pending: tuple[Entry, bool] | None = None
         self._deadline = 0.0
+        self.runs = ()
 
-    def remember(self, entry: Entry, pinned: bool) -> None:
+    def remember(self, entry: Entry, pinned: bool, runs=()) -> None:
         self._pending = (entry, pinned)
         self._deadline = self._clock() + 30.0
+        self.runs = tuple(runs)
 
     def peek(self) -> tuple[Entry, bool] | None:
         if self._pending is not None and self._clock() >= self._deadline:
@@ -23,3 +26,4 @@ class HistoryUndo:
     def clear(self) -> None:
         self._pending = None
         self._deadline = 0.0
+        self.runs = ()

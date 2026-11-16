@@ -197,6 +197,8 @@ fn new_run(
         base: base.map(str::to_string),
         error: None,
         elapsed_ms: 0,
+        format: shell.settings().capture_format,
+        warning: None,
     }
 }
 
@@ -225,10 +227,15 @@ async fn execute(app: &AppHandle, operation: &Operation, png: &[u8], mut run: Ru
             }
             RunKind::Ocr | RunKind::Append => None,
         };
-        let request = match run.kind {
-            RunKind::Review => Request { prompt: Some(REVIEW_PROMPT), context: context.as_ref() },
-            RunKind::Ocr | RunKind::Append => Request::default(),
+        let prompt = if run.kind == RunKind::Review {
+            let suffix = if run.format == "csv" {
+                " Return the corrected table as RFC 4180 comma-delimited CSV inside the text field. Preserve empty cells, row order and literal values. Do not calculate totals."
+            } else { "" };
+            format!("{REVIEW_PROMPT}{suffix}")
+        } else {
+            ctrlcctrlv_core::table_ocr::recognition_prompt(&run.format)
         };
+        let request = Request { prompt: Some(&prompt), context: context.as_ref() };
         let streaming = run.clone();
         let partial = move |text: &str| {
             let mut update = streaming.clone();
@@ -236,7 +243,10 @@ async fn execute(app: &AppHandle, operation: &Operation, png: &[u8], mut run: Ru
             let _ = app.emit(events::RUN, update);
         };
         let started = Instant::now();
-        let result = provider.recognize_stream(png, operation, &request, &partial).await.map_err(|e| e.to_string());
+        let result = provider.recognize_stream(png, operation, &request, &partial).await.map(|mut result| {
+            result.text = ctrlcctrlv_core::table_ocr::table_result(&result.text, &run.format);
+            result
+        }).map_err(|e| e.to_string());
         run.elapsed_ms = started.elapsed().as_millis().min(u64::MAX as u128) as u64;
         result
     }
@@ -253,6 +263,9 @@ async fn execute(app: &AppHandle, operation: &Operation, png: &[u8], mut run: Ru
             None
         }
         Ok(result) => {
+            if run.format == "csv" && !ctrlcctrlv_core::table_ocr::rectangular_csv(&result.text) {
+                run.warning = Some("Прямоугольный CSV не подтверждён · ответ сохранён как текст".into());
+            }
             run.state = RunState::Done;
             run.text = result.text.clone();
             Some(result)
@@ -324,7 +337,9 @@ async fn first_run(
     monitor: u32,
     region: Region,
 ) -> Result<Status, String> {
-    let png = Arc::new(snapshot(monitor, region).await?);
+    let (png, ready) = snapshot(monitor, region).await?;
+    let png = Arc::new(png);
+    let operation = operation.clone().started_at(ready);
     let settings = shell.settings();
     let id = next_capture();
     let run = new_run(shell, id, 1, RunKind::Ocr, &primary(&settings), None);
@@ -335,7 +350,7 @@ async fn first_run(
     if settings.show_preview {
         show_main(app, false);
     }
-    let (run, result) = execute(app, operation, &png, run).await;
+    let (run, result) = execute(app, &operation, &png, run).await;
     let Some(result) = result else {
         return Err(run.error.unwrap_or_else(|| "Распознавание не удалось".into()));
     };
@@ -344,24 +359,29 @@ async fn first_run(
     }
     // A cancel that raced with the answer still leaves the clipboard alone.
     let (publisher, text) = (operation.clone(), result.text.clone());
-    tauri::async_runtime::spawn_blocking(move || {
+    let elapsed = tauri::async_runtime::spawn_blocking(move || {
         let mut written = Ok(());
-        publisher
+        let elapsed = publisher
             .publish(&text, |text| written = Clipboard::new().and_then(|mut c| c.set_text(text)))
             .map_err(|e| e.to_string())?;
-        written.map_err(|e| e.to_string())
+        written.map(|_| elapsed).map_err(|e| e.to_string())
     })
     .await
     .map_err(|_| "Буфер обмена недоступен".to_string())??;
-    Ok(Status::new(Phase::Idle, copied_message(&result.text, Duration::from_millis(run.elapsed_ms))))
+    Ok(Status::new(Phase::Idle, copied_message(&result.text, elapsed)))
 }
 
-async fn snapshot(monitor: u32, region: Region) -> Result<Vec<u8>, String> {
+async fn snapshot(monitor: u32, region: Region) -> Result<(Vec<u8>, tokio::time::Instant), String> {
     tokio::time::sleep(OVERLAY_GONE).await;
-    tauri::async_runtime::spawn_blocking(move || capture_region(monitor, region).and_then(|image| encode_png(&image)))
-        .await
-        .map_err(|_| "Не удалось сделать снимок экрана".to_string())?
-        .map_err(|e| e.to_string())
+    tauri::async_runtime::spawn_blocking(move || {
+        capture_region(monitor, region).and_then(|image| {
+            let ready = tokio::time::Instant::now();
+            encode_png(&image).map(|png| (png, ready))
+        })
+    })
+    .await
+    .map_err(|_| "Не удалось сделать снимок экрана".to_string())?
+    .map_err(|e| e.to_string())
 }
 
 /// Recognizes one more region of what the result window shows (code longer
@@ -375,7 +395,7 @@ async fn append_run(
     region: Region,
 ) -> Result<Status, String> {
     const CLOSED: &str = "Снимок в окне результата уже закрыт · текст не добавлен";
-    let png = snapshot(monitor, region).await?;
+    let (png, _) = snapshot(monitor, region).await?;
     let settings = shell.settings();
     let run = {
         let mut slot = lock(&shell.capture);

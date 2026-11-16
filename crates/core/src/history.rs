@@ -38,6 +38,13 @@ pub struct EntryRef {
     pub created: String,
 }
 
+/// Undo payload lives only in memory, never in a second on-disk history.
+#[derive(Debug, Clone)]
+pub struct DeletedEntry {
+    pub entry: Entry,
+    pub runs: Vec<Run>,
+}
+
 pub const MAX_VISIBLE: usize = 500;
 
 const COLUMNS: &str = "id,created,kind,text,model,status";
@@ -188,6 +195,10 @@ impl History {
 
     /// Deletes and returns the entry, unless it was replaced since `expected_created`.
     pub fn delete(&self, id: i64, expected_created: Option<&str>) -> Result<Option<Entry>> {
+        Ok(self.delete_with_runs(id, expected_created)?.map(|deleted| deleted.entry))
+    }
+
+    pub fn delete_with_runs(&self, id: i64, expected_created: Option<&str>) -> Result<Option<DeletedEntry>> {
         self.with(|db| {
             // Lock before reading so the returned row is the row actually deleted.
             let transaction = db.transaction_with_behavior(TransactionBehavior::Immediate)?;
@@ -196,9 +207,26 @@ impl History {
             let Some(row) = row.filter(|row| expected_created.is_none_or(|created| row.created == created)) else {
                 return Ok(None);
             };
+            let runs = {
+                let mut statement = transaction.prepare(&format!(
+                    "SELECT {RUN_COLUMNS} FROM runs WHERE entry_id=? AND entry_created=? ORDER BY created,id"
+                ))?;
+                statement.query_map(params![id, row.created], run)?.collect::<rusqlite::Result<Vec<_>>>()?
+            };
+            transaction.execute("DELETE FROM runs WHERE entry_id=? AND entry_created=?", params![id, row.created])?;
             transaction.execute("DELETE FROM entries WHERE id=?", [id])?;
             transaction.commit()?;
-            Ok(Some(row))
+            Ok(Some(DeletedEntry { entry: row, runs }))
+        })
+    }
+
+    pub fn purge_orphan_runs(&self) -> Result<()> {
+        self.with(|db| {
+            db.execute(
+                "DELETE FROM runs WHERE NOT EXISTS (SELECT 1 FROM entries WHERE entries.id = runs.entry_id AND entries.created = runs.entry_created)",
+                [],
+            )?;
+            Ok(())
         })
     }
 
@@ -217,6 +245,11 @@ impl History {
 
     /// Undo for [`History::delete`]: keeps the ID when it is still free.
     pub fn restore(&self, entry: &Entry) -> Result<Entry> {
+        self.restore_with_runs(&DeletedEntry { entry: entry.clone(), runs: Vec::new() })
+    }
+
+    pub fn restore_with_runs(&self, deleted: &DeletedEntry) -> Result<Entry> {
+        let entry = &deleted.entry;
         self.with(|db| {
             let transaction = db.transaction_with_behavior(TransactionBehavior::Immediate)?;
             let occupied =
@@ -232,11 +265,12 @@ impl History {
                 )?;
             }
             let id = transaction.last_insert_rowid();
-            // Runs stay attached across delete and undo, even under a new ID.
-            transaction.execute(
-                "UPDATE runs SET entry_id=? WHERE entry_id=? AND entry_created=?",
-                params![id, entry.id, entry.created],
-            )?;
+            for run in &deleted.runs {
+                transaction.execute(
+                    "INSERT INTO runs (entry_id,entry_created,created,provider,model,text,raw_text,status,elapsed_ms) VALUES (?,?,?,?,?,?,?,?,?)",
+                    params![id, entry.created, run.created, run.provider, run.model, run.text, run.raw_text, run.status, run.elapsed_ms],
+                )?;
+            }
             transaction.commit()?;
             Ok(Entry { id, ..entry.clone() })
         })

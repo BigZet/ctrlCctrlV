@@ -1,8 +1,10 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
+from copy import deepcopy
 import json
 import os
 from pathlib import Path
 import sys
+import tempfile
 
 
 def data_directory() -> Path:
@@ -61,9 +63,37 @@ class Settings:
             values.setdefault("review_provider", values.get("provider", "local"))
             result = cls(**{k: v for k, v in values.items() if k in fields})
             result.validate(models)
+            result._unknown = {k: v for k, v in values.items() if k not in fields}
             return result
         except (OSError, ValueError, TypeError, RecursionError):
             return cls()
+
+    def copy(self, **changes):
+        result = replace(self, **changes)
+        result._unknown = deepcopy(getattr(self, "_unknown", {}))
+        return result
+
+    @classmethod
+    def needs_recovery(cls, directory, models=None):
+        path = directory / "settings.json"
+        if not path.exists():
+            return False
+        try:
+            with path.open("rb") as stream:
+                data = stream.read(65537)
+            if len(data) > 65536:
+                return True
+            values = json.loads(data.decode("utf-8"))
+            if not isinstance(values, dict):
+                return True
+            values.setdefault("review_provider", values.get("provider", "local"))
+            result = cls(
+                **{k: v for k, v in values.items() if k in cls.__dataclass_fields__}
+            )
+            result.validate(models)
+            return False
+        except (OSError, ValueError, TypeError, RecursionError):
+            return True
 
     def validate(self, models=None):
         for name in ("show_preview", "autoindent", "delete_autoclose"):
@@ -160,12 +190,29 @@ class Settings:
         if not 128 <= self.max_tokens <= 8192:
             raise ValueError("Некорректный предел ответа")
 
-    def save(self, directory: Path, models=None):
+    def save(self, directory: Path, models=None, *, recover=False):
         self.validate(models)
-        encoded = json.dumps(asdict(self), ensure_ascii=False, indent=2).encode("utf-8")
+        encoded = json.dumps(
+            {**getattr(self, "_unknown", {}), **asdict(self)},
+            ensure_ascii=False,
+            indent=2,
+        ).encode("utf-8")
         if len(encoded) > 65536:
             raise ValueError("Настройки слишком большие")
         directory.mkdir(parents=True, exist_ok=True)
+        if self.needs_recovery(directory, models):
+            if not recover:
+                raise ValueError(
+                    "Настройки повреждены · откройте настройки и явно подтвердите восстановление"
+                )
+            # Preserve exact bytes; never overwrite an earlier recovery file.
+            import shutil
+
+            with tempfile.NamedTemporaryFile(
+                dir=directory, prefix="settings-recovery-", suffix=".json", delete=False
+            ) as backup:
+                with (directory / "settings.json").open("rb") as original:
+                    shutil.copyfileobj(original, backup)
         temporary = directory / "settings.json.tmp"
         temporary.write_bytes(encoded)
         temporary.replace(directory / "settings.json")

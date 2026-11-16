@@ -9,6 +9,8 @@ publish.workspace = true
 [dependencies]
 base64 = "0.23.1"
 caseless = "0.2.2"
+csv = "1.4.0"
+quick-xml = "0.42.0"
 chrono = { version = "0.4.45", default-features = false, features = ["clock", "std"] }
 flate2 = "1.1.10"
 fs4 = "1.1.0"
@@ -19,7 +21,7 @@ png = "0.18.1"
 rand = "0.10.3"
 regex = "1.13.1"
 reqwest = { version = "0.13.5", default-features = false, features = ["http2", "json", "rustls", "stream"] }
-rusqlite = { version = "0.40.2", features = ["bundled", "functions"] }
+rusqlite = { version = "0.41.0", default-features = false, features = ["bundled", "functions", "cache"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = { version = "1.0.154", features = ["preserve_order"] }
 sha2 = "0.11.1"

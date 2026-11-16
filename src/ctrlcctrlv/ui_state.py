@@ -1,4 +1,5 @@
 """Profile-local presentation preferences, independent of OCR settings."""
+
 from copy import deepcopy
 import json
 import os
@@ -7,9 +8,13 @@ import tempfile
 
 
 DEFAULTS = {
-    "preview_sizes": [440, 560], "image_visible": True,
-    "last_save_directory": "", "favorites": [], "history_pins": [],
-    "capture_adjust": False, "capture_help_seen": False,
+    "preview_sizes": [440, 560],
+    "image_visible": True,
+    "last_save_directory": "",
+    "favorites": [],
+    "history_pins": [],
+    "capture_adjust": False,
+    "capture_help_seen": False,
 }
 
 
@@ -21,17 +26,33 @@ def valid(key, value):
     if key in {"image_visible", "capture_adjust", "capture_help_seen"}:
         return type(value) is bool
     if key == "preview_sizes":
-        return isinstance(value, list) and len(value) == 2 and all(type(n) is int and 0 < n <= 10000 for n in value)
+        return (
+            isinstance(value, list)
+            and len(value) == 2
+            and all(type(n) is int and 0 < n <= 10000 for n in value)
+        )
     if key == "last_save_directory":
         return isinstance(value, str) and len(value) <= 4096 and "\0" not in value
     if key == "favorites":
-        return isinstance(value, list) and len(value) <= 1000 and all(isinstance(s, str) and 0 < len(s) <= 256 for s in value)
+        return (
+            isinstance(value, list)
+            and len(value) <= 1000
+            and all(isinstance(s, str) and 0 < len(s) <= 256 for s in value)
+        )
     if key == "history_pins":
-        return (isinstance(value, list) and len(value) <= 100
-                and all(isinstance(ref, dict) and set(ref) == {"id", "created"}
-                        and type(ref["id"]) is int and ref["id"] > 0
-                        and isinstance(ref["created"], str) and len(ref["created"]) <= 64
-                        for ref in value))
+        return (
+            isinstance(value, list)
+            and len(value) <= 100
+            and all(
+                isinstance(ref, dict)
+                and set(ref) == {"id", "created"}
+                and type(ref["id"]) is int
+                and ref["id"] > 0
+                and isinstance(ref["created"], str)
+                and len(ref["created"]) <= 64
+                for ref in value
+            )
+        )
     return False
 
 
@@ -47,7 +68,14 @@ class UiState:
                     return
                 data = json.loads(encoded)
                 if isinstance(data, dict):
-                    self.values.update({key: value for key, value in data.items() if valid(key, value)})
+                    self.values.update(
+                        {key: value for key, value in data.items() if valid(key, value)}
+                    )
+                    # Forward-compatible opaque fields are not exposed as controls,
+                    # but a Python save must not erase the Rust wizard/model list.
+                    self.unknown = {
+                        key: value for key, value in data.items() if key not in DEFAULTS
+                    }
             except (OSError, ValueError, TypeError, RecursionError):
                 pass
 
@@ -56,23 +84,35 @@ class UiState:
 
     def set(self, **changes):
         candidate = deepcopy(self.values)
-        candidate.update({key: deepcopy(value) for key, value in changes.items() if valid(key, value)})
+        candidate.update(
+            {
+                key: deepcopy(value)
+                for key, value in changes.items()
+                if valid(key, value)
+            }
+        )
         temporary = None
         try:
-            encoded = json.dumps(candidate, ensure_ascii=False, indent=2).encode("utf-8")
+            encoded = json.dumps(
+                {**getattr(self, "unknown", {}), **candidate},
+                ensure_ascii=False,
+                indent=2,
+            ).encode("utf-8")
             if len(encoded) > 65536:
                 return False
             if self.directory is None:
                 self.values = candidate
                 return True
             self.directory.mkdir(parents=True, exist_ok=True)
-            with tempfile.NamedTemporaryFile(dir=self.directory, prefix=".ui-state-", delete=False) as stream:
+            with tempfile.NamedTemporaryFile(
+                dir=self.directory, prefix=".ui-state-", delete=False
+            ) as stream:
                 temporary = Path(stream.name)
                 stream.write(encoded)
             os.replace(temporary, self.directory / "ui-state.json")
             self.values = candidate
             return True
-        except OSError:
+        except (OSError, UnicodeError, ValueError, TypeError, RecursionError):
             return False
         finally:
             if temporary is not None:

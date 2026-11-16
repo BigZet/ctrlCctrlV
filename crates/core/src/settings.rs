@@ -107,6 +107,10 @@ impl Default for Settings {
 }
 
 impl Settings {
+    pub fn needs_recovery(directory: &Path, models: &ModelRegistry) -> bool {
+        directory.join("settings.json").exists() && Self::read(directory, models).is_none()
+    }
+
     /// Reads `settings.json`; anything unreadable or invalid yields defaults and
     /// leaves the file untouched.
     pub fn load(directory: &Path, models: &ModelRegistry) -> Self {
@@ -247,6 +251,15 @@ impl Settings {
 
     /// Validates, then atomically replaces `settings.json`.
     pub fn save(&self, directory: &Path, models: &ModelRegistry) -> Result<()> {
+        self.save_inner(directory, models, false)
+    }
+
+    /// Only a user-confirmed recovery may replace an unreadable profile.
+    pub fn save_recovering(&self, directory: &Path, models: &ModelRegistry) -> Result<()> {
+        self.save_inner(directory, models, true)
+    }
+
+    fn save_inner(&self, directory: &Path, models: &ModelRegistry, recover: bool) -> Result<()> {
         self.validate(models)?;
         let encoded = self.to_json();
         if encoded.len() > MAX_SIZE {
@@ -254,6 +267,21 @@ impl Settings {
         }
         let io = |_| Error::operation("Не удалось сохранить настройки");
         std::fs::create_dir_all(directory).map_err(io)?;
+        if Self::needs_recovery(directory, models) {
+            if !recover {
+                return Err(Error::invalid(
+                    "Настройки повреждены · откройте настройки и явно подтвердите восстановление",
+                ));
+            }
+            let mut backup = tempfile::Builder::new()
+                .prefix("settings-recovery-")
+                .suffix(".json")
+                .tempfile_in(directory)
+                .map_err(io)?;
+            std::io::copy(&mut std::fs::File::open(directory.join("settings.json")).map_err(io)?, &mut backup)
+                .map_err(io)?;
+            backup.keep().map_err(|_| Error::operation("Не удалось сохранить исходные настройки"))?;
+        }
         let temporary = directory.join("settings.json.tmp");
         std::fs::write(&temporary, &encoded).map_err(io)?;
         std::fs::rename(&temporary, directory.join("settings.json")).map_err(io)

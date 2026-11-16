@@ -3,6 +3,7 @@
 mod history;
 mod hotkeys;
 mod library;
+mod maintenance;
 mod ocr;
 mod overlay;
 mod panel;
@@ -13,7 +14,7 @@ mod typing;
 use std::sync::{Arc, Mutex, MutexGuard, RwLock};
 
 use base64::Engine as _;
-use ctrlcctrlv_core::history::{Entry, EntryRef, History};
+use ctrlcctrlv_core::history::{DeletedEntry, EntryRef, History};
 use ctrlcctrlv_core::models::ModelRegistry;
 use ctrlcctrlv_core::operation::Operation;
 use ctrlcctrlv_core::remote_catalog::{self, VisionModel};
@@ -37,6 +38,7 @@ enum Activity {
     },
     Recognizing(Operation),
     Typing(typing::Control),
+    Maintenance,
 }
 
 impl Activity {
@@ -46,6 +48,7 @@ impl Activity {
             Activity::Selecting { .. } => Phase::Selecting,
             Activity::Recognizing(_) => Phase::Recognizing,
             Activity::Typing(_) => Phase::Typing,
+            Activity::Maintenance => Phase::Maintenance,
         }
     }
 }
@@ -89,15 +92,21 @@ pub struct Shell {
     status: Mutex<Status>,
     pub capture: Mutex<Option<Capture>>,
     /// The last deleted history entry and whether it was pinned, for undo.
-    pub deleted: Mutex<Option<(Entry, bool)>>,
+    pub deleted: Mutex<Option<(DeletedEntry, bool, std::time::Instant, u64)>>,
     pub install: Mutex<Option<tokio_util::sync::CancellationToken>>,
     /// The text being typed or paused part way, with its position.
-    pub typing: Mutex<Option<TypingJob>>,
+    pub typing: Mutex<
+        Option<TypingJob<<ctrlcctrlv_platform::NativeKeyboard as ctrlcctrlv_platform::typing::Keyboard>::Target>>,
+    >,
+    /// Serialize typing launches and final publication, including resume of one job.
+    pub typing_gate: Mutex<()>,
     /// Stops the local model loading in the background during a selection.
     pub warming: Mutex<Option<tokio_util::sync::CancellationToken>>,
     /// Why the last background load failed, by model, so recognition reports
     /// it instead of loading the same model again.
     pub warm_failure: Mutex<Option<(String, String)>>,
+    pub idle: Mutex<crate::model::IdlePolicy>,
+    pub shutdown: tokio_util::sync::CancellationToken,
 }
 
 pub fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -112,7 +121,12 @@ impl Shell {
         let runtime = LocalRuntime::new(&directory, Session::Ocr, 1, settings.acceleration(), models.clone())
             .map_err(|e| e.to_string())?;
         // History failures never block OCR or typing.
-        let history = History::open(&directory).ok();
+        let history = History::open(&directory)
+            .and_then(|history| {
+                history.purge_orphan_runs()?;
+                Ok(history)
+            })
+            .ok();
         Ok(Self {
             settings: RwLock::new(settings),
             models,
@@ -126,8 +140,11 @@ impl Shell {
             deleted: Mutex::new(None),
             install: Mutex::new(None),
             typing: Mutex::new(None),
+            typing_gate: Mutex::new(()),
             warming: Mutex::new(None),
             warm_failure: Mutex::new(None),
+            idle: Mutex::new(Default::default()),
+            shutdown: tokio_util::sync::CancellationToken::new(),
         })
     }
 
@@ -146,10 +163,11 @@ impl Shell {
     /// Moves from idle to `next`; refuses while anything else runs.
     fn begin(&self, next: Activity) -> bool {
         let mut activity = lock(&self.activity);
-        if !matches!(*activity, Activity::Idle) {
+        if self.shutdown.is_cancelled() || !matches!(*activity, Activity::Idle) {
             return false;
         }
         *activity = next;
+        lock(&self.idle).touch(std::time::Instant::now());
         true
     }
 
@@ -164,6 +182,7 @@ impl Shell {
     }
 
     fn finish(&self) {
+        lock(&self.idle).touch(std::time::Instant::now());
         *lock(&self.activity) = Activity::Idle;
     }
 
@@ -241,6 +260,7 @@ fn cancel(app: &AppHandle) {
             shell.stop_warm_up();
         }
         Activity::Typing(control) => control.stop(),
+        Activity::Maintenance => {}
     }
 }
 
@@ -255,6 +275,7 @@ fn show_main(app: &AppHandle, focus: bool) {
 }
 
 async fn quit(app: &AppHandle) {
+    app.state::<Shell>().shutdown.cancel();
     cancel(app);
     if let Some(token) = lock(&app.state::<Shell>().install).as_ref() {
         token.cancel();
@@ -337,6 +358,23 @@ fn stop_engine_on_signal(handle: &AppHandle) {
 fn stop_engine_on_signal(_handle: &AppHandle) {}
 
 pub fn run() {
+    let directory = data_directory();
+    let _profile_guard = match ctrlcctrlv_core::profile_lock::ProfileLock::acquire(&directory) {
+        Ok(guard) => guard,
+        Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
+            let _ = std::fs::write(directory.join("activate.request"), b"");
+            return;
+        }
+        Err(_) => {
+            ctrlcctrlv_platform::show_error("ctrlCctrlV не запустился", "Не удалось заблокировать каталог профиля");
+            return;
+        }
+    };
+    // Old Python binaries do not know .profile.lock. Never steal their Qt lock.
+    if directory.join("app.lock").exists() {
+        ctrlcctrlv_platform::show_error("Профиль занят", "Закройте прежнюю Python-версию перед запуском Rust-версии");
+        return;
+    }
     let shell = match Shell::new() {
         Ok(shell) => shell,
         Err(message) => {
@@ -385,7 +423,15 @@ pub fn run() {
             let handle = app.handle().clone();
             tray::create(&handle)?;
             stop_engine_on_signal(&handle);
+            maintenance::start(&handle);
             let settings = handle.state::<Shell>().settings();
+            if Settings::needs_recovery(&data_directory(), &handle.state::<Shell>().models) {
+                report(
+                    &handle,
+                    Status::error(Phase::Idle, "Настройки повреждены · восстановите их в разделе «Настройки»"),
+                );
+                show_main(&handle, false);
+            }
             if let Err(message) = hotkeys::install(&handle, &settings) {
                 report(&handle, Status::error(Phase::Idle, message));
                 show_main(&handle, false);
@@ -418,6 +464,7 @@ pub fn run() {
         RunEvent::Exit => {
             // Never leave the engine running after the app is gone.
             let shell = app.state::<Shell>();
+            shell.shutdown.cancel();
             shell.stop_warm_up();
             let _ = tauri::async_runtime::block_on(async { shell.runtime.lock().await.stop().await });
         }

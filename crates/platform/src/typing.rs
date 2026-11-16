@@ -232,13 +232,56 @@ pub fn type_chars<K: Keyboard>(
     start: usize,
     settings: &TypingSettings,
     cancel: &CancelToken,
-    mut progress: impl FnMut(usize, usize),
+    progress: impl FnMut(usize, usize),
     expected: Option<&K::Target>,
 ) -> (usize, Result<()>) {
-    let mut state = RunState { position: start.min(chars.len()), target: None, original: None, current: None };
+    let mut cursor = TypingCursor { position: start.min(chars.len()), pending_delete: None };
+    let result = type_chars_resumable(keyboard, chars, &mut cursor, settings, cancel, progress, expected);
+    (cursor.position, result)
+}
+
+/// Continuation includes a delivered character whose editor-generated closing
+/// pair has not yet been removed. Never replay that character after a pause.
+#[derive(Debug, Clone)]
+pub struct TypingCursor<T> {
+    pub position: usize,
+    pending_delete: Option<T>,
+}
+
+impl<T> Default for TypingCursor<T> {
+    fn default() -> Self {
+        Self { position: 0, pending_delete: None }
+    }
+}
+
+impl<T> TypingCursor<T> {
+    pub fn has_pending_action(&self) -> bool {
+        self.pending_delete.is_some()
+    }
+}
+
+pub fn type_chars_resumable<K: Keyboard>(
+    keyboard: &K,
+    chars: &[char],
+    cursor: &mut TypingCursor<K::Target>,
+    settings: &TypingSettings,
+    cancel: &CancelToken,
+    mut progress: impl FnMut(usize, usize),
+    expected: Option<&K::Target>,
+) -> Result<()> {
+    let start = cursor.position;
+    let mut state = RunState {
+        position: start.min(chars.len()),
+        target: None,
+        original: None,
+        current: None,
+        pending_delete: cursor.pending_delete.take(),
+    };
     let result = run(keyboard, chars, &mut state, settings, cancel, &mut progress, expected);
     state.restore(keyboard, settings);
-    (state.position, result)
+    cursor.position = state.position;
+    cursor.pending_delete = state.pending_delete;
+    result
 }
 
 /// Where a run is, with the window it types into and that window's layout
@@ -248,6 +291,7 @@ struct RunState<T> {
     target: Option<T>,
     original: Option<isize>,
     current: Option<isize>,
+    pending_delete: Option<T>,
 }
 
 impl<T> RunState<T> {
@@ -364,6 +408,16 @@ fn run<K: Keyboard>(
         }
         Ok(())
     };
+    check()?;
+    if let Some(pending_target) = &state.pending_delete {
+        if pending_target != &target {
+            return Err(Error::Operation(
+                "Не завершено удаление автозакрытия · вернитесь в исходное окно или остановите печать и исправьте текст вручную".into(),
+            ));
+        }
+        keyboard.delete()?;
+        state.pending_delete = None;
+    }
     if settings.method == TypingMethod::Layout {
         // With shortcuts the remote layout is unknown until the first switch.
         state.original = keyboard.layout();
@@ -435,6 +489,11 @@ fn run<K: Keyboard>(
     };
 
     let mut autoclose = AutoClose::default();
+    // Reconstruct lexical context without emitting keys when resuming mid-line.
+    let line_start = chars[..state.position].iter().rposition(|&ch| ch == '\n').map_or(0, |i| i + 1);
+    for index in line_start..state.position {
+        autoclose.opens(chars[index], chars[..index].last());
+    }
     // A run that stopped right after a newline resumes by selecting the new
     // line's automatic indentation, as the newline itself would have.
     if settings.autoindent && state.position > 0 && state.position < chars.len() && chars[state.position - 1] == '\n' {
@@ -462,10 +521,13 @@ fn run<K: Keyboard>(
             '\t' => keyboard.tab()?,
             _ => {
                 character(ch, state)?;
+                state.position = index + 1;
                 if settings.delete_autoclose && autoclose.opens(ch, chars[..index].last()) {
+                    state.pending_delete = Some(target.clone());
                     cancel.wait(settings.character_delay);
                     check()?;
                     keyboard.delete()?;
+                    state.pending_delete = None;
                 }
             }
         }
@@ -876,6 +938,46 @@ mod tests {
         let err = type_text(&fake, "abc", &fast(), &cancel, |_, _| cancel.cancel(), None).unwrap_err();
         assert!(matches!(err, Error::Cancelled(_)));
         assert_eq!(fake.events(), [Event::Text('a')]);
+    }
+
+    #[test]
+    fn cancelled_autoclose_resumes_delete_without_replaying_delivered_character() {
+        let cancel = CancelToken::new();
+        let hook = cancel.clone();
+        let mut fake = Fake::new();
+        fake.on_character = Some(Box::new(move || hook.cancel()));
+        let settings = TypingSettings { delete_autoclose: true, ..fast() };
+        let mut cursor = TypingCursor::default();
+        let chars = prepare("(", &settings);
+        assert!(type_chars_resumable(&fake, &chars, &mut cursor, &settings, &cancel, |_, _| {}, None).is_err());
+        assert_eq!(cursor.position, 1);
+        assert!(cursor.has_pending_action());
+        fake.on_character = None;
+        fake.pid.set(200);
+        assert!(
+            type_chars_resumable(&fake, &chars, &mut cursor, &settings, &CancelToken::new(), |_, _| {}, None).is_err()
+        );
+        assert_eq!(fake.events(), [Event::Text('(')]);
+        fake.pid.set(100);
+        type_chars_resumable(&fake, &chars, &mut cursor, &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
+        assert_eq!(fake.events(), [Event::Text('('), Event::Delete]);
+        assert!(!cursor.has_pending_action());
+    }
+
+    #[test]
+    fn resume_reconstructs_string_and_comment_context() {
+        let settings = TypingSettings { delete_autoclose: true, ..fast() };
+        for (text, start, expected) in [
+            ("'a \"'", 3, vec![Event::Text('"'), Event::Text('\'')]),
+            ("# a '", 4, vec![Event::Text('\'')]),
+            ("// '", 3, vec![Event::Text('\'')]),
+        ] {
+            let fake = Fake::new();
+            let chars = prepare(text, &settings);
+            let mut cursor = TypingCursor { position: start, pending_delete: None };
+            type_chars_resumable(&fake, &chars, &mut cursor, &settings, &CancelToken::new(), |_, _| {}, None).unwrap();
+            assert_eq!(fake.events(), expected, "{text}");
+        }
     }
 
     #[test]

@@ -6,7 +6,7 @@ use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 
 use ctrlcctrlv_platform::clipboard::Clipboard;
-use ctrlcctrlv_platform::typing::{CancelToken, Keyboard, MODIFIER_PRESSED, type_chars};
+use ctrlcctrlv_platform::typing::{CancelToken, Keyboard, MODIFIER_PRESSED, TypingCursor, type_chars_resumable};
 use ctrlcctrlv_platform::{Error, NativeKeyboard, Permission, permissions, request_permission};
 use serde::Deserialize;
 use tauri::{AppHandle, Emitter, Manager};
@@ -23,12 +23,26 @@ const KEY_PAUSE_GRACE: Duration = Duration::from_millis(800);
 const PAUSED: &str = "Пауза";
 
 static NEXT_JOB: AtomicU64 = AtomicU64::new(1);
+static NEXT_RUN: AtomicU64 = AtomicU64::new(1);
+type Target = <NativeKeyboard as Keyboard>::Target;
+type NativeJob = TypingJob<Target>;
 
 /// Stops the running typing; `stop` says whether for good or as a pause.
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct Control {
     token: CancelToken,
     stop: Arc<AtomicBool>,
+    run: u64,
+}
+
+impl Default for Control {
+    fn default() -> Self {
+        Self {
+            token: CancelToken::new(),
+            stop: Arc::new(AtomicBool::new(false)),
+            run: NEXT_RUN.fetch_add(1, Ordering::Relaxed),
+        }
+    }
 }
 
 impl Control {
@@ -57,6 +71,7 @@ pub enum Trigger {
 /// continues a paused one while the clipboard still holds its text.
 pub fn start(app: &AppHandle, trigger: Trigger) {
     let shell = app.state::<Shell>();
+    let _gate = lock(&shell.typing_gate);
     match shell.phase() {
         Phase::Idle => {}
         Phase::Typing if trigger == Trigger::Hotkey => return pause(app),
@@ -90,7 +105,7 @@ pub fn start(app: &AppHandle, trigger: Trigger) {
     }
     discard(app);
     let settings = typing_settings(&shell.settings());
-    *lock(&shell.typing) = Some(TypingJob::new(NEXT_JOB.fetch_add(1, Ordering::Relaxed), text, settings));
+    *lock(&shell.typing) = Some(NativeJob::new(NEXT_JOB.fetch_add(1, Ordering::Relaxed), text, settings));
     launch(app, trigger);
 }
 
@@ -114,9 +129,9 @@ fn launch(app: &AppHandle, trigger: Trigger) {
     let started = lock(&shell.typing).as_mut().map(|job| {
         job.refresh_unstarted_settings(settings);
         job.state = if delay.is_some() { TypingState::Countdown } else { TypingState::Typing };
-        (job.chars.clone(), job.position, job.settings)
+        (job.chars.clone(), job.cursor.clone(), job.settings)
     });
-    let Some((chars, position, settings)) = started else {
+    let Some((chars, mut cursor, settings)) = started else {
         shell.finish();
         return;
     };
@@ -125,7 +140,7 @@ fn launch(app: &AppHandle, trigger: Trigger) {
     std::thread::spawn(move || {
         if let Some(delay) = delay {
             for left in (1..=delay.as_secs()).rev() {
-                update(&app, |job| {
+                update(&app, &control, |job| {
                     job.countdown = left;
                     job.message = format!("Печать через {left} с · переключитесь в нужное окно");
                 });
@@ -134,11 +149,11 @@ fn launch(app: &AppHandle, trigger: Trigger) {
                     Status::new(Phase::Typing, format!("Печать через {left} с · переключитесь в нужное окно")),
                 );
                 if control.token.wait(Duration::from_secs(1)) {
-                    return finish(&app, &control, position, Err(Error::Cancelled(PAUSED.into())));
+                    return finish(&app, &control, cursor, Err(Error::Cancelled(PAUSED.into())));
                 }
             }
         }
-        update(&app, |job| {
+        update(&app, &control, |job| {
             job.state = TypingState::Typing;
             job.countdown = 0;
             job.message = "Печатаю…".into();
@@ -148,18 +163,28 @@ fn launch(app: &AppHandle, trigger: Trigger) {
         let progress = |done: usize, total: usize| {
             if done == total || last.elapsed() >= PROGRESS_INTERVAL {
                 last = Instant::now();
-                update(&app, |job| job.position = done);
+                update(&app, &control, |job| job.position = done);
             }
         };
-        let (position, result) =
-            type_chars(&NativeKeyboard, &chars, position, &settings, &control.token, progress, expected.as_ref());
-        finish(&app, &control, position, result);
+        let result = type_chars_resumable(
+            &NativeKeyboard,
+            &chars,
+            &mut cursor,
+            &settings,
+            &control.token,
+            progress,
+            expected.as_ref(),
+        );
+        finish(&app, &control, cursor, result);
     });
 }
 
-fn finish(app: &AppHandle, control: &Control, position: usize, result: ctrlcctrlv_platform::Result<()>) {
+fn finish(app: &AppHandle, control: &Control, cursor: TypingCursor<Target>, result: ctrlcctrlv_platform::Result<()>) {
     let shell = app.state::<Shell>();
-    shell.finish();
+    let _gate = lock(&shell.typing_gate);
+    if !matches!(&*lock(&shell.activity), Activity::Typing(active) if active.run == control.run) {
+        return;
+    }
     let by_key = matches!(&result, Err(Error::Cancelled(message)) if message == MODIFIER_PRESSED);
     let end = match result {
         Ok(()) => RunEnd::Completed,
@@ -171,6 +196,8 @@ fn finish(app: &AppHandle, control: &Control, position: usize, result: ctrlcctrl
     let ended = {
         let mut slot = lock(&shell.typing);
         let Some(job) = slot.as_mut() else { return };
+        let position = cursor.position;
+        job.cursor = cursor;
         job.end(position, end);
         if by_key && job.state == TypingState::Paused {
             job.paused_by_key = Some(Instant::now());
@@ -178,11 +205,12 @@ fn finish(app: &AppHandle, control: &Control, position: usize, result: ctrlcctrl
         job.clone()
     };
     conclude(app, &ended);
+    shell.finish();
 }
 
 /// Tells the panel and the main window how the job ended, and stores a
 /// finished job in history.
-fn conclude(app: &AppHandle, job: &TypingJob) {
+fn conclude(app: &AppHandle, job: &NativeJob) {
     let shell = app.state::<Shell>();
     emit(app);
     let message = match job.state {
@@ -201,7 +229,12 @@ fn conclude(app: &AppHandle, job: &TypingJob) {
 }
 
 /// Changes the job and sends it to the panel.
-fn update(app: &AppHandle, change: impl FnOnce(&mut TypingJob)) {
+fn update(app: &AppHandle, control: &Control, change: impl FnOnce(&mut NativeJob)) {
+    let shell = app.state::<Shell>();
+    let _gate = lock(&shell.typing_gate);
+    if !matches!(&*lock(&shell.activity), Activity::Typing(active) if active.run == control.run) {
+        return;
+    }
     if let Some(job) = lock(&app.state::<Shell>().typing).as_mut() {
         change(job);
     }
@@ -229,6 +262,7 @@ pub fn pause(app: &AppHandle) {
 /// Stops typing for good: the running job, or the paused one.
 pub fn stop(app: &AppHandle) {
     let shell = app.state::<Shell>();
+    let _gate = lock(&shell.typing_gate);
     if let Activity::Typing(control) = &*lock(&shell.activity) {
         // The worker reports the outcome.
         return control.stop();
@@ -254,6 +288,7 @@ fn discard(app: &AppHandle) {
 
 pub fn resume(app: &AppHandle) {
     let shell = app.state::<Shell>();
+    let _gate = lock(&shell.typing_gate);
     let paused = lock(&shell.typing).as_ref().is_some_and(|job| job.state == TypingState::Paused);
     if !paused {
         return;

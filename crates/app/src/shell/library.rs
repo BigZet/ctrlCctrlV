@@ -9,7 +9,8 @@ use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
 use tokio_util::sync::CancellationToken;
 
-use super::{Shell, changed, lock};
+use super::{Activity, Shell, changed, lock};
+use crate::model::Phase;
 use crate::model::{InstallProgress, events};
 
 #[derive(Serialize)]
@@ -90,12 +91,21 @@ pub fn model_install(app: AppHandle, id: String) -> Result<(), String> {
     let token = CancellationToken::new();
     {
         let mut install = lock(&shell.install);
+        if shell.phase() == Phase::Maintenance || shell.shutdown.is_cancelled() {
+            return Err("Дождитесь окончания обслуживания движка".into());
+        }
         if install.is_some() {
             return Err("Дождитесь окончания текущей загрузки".into());
         }
         *install = Some(token.clone());
     }
-    let mut runtime = installer(&shell)?;
+    let mut runtime = match installer(&shell) {
+        Ok(runtime) => runtime,
+        Err(error) => {
+            *lock(&shell.install) = None;
+            return Err(error);
+        }
+    };
     tauri::async_runtime::spawn(async move {
         let progress = |done: u64, total: u64, finished: bool, error: Option<String>| InstallProgress {
             model: id.clone(),
@@ -133,10 +143,14 @@ pub fn model_cancel_install(app: AppHandle) {
 #[tauri::command]
 pub async fn model_delete(app: AppHandle, id: String) -> Result<(), String> {
     let shell = app.state::<Shell>();
-    if lock(&shell.install).is_some() {
-        return Err("Дождитесь окончания загрузки".into());
+    {
+        let install = lock(&shell.install);
+        if install.is_some() || !shell.begin(Activity::Maintenance) {
+            return Err("Дождитесь окончания текущей операции или загрузки".into());
+        }
     }
     let result = shell.runtime.lock().await.delete(&id).await.map_err(|e| e.to_string());
+    shell.finish();
     changed(&app);
     result
 }
@@ -144,7 +158,12 @@ pub async fn model_delete(app: AppHandle, id: String) -> Result<(), String> {
 /// Stops the engine and frees its memory; the next local OCR loads it again.
 #[tauri::command]
 pub async fn engine_unload(app: AppHandle) -> Result<(), String> {
-    let result = app.state::<Shell>().runtime.lock().await.stop().await.map_err(|e| e.to_string());
+    let shell = app.state::<Shell>();
+    if !shell.begin(Activity::Maintenance) {
+        return Err("Дождитесь окончания текущей операции".into());
+    }
+    let result = shell.runtime.lock().await.stop().await.map_err(|e| e.to_string());
+    shell.finish();
     changed(&app);
     result
 }

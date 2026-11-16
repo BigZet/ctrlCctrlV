@@ -186,6 +186,23 @@ async fn sensitive_error_body_not_exposed() {
     assert!(!message.contains("private") && !message.contains("secret"));
 }
 
+#[test]
+fn unknown_provider_errors_never_echo_request_or_key() {
+    let body = br#"{"error":{"message":"private-transcription secret-key","metadata":{"raw":"private screenshot"}}}"#;
+    let message = ctrlcctrlv_core::ocr::http_error(400, body);
+    assert!(!message.contains("private") && !message.contains("secret"));
+    assert!(message.contains("Обновите каталог"));
+    let body = br#"{"error":{"metadata":{"provider_name":"private transcription secret"}}}"#;
+    assert!(!ctrlcctrlv_core::ocr::http_error(401, body).contains("private"));
+}
+
+#[test]
+fn published_duration_includes_preparation_and_sink_time() {
+    let operation = Operation::new().started_at(tokio::time::Instant::now() - Duration::from_secs(2));
+    let elapsed = operation.publish("synthetic", |_| std::thread::sleep(Duration::from_millis(20))).unwrap();
+    assert!(elapsed >= Duration::from_millis(2020));
+}
+
 #[tokio::test]
 async fn http_400_reasons_are_classified() {
     for (body, reason) in [
@@ -194,7 +211,7 @@ async fn http_400_reasons_are_classified() {
         (r#"{"error":{"message":"Context length exceeded"}}"#, "лимит модели"),
         (r#"{"error":{"message":"No endpoints support image input"}}"#, "не принимает изображения"),
         ("not json", "Провайдер отклонил запрос. Обновите каталог"),
-        (r#"{"error":{"message":"Unsupported   parameter: top_k"}}"#, "отклонил запрос: Unsupported parameter: top_k."),
+        (r#"{"error":{"message":"Unsupported   parameter: top_k"}}"#, "Обновите каталог"),
     ] {
         let (_server, url) = endpoint(move |_| Reply::bytes(400, body.as_bytes(), &[])).await;
         let error = OcrProvider::new(url, "m", "k").local().recognize(b"png", &Operation::new()).await.unwrap_err();

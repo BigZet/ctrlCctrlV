@@ -97,6 +97,66 @@ fn settings_written_by_either_version_are_read_by_the_other() {
 }
 
 #[test]
+fn profile_lock_excludes_python_and_rust_and_releases_after_process_death() {
+    let python = match interpreter() {
+        Some(python) => python,
+        None => return,
+    };
+    let directory = tempfile::tempdir().unwrap();
+    let dir = directory.path().to_str().unwrap();
+    let guard = ctrlcctrlv_core::profile_lock::ProfileLock::acquire(directory.path()).unwrap();
+    assert_eq!(call_with(&python, json!({"command":"try_profile_lock","directory":dir})), Some(json!(false)));
+    drop(guard);
+    assert_eq!(call_with(&python, json!({"command":"try_profile_lock","directory":dir})), Some(json!(true)));
+    let mut child = Command::new(&python).args(["-u", "-c",
+        "import sys; from pathlib import Path; from ctrlcctrlv.profile_lock import ProfileLock; guard=ProfileLock(Path(sys.argv[1])); print('ready',flush=True); sys.stdin.read()",
+        dir]).env("PYTHONPATH", repository().join("src")).stdin(Stdio::piped()).stdout(Stdio::piped()).spawn().unwrap();
+    use std::io::BufRead;
+    let mut line = String::new();
+    std::io::BufReader::new(child.stdout.take().unwrap()).read_line(&mut line).unwrap();
+    assert_eq!(line.trim(), "ready");
+    assert_eq!(
+        ctrlcctrlv_core::profile_lock::ProfileLock::acquire(directory.path()).err().unwrap().kind(),
+        std::io::ErrorKind::WouldBlock
+    );
+    child.kill().unwrap();
+    child.wait().unwrap();
+    assert!(ctrlcctrlv_core::profile_lock::ProfileLock::acquire(directory.path()).is_ok());
+}
+
+#[test]
+fn python_ui_save_preserves_rust_wizard_and_review_selection() {
+    let python = python!();
+    let directory = tempfile::tempdir().unwrap();
+    let mut ui = ctrlcctrlv_core::ui_state::UiState::load(directory.path());
+    ui.set_setup_done().unwrap();
+    let models = vec![ctrlcctrlv_core::ui_state::ModelRef { provider: "local".into(), model: "qwen3-vl-4b".into() }];
+    ui.set_review_models(&models).unwrap();
+    assert_eq!(python(json!({"command":"ui_save","directory":directory.path().to_str().unwrap()})), json!(true));
+    let loaded = ctrlcctrlv_core::ui_state::UiState::load(directory.path());
+    assert!(loaded.setup_done());
+    assert_eq!(loaded.review_models(), models);
+}
+
+#[test]
+fn whole_table_conversion_matches_python_on_supported_literal_corpus() {
+    let python = python!();
+    let texts = [
+        "| A | B |\n| --- | --- |\n| x,y | \"z\" |\n| | 001 |",
+        "<table><tr><td>a&amp;b<br>c</td><td></td></tr></table>",
+        "<table>\n### Table - values\n*Type: data*\n|a|b|\n|---|---|\n|1|2|\n</table>",
+        "<table><tr><td colspan=\"2\">x</td></tr></table>",
+        "some prose\n|a|b|\n|---|---|\n|1|2|",
+        "f(a, b)\n    next()",
+    ];
+    let cases: Vec<_> = texts.iter().flat_map(|text| ["auto", "csv", "text"].map(|mode| (*text, mode))).collect();
+    let expected = python(json!({"command":"table_results","cases":cases}));
+    for ((text, mode), expected) in cases.iter().zip(expected.as_array().unwrap()) {
+        assert_eq!(ctrlcctrlv_core::table_ocr::table_result(text, mode), expected.as_str().unwrap(), "{mode} {text}");
+    }
+}
+
+#[test]
 fn history_is_shared_in_both_directions() {
     let python = python!();
     let directory = tempfile::tempdir().unwrap();
@@ -290,7 +350,7 @@ fn error_messages_match_python() {
         (400, r#"{"error":{"message":"max_completion_tokens too large"}}"#),
         (400, r#"{"error":{"message":"Context Window"}}"#),
         (400, r#"{"error":{"message":"modalities"}}"#),
-        // An unrecognized message is shown as is here, unlike Python: see ocr.rs.
+        (400, r#"{"error":{"message":"private transcription","metadata":{"raw":"secret"}}}"#),
         (400, r#"{"error":"plain"}"#),
         (400, r#"[]"#),
         (400, "not json"),

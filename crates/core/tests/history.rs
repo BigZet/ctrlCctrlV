@@ -107,17 +107,34 @@ fn several_model_runs_stay_with_their_capture() {
     assert!(history.update_text(&entry, "second", "qwen3-vl-8b").unwrap());
     assert_eq!(history.get(id).unwrap().unwrap().text, "second");
 
-    // Runs survive delete and undo, and are dropped by compaction otherwise.
-    let deleted = history.delete(id, None).unwrap().unwrap();
+    // Both tables are cleared immediately; undo survives only in memory.
+    let deleted = history.delete_with_runs(id, None).unwrap().unwrap();
+    assert!(history.runs(&entry).unwrap().is_empty());
     let blocker = history.add("ocr", "blocker", "", "completed").unwrap().unwrap();
-    let restored = history.restore(&deleted).unwrap();
+    let restored = history.restore_with_runs(&deleted).unwrap();
     assert_ne!(restored.id, id);
     assert_eq!(history.runs(&restored.reference()).unwrap().len(), 3);
     history.delete(restored.id, None).unwrap();
+    assert!(history.runs(&restored.reference()).unwrap().is_empty());
     history.compact().unwrap();
     assert!(history.runs(&restored.reference()).unwrap().is_empty());
     assert!(history.get(blocker).unwrap().is_some());
 
     let missing = EntryRef { id: 999, created: "x".into() };
     assert!(history.add_run(&missing, NewRun::default()).unwrap().is_none());
+}
+
+#[test]
+fn failed_restore_can_be_retried_without_losing_snapshot_or_answers() {
+    let (directory, history) = open();
+    let id = history.add("ocr", "published", "m", "completed").unwrap().unwrap();
+    let entry = history.get(id).unwrap().unwrap();
+    history.add_run(&entry.reference(), NewRun { text: "answer", raw_text: "raw", ..NewRun::default() }).unwrap();
+    let snapshot = history.delete_with_runs(id, None).unwrap().unwrap();
+    let blocker = rusqlite::Connection::open(directory.path().join("history.sqlite3")).unwrap();
+    blocker.execute_batch("BEGIN IMMEDIATE").unwrap();
+    assert!(history.restore_with_runs(&snapshot).is_err());
+    blocker.execute_batch("ROLLBACK").unwrap();
+    let restored = history.restore_with_runs(&snapshot).unwrap();
+    assert_eq!(history.runs(&restored.reference()).unwrap()[0].raw_text, "raw");
 }

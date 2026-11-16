@@ -2,10 +2,10 @@ name: Rust desktop shell
 
 on:
   push:
-    branches: ['main', 'claude/**']
-    paths: ['crates/**', 'Cargo.toml', 'Cargo.lock', '.github/workflows/rust-app.yml']
+    branches: ['main', 'fix/**', 'claude/**', 'codex/**']
+    paths: ['crates/**', 'Cargo.toml', 'Cargo.lock', 'scripts/verify_rust_ui.mjs', '.github/workflows/rust-app.yml']
   pull_request:
-    paths: ['crates/**', 'Cargo.toml', 'Cargo.lock', '.github/workflows/rust-app.yml']
+    paths: ['crates/**', 'Cargo.toml', 'Cargo.lock', 'scripts/verify_rust_ui.mjs', '.github/workflows/rust-app.yml']
   workflow_dispatch:
 
 permissions:
@@ -44,6 +44,7 @@ jobs:
           node-version: '22'
       - run: cargo clippy -p ctrlcctrlv-app --all-targets -- -D warnings
       - run: cargo test -p ctrlcctrlv-app
+      - run: node scripts/verify_rust_ui.mjs
       - name: Build the app
         working-directory: crates/app
         run: npx --yes @tauri-apps/cli@2.12.3 build --ci ${{ matrix.bundle }}

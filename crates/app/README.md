@@ -40,6 +40,10 @@ commands.
 
 ## Run
 
+Requires Rust **1.89+** (the patched SQLite dependency raised the previous
+1.88 minimum). Close old Python/Rust copies before upgrading a shared profile.
+See [profile ownership, recovery, undo and validation limits](../../docs/PROFILE_COMPATIBILITY.md).
+
 ```sh
 cargo run -p ctrlcctrlv-app
 ```
@@ -62,3 +66,12 @@ ctrlCctrlV's own window). The cancel hotkey and "Стоп" end the job.
 Windows VDI: settings offer exact Alt+Unicode Hex input or explicit compatible
 substitutions for symbols outside keyboard layouts. Setup, limits and the
 acceptance sample: [VDI typing](../../docs/VDI_TYPING.md).
+
+Capture format (auto/text/CSV) is frozen per run; raw model replies stay separate.
+Idle unloading respects the engine's active operations. Run cards label inference
+time; the copied-status timing includes PNG encoding and the clipboard write.
+
+Portable checks: `cargo test --workspace --locked`; JavaScript IPC smoke:
+`node scripts/verify_rust_ui.mjs` from the repository root. Compatibility tests
+must run with `CTRLCCTRLV_REQUIRE_PYTHON=1` and `CTRLCCTRLV_PYTHON` pointing to
+Python with the application's dependencies. No inference key is needed.

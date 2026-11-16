@@ -6,7 +6,7 @@ use ctrlcctrlv_core::ui_state::ModelRef;
 use serde::Serialize;
 use tauri::{AppHandle, Manager};
 
-use super::{Shell, changed, hotkeys, lock, tray};
+use super::{Activity, Shell, changed, hotkeys, lock, tray};
 use crate::model::ModelChoice;
 
 #[derive(Serialize)]
@@ -14,6 +14,7 @@ use crate::model::ModelChoice;
 pub struct SettingsView {
     settings: Settings,
     has_key: bool,
+    needs_recovery: bool,
     /// Checked by default in the result window; the first one is also the
     /// Python app's review model.
     review_models: Vec<ModelChoice>,
@@ -23,7 +24,12 @@ pub struct SettingsView {
 pub fn settings_get(app: AppHandle) -> SettingsView {
     let shell = app.state::<Shell>();
     let has_key = Credentials::system().and_then(|c| c.read()).is_ok_and(|key| !key.is_empty());
-    SettingsView { settings: shell.settings(), has_key, review_models: review_models(&shell) }
+    SettingsView {
+        settings: shell.settings(),
+        has_key,
+        review_models: review_models(&shell),
+        needs_recovery: Settings::needs_recovery(&data_directory(), &shell.models),
+    }
 }
 
 /// The stored list, or the Python app's single review model before the list
@@ -44,61 +50,88 @@ fn review_models(shell: &Shell) -> Vec<ModelChoice> {
 #[tauri::command]
 pub fn review_models_set(app: AppHandle, models: Vec<ModelChoice>) -> Result<Vec<ModelChoice>, String> {
     let shell = app.state::<Shell>();
-    let mut seen = std::collections::HashSet::new();
-    let models: Vec<ModelChoice> = models.into_iter().filter(|m| seen.insert(m.clone())).collect();
-    let refs: Vec<ModelRef> =
-        models.iter().map(|m| ModelRef { provider: m.provider.clone(), model: m.model.clone() }).collect();
-    lock(&shell.ui).set_review_models(&refs).map_err(|e| e.to_string())?;
-    if let Some(first) = models.first() {
-        let mut settings = shell.settings();
-        settings.review_provider = first.provider.clone();
-        if first.local() {
-            settings.review_local_model = first.model.clone();
-        } else {
-            settings.review_remote_model = first.model.clone();
-        }
-        // A model the Python app would refuse (an OCR-only local one) is kept
-        // out of its field; the list itself still holds it.
-        if settings.validate(&shell.models).is_ok() {
-            settings.save(&data_directory(), &shell.models).map_err(|e| e.to_string())?;
-            shell.set_settings(settings);
-        }
+    if !shell.begin(Activity::Maintenance) {
+        return Err("Дождитесь окончания текущей операции".into());
     }
+    let result = (|| {
+        let mut seen = std::collections::HashSet::new();
+        let models: Vec<ModelChoice> = models.into_iter().filter(|m| seen.insert(m.clone())).collect();
+        let refs: Vec<ModelRef> =
+            models.iter().map(|m| ModelRef { provider: m.provider.clone(), model: m.model.clone() }).collect();
+        lock(&shell.ui).set_review_models(&refs).map_err(|e| e.to_string())?;
+        if let Some(first) = models.first() {
+            let mut settings = shell.settings();
+            settings.review_provider = first.provider.clone();
+            if first.local() {
+                settings.review_local_model = first.model.clone();
+            } else {
+                settings.review_remote_model = first.model.clone();
+            }
+            // A model the Python app would refuse (an OCR-only local one) is kept
+            // out of its field; the list itself still holds it.
+            if settings.validate(&shell.models).is_ok() {
+                settings.save(&data_directory(), &shell.models).map_err(|e| e.to_string())?;
+                shell.set_settings(settings);
+            }
+        }
+        Ok(models)
+    })();
+    shell.finish();
     changed(&app);
-    Ok(models)
+    result
 }
 
 #[tauri::command]
-pub async fn settings_save(app: AppHandle, settings: Settings) -> Result<(), String> {
+pub async fn settings_save(app: AppHandle, settings: Settings, recover: Option<bool>) -> Result<(), String> {
     let shell = app.state::<Shell>();
-    let previous = shell.settings();
-    settings.save(&data_directory(), &shell.models).map_err(|e| e.to_string())?;
-    shell.set_settings(settings.clone());
-    if previous.acceleration != settings.acceleration {
-        // The engine for the other acceleration lives in another directory.
-        let mut runtime = shell.runtime.lock().await;
-        let _ = runtime.stop().await;
-        runtime.acceleration = settings.acceleration();
+    // Settings may stop/switch the engine. Never do that under an active OCR.
+    {
+        let install = lock(&shell.install);
+        if install.is_some() || !shell.begin(Activity::Maintenance) {
+            return Err("Дождитесь окончания текущей операции или загрузки".into());
+        }
     }
-    let hotkeys_changed =
-        (&previous.capture_hotkey, &previous.typing_hotkey, &previous.cancel_hotkey, &previous.hotkey_mode)
-            != (&settings.capture_hotkey, &settings.typing_hotkey, &settings.cancel_hotkey, &settings.hotkey_mode);
-    let result = if hotkeys_changed {
-        // Hotkeys belong to the event-loop thread.
-        let (sender, receiver) = tokio::sync::oneshot::channel();
-        let next = settings.clone();
-        let handle = app.clone();
-        app.run_on_main_thread(move || {
-            let _ = sender.send(hotkeys::reload(&handle, &next));
-        })
+    let previous = shell.settings();
+    let result = async {
+        settings.validate(&shell.models).map_err(|e| e.to_string())?;
+        if previous.acceleration != settings.acceleration {
+            shell.runtime.lock().await.stop().await.map_err(|e| e.to_string())?;
+        }
+        if recover == Some(true) {
+            settings.save_recovering(&data_directory(), &shell.models)
+        } else {
+            settings.save(&data_directory(), &shell.models)
+        }
         .map_err(|e| e.to_string())?;
-        receiver.await.unwrap_or_else(|_| Err("Не удалось применить горячие клавиши".into()))
-    } else {
-        Ok(())
-    };
-    let _ = tray::refresh(&app);
-    changed(&app);
-    result.map_err(|message| format!("Настройки сохранены, но {}", lowercase_first(&message)))
+        shell.set_settings(settings.clone());
+        if previous.acceleration != settings.acceleration {
+            // The engine for the other acceleration lives in another directory.
+            let mut runtime = shell.runtime.lock().await;
+            runtime.acceleration = settings.acceleration();
+        }
+        let hotkeys_changed =
+            (&previous.capture_hotkey, &previous.typing_hotkey, &previous.cancel_hotkey, &previous.hotkey_mode)
+                != (&settings.capture_hotkey, &settings.typing_hotkey, &settings.cancel_hotkey, &settings.hotkey_mode);
+        let result = if hotkeys_changed {
+            // Hotkeys belong to the event-loop thread.
+            let (sender, receiver) = tokio::sync::oneshot::channel();
+            let next = settings.clone();
+            let handle = app.clone();
+            app.run_on_main_thread(move || {
+                let _ = sender.send(hotkeys::reload(&handle, &next));
+            })
+            .map_err(|e| e.to_string())?;
+            receiver.await.unwrap_or_else(|_| Err("Не удалось применить горячие клавиши".into()))
+        } else {
+            Ok(())
+        };
+        let _ = tray::refresh(&app);
+        changed(&app);
+        result.map_err(|message| format!("Настройки сохранены, но {}", lowercase_first(&message)))
+    }
+    .await;
+    shell.finish();
+    result
 }
 
 fn lowercase_first(text: &str) -> String {

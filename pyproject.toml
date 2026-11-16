@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<10", "pyinstaller>=6,<7"]
+dev = ["pytest>=8,<10", "pyinstaller>=6,<7", "ruff>=0.17,<0.18"]
 
 [project.scripts]
 ctrlcctrlv = "ctrlcctrlv.app:main"

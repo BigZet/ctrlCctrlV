@@ -96,3 +96,31 @@ def test_vdi_special_character_mode_survives_python_save(tmp_path, mode):
     )
     settings.save(tmp_path)
     assert Settings.load(tmp_path) == settings
+
+
+def test_unknown_settings_survive_copy_and_save(tmp_path):
+    import json
+
+    (tmp_path / "settings.json").write_text(
+        '{"future":{"mode":"keep"},"autoindent":true}'
+    )
+    settings = Settings.load(tmp_path).copy(show_preview=False)
+    settings.save(tmp_path)
+    assert json.loads((tmp_path / "settings.json").read_text())["future"] == {
+        "mode": "keep"
+    }
+
+
+def test_recovery_requires_confirmation_and_preserves_original(tmp_path):
+    original = b'{"provider":"wrong","custom":"private"}'
+    path = tmp_path / "settings.json"
+    path.write_bytes(original)
+    assert Settings.needs_recovery(tmp_path)
+    with pytest.raises(ValueError, match="повреждены"):
+        Settings.load(tmp_path).save(tmp_path)
+    assert path.read_bytes() == original
+    Settings.load(tmp_path).save(tmp_path, recover=True)
+    assert not Settings.needs_recovery(tmp_path)
+    assert [p.read_bytes() for p in tmp_path.glob("settings-recovery-*.json")] == [
+        original
+    ]

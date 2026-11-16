@@ -322,7 +322,6 @@ pub fn http_error(status: u16, body: &[u8]) -> String {
                 message.push_str(raw);
             }
         }
-        let detail = message.split_whitespace().collect::<Vec<_>>().join(" ");
         let message = message.to_lowercase();
         let has = |words: &[&str]| words.iter().any(|word| message.contains(word));
         let reason = if has(&["response_format", "json_object", "json_schema"]) {
@@ -334,14 +333,7 @@ pub fn http_error(status: u16, body: &[u8]) -> String {
         } else if has(&["image", "vision", "multimodal", "modality", "modalities"]) {
             "Модель или её провайдер не принимает изображения. Выберите другую vision-модель."
         } else {
-            // Unrecognized: show what the provider said, so it can be acted on.
-            let detail: String = detail.chars().take(300).collect();
-            return if detail.is_empty() {
-                "OCR HTTP 400. Провайдер отклонил запрос. Обновите каталог или выберите другую vision-модель. Буфер не изменён."
-                    .into()
-            } else {
-                format!("OCR HTTP 400. Провайдер отклонил запрос: {detail}. Буфер не изменён.")
-            };
+            "Провайдер отклонил запрос. Обновите каталог или выберите другую vision-модель."
         };
         return format!("OCR HTTP 400. {reason} Буфер не изменён.");
     }
@@ -371,10 +363,27 @@ pub fn http_error(status: u16, body: &[u8]) -> String {
 fn upstream_provider(body: &[u8]) -> Option<String> {
     let value: Value = serde_json::from_slice(body).ok()?;
     let name = value.pointer("/error/metadata/provider_name")?.as_str()?.trim();
-    let plain = !name.is_empty()
-        && name.chars().count() <= 64
-        && name.chars().all(|c| c.is_alphanumeric() || matches!(c, ' ' | '-' | '_' | '.'));
-    plain.then(|| name.to_string())
+    // Lexical validation alone could echo a transcription/key placed in this
+    // field. Only known public names may leave the response-body boundary.
+    const KNOWN: &[&str] = &[
+        "Anthropic",
+        "OpenAI",
+        "Google",
+        "Google AI Studio",
+        "Google Vertex",
+        "Amazon Bedrock",
+        "Azure",
+        "Groq",
+        "DeepInfra",
+        "Together",
+        "Fireworks",
+        "Mistral",
+        "Cerebras",
+        "SambaNova",
+        "Novita",
+        "Nvidia",
+    ];
+    KNOWN.iter().find(|known| known.eq_ignore_ascii_case(name)).map(|name| (*name).to_string())
 }
 
 /// One provider's outcome in a side-by-side comparison.
